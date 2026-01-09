@@ -1,0 +1,35 @@
+\documentclass[11pt,a4paper]{letter}
+\usepackage[utf8]{inputenc}
+
+% --- MANUAL MARGINS (No 'geometry' package needed) ---
+\setlength{\textwidth}{6.5in}
+\setlength{\textheight}{9in}
+\setlength{\oddsidemargin}{0in}
+\setlength{\topmargin}{-0.5in}
+
+% --- ARIAL/HELVETICA FONT ---
+\usepackage[scaled]{helvet}
+\renewcommand\familydefault{\sfdefault} 
+\usepackage[T1]{fontenc}
+
+\usepackage{parskip}
+
+\address{ \VAR{my_address} }
+\signature{ \VAR{my_name} }
+
+\begin{document}
+
+\begin{letter}{ \VAR{recipient_name} \\ \VAR{recipient_company} }
+
+\opening{Dear \VAR{recipient_name},}
+
+\VAR{body_text}
+
+\closing{Sincerely,}
+
+\end{letter}
+
+% NOTE: Attachments are removed from here. 
+% Python will add them to the PDF automatically.
+
+\end{document}
