@@ -1,0 +1,16 @@
+# Python
+__pycache__/
+venv/
+
+# LaTeX build artifacts
+*.aux
+*.log
+*.out
+*.fls
+*.fdb_latexmk
+
+# Generated output
+generated/
+
+# Sensitive Assets (Optional but recommended)
+assets/
