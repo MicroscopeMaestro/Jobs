@@ -1,66 +1,133 @@
 \documentclass[11pt,a4paper]{article}
-\usepackage[left=0.7in,top=0.6in,right=0.7in,bottom=0.6in]{geometry}
+\usepackage[left=0.6in,top=0.6in,right=0.6in,bottom=0.6in]{geometry}
 \usepackage{carlito} 
 \renewcommand*\familydefault{\sfdefault}
 \usepackage[T1]{fontenc}
 \usepackage{url}
-\usepackage{hyperref}
+\usepackage[hidelinks]{hyperref} 
 \usepackage{enumitem}
 \usepackage{ragged2e}
 \usepackage{titlesec}
-\usepackage{graphicx} % <--- REQUIRED FOR PHOTO
-\usepackage[export]{adjustbox} % <--- Helps align the image
+\usepackage{graphicx}
+\usepackage{tikz} 
+\usepackage{xcolor} 
 
-% Prevent hyphenation
+%-----------------------------------------------------------
+% Custom Colors
+%-----------------------------------------------------------
+\definecolor{TECHBLUE}{RGB}{0, 0, 0} 
+\definecolor{TEXTGRAY}{RGB}{60, 60, 60}
+
+%-----------------------------------------------------------
+% Formatting
+%-----------------------------------------------------------
 \hyphenpenalty=10000
 \exhyphenpenalty=10000
 \sloppy
 
-% Section Formatting
-\titleformat{\section}{\Large\bfseries\uppercase}{}{0em}{}[\titlerule]
-
-\hypersetup{
-    colorlinks=true,
-    linkcolor=black,
-    urlcolor=blue,
-    pdftitle={CV - Juan David Muñoz-Bolaños},
-}
+% Section Styling
+\titleformat{\section}{\Large\bfseries\color{TECHBLUE}\uppercase}{}{0em}{}[\color{TECHBLUE}\titlerule]
 
 \pagestyle{empty}
 
 \begin{document}
 
 %-----------------------------------------------------------
-% Header with PHOTO
+% Header
 %-----------------------------------------------------------
-\vspace*{-1cm} % Pull header up slightly to make room
 \noindent
-\begin{minipage}[t]{0.70\textwidth}
-    \vspace{0pt} % Aligns top of text with top of image
-    {\Huge \bfseries Juan David Muñoz-Bolaños} \\ [6pt]
-    {\Large R\&D Optical Engineer | Extreme precision restoration} \\ [4pt]
-    Rechenaurstraße 42, Innsbruck, Austria \textbar{} +43 676 9115145 \\
-    \href{mailto:juan.munoz@student.i-med.ac.at}{juan.munoz@student.i-med.ac.at}
+\begin{minipage}[c]{0.70\textwidth} 
+    {\Huge \bfseries \color{TECHBLUE} Juan David Muñoz-Bolaños} \\ [6pt]
+    {\Large R\&D Optical Engineer | Adaptive Optics \& Machine Vision} \\ [6pt]
+    {\color{TEXTGRAY} 
+    Rechenaurstraße 42, Innsbruck, Austria \\
+    +43 676 9115145 \textbar{} \href{mailto:juan.munoz@i-med.ac.at}{juan.munoz@i-med.ac.at}
+    }
 \end{minipage}%
 \hfill
-\begin{minipage}[t]{0.25\textwidth}
-    \vspace{0pt}
+\begin{minipage}[c]{0.25\textwidth}
     \raggedleft
-    % REPLACE 'photo.jpg' WITH YOUR ACTUAL FILE NAME
-    % Ensure the photo is in the same folder as the .tex file
-    \includegraphics[width=3.5cm, valign=t]{photo.jpg} 
+    \begin{tikzpicture}
+        \clip (0,0) circle (1.75cm); 
+        \node at (0,0) {\includegraphics[width=3.5cm]{cv_photo.png}}; 
+    \end{tikzpicture}
 \end{minipage}
 
-\vspace{0.5cm} % Space after header
+\vspace{0.2cm} 
+
 %-----------------------------------------------------------
 % Summary
 %-----------------------------------------------------------
 \section*{Summary}
 \justifying
-Optical physicist specializing in high-precision instrumentation, with deep expertise in **Adaptive Optics**, **Two-Photon Microscopy**, and **Femtosecond Interferometry**. Proven track record of building complex optical setups from scratch, automating experimental control, and performing custom wave-propagation simulations. Passionate about pushing the limits of imaging resolution and precision.
-\vspace{4pt}
+R\&D Engineer with a dual background in **Physics Engineering** and **Advanced Microscopy**. Expert in bridging the gap between optical simulation and hardware prototyping. Proven experience in designing industrial machine vision systems and complex multiphoton setups. Specialized in wavefront shaping, **GPU-accelerated simulations**, and leveraging **LLMs** to optimize coding workflows and experimental control.
 
-\noindent\textit{\textbf{Personal Interests:}} Outside the lab, I find joy in a balanced life through cycling, skiing, and social dancing.
+%-----------------------------------------------------------
+% Technical Skills (Updated with GPU/LLM)
+%-----------------------------------------------------------
+\section*{Technical Skills}
+\begin{description}[leftmargin=12pt, style=nextline, font=\bfseries\color{TECHBLUE}]
+    \item[Optical Design \& Alignment]
+    Multiphoton Microscopy (2P/3P), Adaptive Optics (SLM/Deformable Mirrors), Interferometry, Beam Shaping, Fiber Optics, Spectrometers.
+
+    \item[High-Performance Computing] % <--- NEW CATEGORY
+    **GPU Computing** (CuPy, PyTorch for FFTs), **LLM Integration** (Copilot/GPT for code acceleration), Parallel Computing, Image Processing Pipelines.
+
+    \item[Hardware \& Automation]
+    LabVIEW (FPGA Real-time), Industrial Cameras (Machine Vision), Motion Control, PMT/APD detection optimization.
+
+    \item[Simulation \& Analysis]
+    Python (NumPy, SciPy), Optical Wave Propagation (Diffractive modeling), Phase Retrieval Algorithms, Fourier Optics.
+
+    \item[Languages]
+    English (Proficient), German (Speakable), Spanish (Native).
+\end{description}
+
+%-----------------------------------------------------------
+% Experience
+%-----------------------------------------------------------
+\section*{Professional Experience}
+
+\noindent
+\textbf{Medical University of Innsbruck} \hfill Innsbruck, Austria \\
+\textit{PhD Researcher - Adaptive Optics} \hfill Jan 2022 -- Present
+\begin{itemize}[leftmargin=12pt, itemsep=0pt, topsep=2pt]
+    \item **Designed and built** a custom two-photon microscope capable of deep-tissue imaging via wavefront shaping.
+    \item **Accelerated simulation speed** by implementing **GPU-based algorithms** (CuPy) for complex wave propagation and phase retrieval.
+    \item **Developed novel algorithms** for correcting aberrations in scattering media, utilizing LLM tools to rapid-prototype Python control scripts.
+    \item Automated the control of Spatial Light Modulators (SLM) and galvo-scanners using Python and FPGA.
+\end{itemize}
+
+\vspace{5pt}
+
+\noindent
+\textbf{École Polytechnique} \hfill Paris, France \\
+\textit{R\&D Optical Intern} \hfill Jul 2025 -- Aug 2025
+\begin{itemize}[leftmargin=12pt, itemsep=0pt, topsep=2pt]
+    \item Implemented variable Numerical Aperture (NA) control to optimize signal-to-noise ratio in nonlinear imaging systems.
+    \item Engineered detection paths specifically for high-scattering environments.
+\end{itemize}
+
+\vspace{5pt}
+
+\noindent
+\textbf{Leibniz Institute of Photonic Technology (IPHT)} \hfill Jena, Germany \\
+\textit{Assistant Researcher} \hfill Jun 2020 -- Dec 2021
+\begin{itemize}[leftmargin=12pt, itemsep=0pt, topsep=2pt]
+    \item Assembled setups for vibrational imaging (Raman/IR) applied to rapid cancer tissue diagnostics.
+    \item Integrated photothermal microscopy hardware for environmental microplastic detection.
+\end{itemize}
+
+\vspace{5pt}
+
+\noindent
+\textbf{INTECOL S.A.S.} \hfill Medellin, Colombia \\
+\textit{Machine Vision Engineer} \hfill Mar 2018 -- Mar 2019
+\begin{itemize}[leftmargin=12pt, itemsep=0pt, topsep=2pt]
+    \item **Industrial Success:** Designed and deployed quality control systems for production lines using high-speed cameras.
+    \item Developed and deployed custom image processing algorithms for automated defect detection, reducing manual inspection error rates.
+    \item Managed the full hardware lifecycle: from optical component selection to on-site installation and calibration.
+\end{itemize}
 
 %-----------------------------------------------------------
 % Education
@@ -68,101 +135,29 @@ Optical physicist specializing in high-precision instrumentation, with deep expe
 \section*{Education}
 \noindent
 \textbf{Medical University of Innsbruck} \hfill Innsbruck, Austria \\
-\textit{Ph.D. Advanced Microscopy} \hfill Jan 2022 -- Present
-\begin{itemize}[leftmargin=12pt, itemsep=1pt, topsep=2pt]
-    \item \textbf{Thesis:} Deep tissue imaging by wavefront shaping.
-    \item \textbf{Key Tech:} optical interferometry, spatial light modulators, optical resolution restoration strategies.
-    \item \textbf{Achievement:} Development of phase retrieval framework to measure aberrations deep in scattering media using two-photon microscopy.
-\end{itemize}
+\textit{Ph.D. Advanced Microscopy} \hfill Expected 2026
 
-\vspace{6pt}
+\vspace{2pt}
 
 \noindent
-\textbf{Friedrich Schiller University Jena - Abbe School of Photonics} \hfill Jena, Germany \\
-\textit{M.Sc. in Photonics} \hfill Oct 2019 -- Dec 2021
-\begin{itemize}[leftmargin=12pt, itemsep=1pt, topsep=2pt]
-    \item \textbf{Thesis:} Design of a 1064 nm fiber probe Raman imaging spectrometer.
-    \item \textbf{Focus:} Optical Design, Fiber Optics, Spectroscopy.
-\end{itemize}
+\textbf{Friedrich Schiller University Jena} \hfill Jena, Germany \\
+\textit{M.Sc. in Photonics} \hfill 2019 -- 2021
 
-\vspace{6pt}
+\vspace{2pt}
 
 \noindent
-\textbf{University of Cauca} \hfill Popayan, Colombia \\
-\textit{B.Sc. in Physics Engineering} \hfill Mar 2012 -- Mar 2018
+\textbf{University of Cauca} \hfill Colombia \\
+\textit{B.Sc. in Physics Engineering} \hfill 2012 -- 2018
 
 %-----------------------------------------------------------
-% Research & Professional Experience
+% Selected Publications & Awards
 %-----------------------------------------------------------
-\section*{Experience}
-
-\noindent
-\textbf{École Polytechnique} \hfill Paris, France \\
-\textit{Research Intern (LOB)} \hfill Jul 2025 -- Aug 2025
-\begin{itemize}[leftmargin=12pt, itemsep=1pt, topsep=2pt]
-    \item Implemented variable Numerical Aperture (NA) control to enhance signal-to-noise ratio in nonlinear imaging.
-    \item Optimized detection paths for scattering environments.
-\end{itemize}
-
-\vspace{6pt}
-
-\noindent
-\textbf{Leibniz Institute of Photonic Technology (IPHT)} \hfill Jena, Germany \\
-\textit{Assistant Researcher} \hfill Jun 2020 -- Dec 2021
-\begin{itemize}[leftmargin=12pt, itemsep=1pt, topsep=2pt]
-    \item Conducted vibrational imaging (Raman/IR) for cancer tissue diagnostics.
-    \item Integrated photothermal microscopy setups for microplastic detection.
-\end{itemize}
-
-\vspace{6pt}
-
-\noindent
-\textbf{INTECOL S.A.S.} \hfill Medellin, Colombia \\
-\textit{Machine Vision Engineer} \hfill Mar 2018 -- Mar 2019
-\begin{itemize}[leftmargin=12pt, itemsep=1pt, topsep=2pt]
-    \item Designed industrial quality control systems using high-speed cameras and custom optics.
-    \item Developed image processing algorithms for automated defect detection (Production Line).
-\end{itemize}
-
-%-----------------------------------------------------------
-% Technical Skills (Core Competencies)
-%-----------------------------------------------------------
-\section*{Technical Skills}
-\begin{description}[leftmargin=12pt, style=nextline, font=\bfseries]
-    \item[Optical Engineering]
-    Design/Alignment of Multiphoton Microscopes, Adaptive Optics (SLM/Deformable Mirrors), Interferometry (Mach-Zehnder/Michelson), Ultrafast Lasers, Spectrometers.
-
-    \item[Simulation \& Analysis]
-    LabVIEW (FPGA), Python, Optical Wave Propagation Simulations.
-
-    \item[Languages]
-    English Proficient, German speakable, Spanish (Native).
-\end{description}
-
-%-----------------------------------------------------------
-% Selected Publications & Conferences
-%-----------------------------------------------------------
-\section*{Selected Publications \& Presentations}
-    
-\begin{itemize}[leftmargin=12pt, itemsep=3pt]
-
+\section*{Selected Publications \& Awards}
+\begin{itemize}[leftmargin=12pt, itemsep=1pt]
+    \item \textbf{Awards:} ZEISS Summer School (2025), COLFUTURO Grant (2019).
     \item \textbf{J. D. Muñoz-Bolaños}, et al., “Scatter compensation for enabling deep two-photon microscopy using a MEMS phase light modulator,” \textit{Proc. SPIE} (2026).
-    
     \item \textbf{J. D. Muñoz-Bolaños}, et al. "Wavefront corrections over large fields of view via beam cone tomography." \textit{Proc. SPIE}, (2025).
-
-    \item \textbf{J.D. Muñoz-Bolaños}, et al. "Confocal Raman Microscopy with Adaptive Optics." \textit{ACS Photonics}, (2024).
-
 \end{itemize}
-
-%-----------------------------------------------------------
-% Schools & Awards
-%-----------------------------------------------------------
-\section*{Schools \& Awards}
-\begin{tabular*}{\textwidth}{l@{\extracolsep{\fill}}r}
-    \textbf{ZEISS Summer School} (Oberkochen, Germany) & 2025 \\
-    \textbf{SPIE Biophotonics Summer School} (Ven, Denmark) & 2025 \\
-    \textbf{COLFUTURO Scholarship Grant} (Top professionals of Colombia) & 2019 -- 2021 \\
-\end{tabular*}
 
 %-----------------------------------------------------------
 % References
