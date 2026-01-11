@@ -121,8 +121,8 @@ def generate_application(data):
         merger.close()
         
         print(f"\n✅ SUCCESS! Created: {final_filename}")
-        try: subprocess.run(['open', final_output_path], check=False)
-        except: pass
+        #try: subprocess.run(['open', final_output_path], check=False)
+        #except: pass
 
 if __name__ == "__main__":
     

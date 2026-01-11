@@ -1,26 +1,32 @@
 \documentclass[11pt,a4paper]{article}
-\usepackage[left=0.6in,top=0.6in,right=0.6in,bottom=0.6in]{geometry}
-\usepackage{carlito} 
-\renewcommand*\familydefault{\sfdefault}
-\usepackage[T1]{fontenc}
+
+% --- PDFLATEX COMPATIBLE PREAMBLE ---
+\usepackage[utf8]{inputenc} % Handles special characters like 'ñ'
+\usepackage[T1]{fontenc}    % proper font encoding
+\usepackage[english]{babel} % English hyphenation
+\usepackage{helvet}         % Uses Helvetica (standard sans-serif)
+\renewcommand{\familydefault}{\sfdefault} % Set default font to sans-serif
+
+\usepackage[a4paper, top=1.5cm, bottom=1.5cm, left=1.5cm, right=1.5cm]{geometry}
+\usepackage{enumitem}
+\setlist[itemize]{label=-}
+
+% --- PACKAGES ---
 \usepackage{url}
 \usepackage[hidelinks]{hyperref} 
-\usepackage{enumitem}
 \usepackage{ragged2e}
 \usepackage{titlesec}
 \usepackage{graphicx}
 \usepackage{tikz} 
 \usepackage{xcolor} 
+\usepackage{tabularx}
 
 %-----------------------------------------------------------
-% Custom Colors
+% Custom Colors & Styles
 %-----------------------------------------------------------
-\definecolor{TECHBLUE}{RGB}{0, 0, 0} 
+\definecolor{TECHBLUE}{RGB}{0, 0, 0} % Keeping it professional black
 \definecolor{TEXTGRAY}{RGB}{60, 60, 60}
 
-%-----------------------------------------------------------
-% Formatting
-%-----------------------------------------------------------
 \hyphenpenalty=10000
 \exhyphenpenalty=10000
 \sloppy
@@ -37,10 +43,10 @@
 %-----------------------------------------------------------
 \noindent
 \begin{minipage}[c]{0.70\textwidth} 
-    {\Huge \bfseries \color{TECHBLUE} Juan David Muñoz-Bolaños} \\ [6pt]
-    {\Large R\&D Optical Engineer | Adaptive Optics \& Machine Vision} \\ [6pt]
+    {\Huge \bfseries \color{TECHBLUE} Juan David Mu\~{n}oz-Bola\~{n}os} \\ [6pt]
+    {\Large R\&D Optical Engineer | Machine Vision \& Metrology} \\ [6pt]
     {\color{TEXTGRAY} 
-    Rechenaurstraße 42, Innsbruck, Austria \\
+    Rechenauerstra\ss{}e 42, Innsbruck, Austria (Tirol) \\
     +43 676 9115145 \textbar{} \href{mailto:juan.munoz@i-med.ac.at}{juan.munoz@i-med.ac.at}
     }
 \end{minipage}%
@@ -48,39 +54,43 @@
 \begin{minipage}[c]{0.25\textwidth}
     \raggedleft
     \begin{tikzpicture}
+        % Photo Placeholder - Draws a circle with initials if photo is missing
+        % This ensures compilation works even without the image file
         \clip (0,0) circle (1.75cm); 
+        \fill[black!10] (-2,-2) rectangle (2,2);
+        \node[text=black!60, font=\bfseries\Huge] at (0,0) {JM};
+        % To use your real photo:
+        % 1. Save your photo as 'cv_photo.png' in the same folder
+        % 2. Uncomment the line below:
         \node at (0,0) {\includegraphics[width=3.5cm]{cv_photo.png}}; 
     \end{tikzpicture}
 \end{minipage}
 
-\vspace{0.2cm} 
+\vspace{0.5cm} 
 
 %-----------------------------------------------------------
 % Summary
 %-----------------------------------------------------------
 \section*{Summary}
 \justifying
-R\&D Engineer with a dual background in **Physics Engineering** and **Advanced Microscopy**. Expert in bridging the gap between optical simulation and hardware prototyping. Proven experience in designing industrial machine vision systems and complex multiphoton setups. Specialized in wavefront shaping, **GPU-accelerated simulations**, and leveraging **LLMs** to optimize coding workflows and experimental control.
+R\&D Optical Engineer based in **Tirol** with a dual background in **Industrial Machine Vision** and **High-Precision Microscopy**. Expert in designing optical inspection systems, implementing illumination solutions for defect inspection, and developing adaptive optics algorithms. Educated in **Germany** (M.Sc.) and **Austria** (Ph.D.). Proficient in transferring complex optical concepts---such as interferometry and wavefront shaping---into robust, high-speed hardware solutions suitable for semiconductor and industrial applications.
 
 %-----------------------------------------------------------
-% Technical Skills (Updated with GPU/LLM)
+% Technical Skills
 %-----------------------------------------------------------
 \section*{Technical Skills}
 \begin{description}[leftmargin=12pt, style=nextline, font=\bfseries\color{TECHBLUE}]
-    \item[Optical Design \& Alignment]
-    Multiphoton Microscopy (2P/3P), Adaptive Optics (SLM/Deformable Mirrors), Interferometry, Beam Shaping, Fiber Optics, Spectrometers.
+    \item[Machine Vision \& Inspection]
+    MVTec HALCON, OCR (Optical Character Recognition), Laser Profilometry, Industrial Illumination Design, Camera Calibration, Defect Detection, Quality Control Systems.
 
-    \item[High-Performance Computing] % <--- NEW CATEGORY
-    **GPU Computing** (CuPy, PyTorch for FFTs), **LLM Integration** (Copilot/GPT for code acceleration), Parallel Computing, Image Processing Pipelines.
+    \item[Optical Engineering]
+    Adaptive Optics (SLM, Texas Instruments DMD), Interferometry (Phase-stepping), Spectrometers, Raman Microscopy, Multiphoton Imaging, Beam Shaping, Lithography concepts.
 
-    \item[Hardware \& Automation]
-    LabVIEW (FPGA Real-time), Industrial Cameras (Machine Vision), Motion Control, PMT/APD detection optimization.
-
-    \item[Simulation \& Analysis]
-    Python (NumPy, SciPy), Optical Wave Propagation (Diffractive modeling), Phase Retrieval Algorithms, Fourier Optics.
+    \item[Software \& Computing]
+    Python (NumPy, SciPy), LabVIEW (FPGA Real-time), GPU Computing (CuPy), MATLAB, Image Processing Algorithms.
 
     \item[Languages]
-    English (Proficient), German (Speakable), Spanish (Native).
+    English (Proficient), German (B2/Working Proficiency), Spanish (Native).
 \end{description}
 
 %-----------------------------------------------------------
@@ -90,22 +100,12 @@ R\&D Engineer with a dual background in **Physics Engineering** and **Advanced M
 
 \noindent
 \textbf{Medical University of Innsbruck} \hfill Innsbruck, Austria \\
-\textit{PhD Researcher - Adaptive Optics} \hfill Jan 2022 -- Present
-\begin{itemize}[leftmargin=12pt, itemsep=0pt, topsep=2pt]
-    \item **Designed and built** a custom two-photon microscope capable of deep-tissue imaging via wavefront shaping.
-    \item **Accelerated simulation speed** by implementing **GPU-based algorithms** (CuPy) for complex wave propagation and phase retrieval.
-    \item **Developed novel algorithms** for correcting aberrations in scattering media, utilizing LLM tools to rapid-prototype Python control scripts.
-    \item Automated the control of Spatial Light Modulators (SLM) and galvo-scanners using Python and FPGA.
-\end{itemize}
-
-\vspace{5pt}
-
-\noindent
-\textbf{École Polytechnique} \hfill Paris, France \\
-\textit{R\&D Optical Intern} \hfill Jul 2025 -- Aug 2025
-\begin{itemize}[leftmargin=12pt, itemsep=0pt, topsep=2pt]
-    \item Implemented variable Numerical Aperture (NA) control to optimize signal-to-noise ratio in nonlinear imaging systems.
-    \item Engineered detection paths specifically for high-scattering environments.
+\textit{PhD Researcher - Adaptive Optics \& Metrology} \hfill Jan 2022 -- Present
+\begin{itemize}[leftmargin=12pt, itemsep=2pt, topsep=2pt]
+    \item \textbf{High-Precision Metrology:} Developed a setup using a novel transmissive Spatial Light Modulator (SLM) combined with phase-stepping interferometry to correct optical aberrations. Achieved high-resolution observation in two-photon microscopy (e.g., neuronal imaging).
+    \item \textbf{Deep Signal Restoration:} Engineered a system using Raman microscopy and transmissive wavefront shaping to restore optical signals at significant penetration depths in scattering media.
+    \item \textbf{High-Speed Hardware Control:} Currently implementing a \textbf{Texas Instruments DLP/DMD device} (reflection mode) to correct optical aberrations at high speeds, enabling real-time in-vivo image restoration.
+    \item \textbf{Algorithm Development:} Accelerated holographic algorithms using GPU computing (CuPy) for rapid phase retrieval.
 \end{itemize}
 
 \vspace{5pt}
@@ -113,8 +113,8 @@ R\&D Engineer with a dual background in **Physics Engineering** and **Advanced M
 \noindent
 \textbf{Leibniz Institute of Photonic Technology (IPHT)} \hfill Jena, Germany \\
 \textit{Assistant Researcher} \hfill Jun 2020 -- Dec 2021
-\begin{itemize}[leftmargin=12pt, itemsep=0pt, topsep=2pt]
-    \item Assembled setups for vibrational imaging (Raman/IR) applied to rapid cancer tissue diagnostics.
+\begin{itemize}[leftmargin=12pt, itemsep=2pt, topsep=2pt]
+    \item Assembled multimodal setups for vibrational imaging (Raman/IR) applied to rapid diagnostics.
     \item Integrated photothermal microscopy hardware for environmental microplastic detection.
 \end{itemize}
 
@@ -123,10 +123,10 @@ R\&D Engineer with a dual background in **Physics Engineering** and **Advanced M
 \noindent
 \textbf{INTECOL S.A.S.} \hfill Medellin, Colombia \\
 \textit{Machine Vision Engineer} \hfill Mar 2018 -- Mar 2019
-\begin{itemize}[leftmargin=12pt, itemsep=0pt, topsep=2pt]
-    \item **Industrial Success:** Designed and deployed quality control systems for production lines using high-speed cameras.
-    \item Developed and deployed custom image processing algorithms for automated defect detection, reducing manual inspection error rates.
-    \item Managed the full hardware lifecycle: from optical component selection to on-site installation and calibration.
+\begin{itemize}[leftmargin=12pt, itemsep=2pt, topsep=2pt]
+    \item \textbf{Automated Quality Control (OCR):} Designed and deployed an inspection system for bottling lines. Implemented custom illumination and \textbf{HALCON} software algorithms to read and verify OCR codes on printed labels, ensuring 100\% traceability.
+    \item \textbf{Safety-Critical Metrology:} Developed a \textbf{laser profilometry system} to inspect the thickness of urban cable car lines (Metro de Medell\'in). Analyzed cable properties critical for public transportation safety.
+    \item Managed full project lifecycles, from selecting industrial cameras/optics to on-site installation and calibration.
 \end{itemize}
 
 %-----------------------------------------------------------
@@ -135,7 +135,7 @@ R\&D Engineer with a dual background in **Physics Engineering** and **Advanced M
 \section*{Education}
 \noindent
 \textbf{Medical University of Innsbruck} \hfill Innsbruck, Austria \\
-\textit{Ph.D. Advanced Microscopy} \hfill Expected 2026
+\textit{Ph.D. Advanced Microscopy \& Optics} \hfill Expected 2026
 
 \vspace{2pt}
 
@@ -150,13 +150,13 @@ R\&D Engineer with a dual background in **Physics Engineering** and **Advanced M
 \textit{B.Sc. in Physics Engineering} \hfill 2012 -- 2018
 
 %-----------------------------------------------------------
-% Selected Publications & Awards
+% Selected Publications
 %-----------------------------------------------------------
 \section*{Selected Publications \& Awards}
 \begin{itemize}[leftmargin=12pt, itemsep=1pt]
+    \item \textbf{J. D. Mu\~{n}oz-Bola\~{n}os}, et al. "Scatter compensation for enabling deep two-photon microscopy using a MEMS phase light modulator," \textit{Proc. SPIE} (2026).
+    \item \textbf{J. D. Mu\~{n}oz-Bola\~{n}os}, et al. "Wavefront corrections over large fields of view via beam cone tomography." \textit{Proc. SPIE}, (2025).
     \item \textbf{Awards:} ZEISS Summer School (2025), COLFUTURO Grant (2019).
-    \item \textbf{J. D. Muñoz-Bolaños}, et al., “Scatter compensation for enabling deep two-photon microscopy using a MEMS phase light modulator,” \textit{Proc. SPIE} (2026).
-    \item \textbf{J. D. Muñoz-Bolaños}, et al. "Wavefront corrections over large fields of view via beam cone tomography." \textit{Proc. SPIE}, (2025).
 \end{itemize}
 
 %-----------------------------------------------------------
@@ -164,10 +164,10 @@ R\&D Engineer with a dual background in **Physics Engineering** and **Advanced M
 %-----------------------------------------------------------
 \section*{References}
 \noindent
-\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}} l l}
-\textbf{Prof. Monika Ritsch-Marte} & \textbf{Prof. Jürgen Popp} \\
+\begin{tabularx}{\textwidth}{@{} X X @{}}
+\textbf{Prof. Monika Ritsch-Marte} & \textbf{Prof. J\"{u}rgen Popp} \\
 Medical University of Innsbruck & Leibniz Institute of Photonic Technology \\
 \href{mailto:monika.ritsch-marte@i-med.ac.at}{monika.ritsch-marte@i-med.ac.at} & \href{mailto:juergen.popp@leibniz-ipht.de}{juergen.popp@leibniz-ipht.de} \\
-\end{tabular*}
+\end{tabularx}
 
 \end{document}
