@@ -1,13 +1,23 @@
 \documentclass[11pt,a4paper]{article}
-\usepackage[left=1in,top=0.8in,right=1in,bottom=1in]{geometry}
-\usepackage{carlito}
-\renewcommand*\familydefault{\sfdefault}
+
+% --- PDFLATEX COMPATIBLE PREAMBLE ---
+\usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+\usepackage{helvet}         
+\renewcommand{\familydefault}{\sfdefault}
+
+% Adjusted margins to fit everything nicely on one page
+\usepackage[left=0.9in,top=0.8in,right=0.9in,bottom=0.8in]{geometry}
 \usepackage{url}
 \usepackage{hyperref}
 \usepackage{enumitem}
+\usepackage{xcolor}
 
-% Prevent hyphenation
+% Custom Colors 
+\definecolor{TECHBLUE}{RGB}{0, 0, 0} 
+
+% Prevent hyphenation 
 \hyphenpenalty=10000
 \exhyphenpenalty=10000
 \sloppy
@@ -15,64 +25,82 @@
 \hypersetup{
     colorlinks=true,
     linkcolor=black,
-    urlcolor=blue,
+    urlcolor=black,
 }
 
 \pagestyle{empty}
 \setlength{\parindent}{0pt}
-\setlength{\parskip}{0.8em}
+\setlength{\parskip}{0.6em} % Reduced slightly to fit one page
 
 \begin{document}
-
 %-----------------------------------------------------------
 % Sender Information
 %-----------------------------------------------------------
-\textbf{Juan David Muñoz-Bolaños} \\
-Rechenaurstraße 42, Innsbruck, Austria \\
+\textbf{\large Juan David Muñoz-Bolaños} \\
+Rechenauerstraße 42, Innsbruck, Austria (Tirol) \\
 +43 676 9115145 \\
-\href{mailto:juan.munoz@student.i-med.ac.at}{juan.munoz@student.i-med.ac.at}
+\href{mailto:juan.munoz@i-med.ac.at}{juan.munoz@i-med.ac.at}
 
 \vspace{12pt}
 
 %-----------------------------------------------------------
 % Recipient Information
 %-----------------------------------------------------------
-\textbf{ASML PhD Master Class Selection Committee} \\
-ASML Headquarters \\
-Veldhoven, Netherlands
+\textbf{Ms. Astrid Schernthaner} \\
+HR Business Partner \\
+Besi Austria GmbH \\
+Innstraße 16 \\
+6241 Radfeld, Austria
 
 \vspace{12pt}
 
 %-----------------------------------------------------------
 % Subject Line
 %-----------------------------------------------------------
-\textbf{Subject: Application for the ASML PhD Master Class 2026}
+\textbf{Subject: Application for Senior Vision Engineer (Job ID: 257595)}
 
 \vspace{6pt}
 
 %-----------------------------------------------------------
 % Body
 %-----------------------------------------------------------
-Dear ASML Selection Committee,
+Dear Ms. Schernthaner,
 
-I would like to show my great interest for the ASML PhD Master Class 2026. Approaching the completion of my PhD in optical microscopy at the University of Innsbruck (Austria), I am looking forward to an environment where I can transition my technical expertise into industrial impact. I was familiar with ASML long before the current semiconductor boom, thanks to its collaboration with Zeiss and the fact that I studied in Jena, the city where Zeiss was grounded.
+I am writing to show my interest for the \textbf{Senior Vision Engineer} position at Besi Austria. 
+As an R\&D Optical Engineer currently living in **Innsbruck**, 
+I offer a seamless transition into a full-time role. 
+I have followed Besi's leadership in high-precision die-attach technology with interest, 
+and the opportunity to drive the development of alignment systems in Radfeld aligns 
+with my background in industrial vision and advanced metrology.
 
-My doctoral research is a hands-on extreme precision measurements. I specialize in building custom optical setups, focusing on **Two-Photon Microscopy** and **Adaptive Optics**. With effort I have mastered the challenges of **femtosecond interferometry** by many hours in the dark lab. I understand that manufacturing nanometer-scale devices demands metrology with picometer-level precision and luckily a rigorous engineering challenge I face daily.
+If I am not wrong, the position requires a candidate who can bridge the gap between "algorithmics" and "optics hardware." 
+My career has been defined by this intersection:
 
-I find your vision inspiring by solving the humanity's toughest challenges . I would be flourishing with a professional environment that balances work stability with the freedom to imagine.
+\textbf{1. Proven Industrial Vision Experience:} \\
+Before my M.Sc., I worked as a Machine Vision Engineer at INTECOL S.A.S. 
+I successfully implemented **MVTec HALCON** solutions for high-speed bottling lines, 
+designing custom illumination concepts to ensure robust **OCR** inspection. 
+We implemented a safety-critical **laser profilometry** project for urban cable cars in Metro de Medellin. 
+This experience ensures I can "create proofs of concept" that are reliable enough for production transfer.
 
-Throughout my  career, I have cultivated a skill set aligned with modern lithography:
+\textbf{2. Advanced Optics \& Lab Development:} \\
+During my PhD in Innsbruck and my Master's in Jena, I specialized in the extreme precision required 
+for semiconductor-scale inspection. 
+I design and maintain complex optical labs featuring **Adaptive Optics** and **SLM/DMD** technology. 
+I am currently integrating high-speed/precision Texas Instruments MEMS devices to correct optical aberrations,
+mirroring the high-speed alignment needs of modern die bonders.
 
-\begin{itemize}[leftmargin=*, itemsep=1pt, topsep=2pt]
-    \item \textbf{Extreme Precision Metrology:} Extensive experience constructing optical interferometers and overcoming stability challenges in femtosecond regimes and nanometer precision.
-    \item \textbf{Wavefront Control \& Simulation:} Deep understanding of phase manipulation by physical-mathematical models. 
-    \item \textbf{System Integration:} Proficient in automating experimental control and analysis pipelines using Python and LabVIEW-FPGA.
-    \item \textbf{Communication:} Proven ability to disseminate complex research, evidenced by 5 peer-reviewed publications and presentations at 4 international conferences.
-\end{itemize}
+\textbf{3. Local \& Legal Integration:} \\
+With a MINT degree from Germany and an upcoming Austrian PhD, 
+I qualify for the \textbf{Red-White-Red Card (High-Skilled / Shortage Occupation)}. 
+This ensures a straightforward hiring process, similar to EU candidate. 
+Living in Innsbruck, I am already integrated into the Tyrolean region, 
+with appreciation for the local quality of life: skiing, biking and dancing are my passions. 
+I am committed to a long-term future in Tyrol.
 
-Outside the lab, I bring passion to my personal life, living in the Alps, I enjoy rides for **skiing and cycling**, and I also find joy in **dancing**. I believe this balance keeps my mind fresh and fosters the resilience needed for complex research.
-
-I would appreciate your consideration of my extreme optimistic background, and I would be glad to be hear you back. Thank you for your time.
+I would be grateful to bring my "capacity for excellence" to Besi, 
+translating my expertise in precision optics and industrial inspection into the next generation of chip placement machines. 
+Thank you for considering my application.
 
 \vspace{18pt}
 
@@ -84,7 +112,7 @@ Sincerely,
 \vspace{12pt}
 
 \textbf{Juan David Muñoz-Bolaños} \\
-R\&D Optical Engineer- PhD\\
+R\&D Optical Engineer \\
 Medical University of Innsbruck
 
 \end{document}

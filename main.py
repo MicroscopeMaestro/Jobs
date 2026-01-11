@@ -2,7 +2,7 @@
 import os
 import shutil
 import subprocess
-import re  # <--- ADDED: To clean up the filenames
+import re
 from jinja2 import Environment, FileSystemLoader
 from pypdf import PdfWriter
 
@@ -13,40 +13,45 @@ OUTPUT_DIR = 'generated'
 
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
-# --- Helper: Clean Text for Filenames ---
 def sanitize_filename(text):
-    """
-    Removes special characters and spaces to make strings safe for filenames.
-    Example: "R&D Engineer @ Zeiss!" -> "R_D_Engineer_Zeiss"
-    """
-    # Replace non-alphanumeric characters with underscores
     clean = re.sub(r'[^a-zA-Z0-9]', '_', text)
-    # Remove multiple underscores in a row (optional, looks nicer)
     clean = re.sub(r'_+', '_', clean)
     return clean.strip('_')
 
 def compile_latex(tex_filename, output_name):
     """ Compiles a .tex file inside OUTPUT_DIR to PDF. """
-    print(f"Compiling {tex_filename}...")
+    print(f"   Compiling LaTeX: {tex_filename} -> {output_name}...")
     tex_path = os.path.join(OUTPUT_DIR, tex_filename)
     
+    # Run pdflatex twice (quietly first, then verbose if needed)
     cmd = ['pdflatex', '-output-directory', OUTPUT_DIR, '-interaction=nonstopmode', tex_path]
-    
+    subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     process = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
+    
     expected_pdf = os.path.join(OUTPUT_DIR, output_name)
     
     if process.returncode != 0 and not os.path.isfile(expected_pdf):
-        print(f" ! CRITICAL ERROR in {tex_filename}")
+        print(f"   ! CRITICAL ERROR compiling {tex_filename}")
         errors = [line for line in process.stdout.split('\n') if line.startswith('!')]
-        for err in errors[:5]: print(f"   {err}")
+        for err in errors[:5]: print(f"     {err}")
         return None
         
     return expected_pdf
 
-def create_scaled_pdf(filename, scale=0.5):
-    """ Wraps a PDF/Image in a LaTeX container to resize and center it. """
-    print(f" -> Resizing {filename} to {scale*100}%...")
+def create_scaled_pdf(filename, scale=0.8):
+    """ 
+    Wraps a PDF/Image in a LaTeX container to resize and center it. 
+    """
+    print(f"   -> Scaling {filename} to {scale*100}%...")
     
+    # 1. Clean filename logic to prevent "file.pdf.pdf" errors
+    base_name = os.path.splitext(filename)[0] # "id_card"
+    wrapper_tex_name = f"scaled_{base_name}.tex" # "scaled_id_card.tex"
+    wrapper_pdf_name = f"scaled_{base_name}.pdf" # "scaled_id_card.pdf"
+    
+    wrapper_path = os.path.join(OUTPUT_DIR, wrapper_tex_name)
+    
+    # 2. Create the wrapper LaTeX file
     tex_content = fr"""
 \documentclass[a4paper]{{article}}
 \usepackage{{graphicx}}
@@ -56,98 +61,139 @@ def create_scaled_pdf(filename, scale=0.5):
 \begin{{document}}
     \vspace*{{\fill}}
     \begin{{center}}
+        % keepaspectratio ensures it doesn't distort
         \includegraphics[width={scale}\textwidth, keepaspectratio]{{{filename}}}
     \end{{center}}
     \vspace*{{\fill}}
 \end{{document}}
     """
     
-    wrapper_name = f"scaled_{filename}.tex"
-    with open(os.path.join(OUTPUT_DIR, wrapper_name), "w") as f:
+    with open(wrapper_path, "w") as f:
         f.write(tex_content)
         
-    return compile_latex(wrapper_name, f"scaled_{filename}.pdf")
+    return compile_latex(wrapper_tex_name, wrapper_pdf_name)
 
 def generate_application(data):
+    company = data.get('recipient_company', 'Company')
+    print(f"\n--- Generating Application for: {company} ---")
+
     # --- STEP 0: PREPARE ASSETS ---
-    print("Preparing assets...")
-    for item in os.listdir(ASSETS_DIR):
-        s = os.path.join(ASSETS_DIR, item)
-        d = os.path.join(OUTPUT_DIR, item)
-        if os.path.isfile(s):
-            shutil.copy2(s, d)
+    # Copy files from assets/ to generated/ so LaTeX can find them
+    if os.path.exists(ASSETS_DIR):
+        for item in os.listdir(ASSETS_DIR):
+            s = os.path.join(ASSETS_DIR, item)
+            d = os.path.join(OUTPUT_DIR, item)
+            if os.path.isfile(s):
+                shutil.copy2(s, d)
+    else:
+        print(f" ! Warning: '{ASSETS_DIR}' folder missing.")
 
     # --- STEP 1: COMPILE LETTER ---
-    env = Environment(loader=FileSystemLoader(TEMPLATE_DIR), block_start_string=r'\BLOCK{', variable_start_string=r'\VAR{')
-    
-    cl_rendered = env.get_template("cover_letter.tex").render(data)
-    with open(os.path.join(OUTPUT_DIR, 'cover_letter.tex'), "w") as f: f.write(cl_rendered)
-    cl_pdf = compile_latex('cover_letter.tex', 'cover_letter.pdf')
+    print("1. Generating Cover Letter...")
+    cl_pdf = None
+    try:
+        env = Environment(loader=FileSystemLoader(TEMPLATE_DIR), block_start_string=r'\BLOCK{', variable_start_string=r'\VAR{')
+        cl_rendered = env.get_template("cover_letter.tex").render(data)
+        
+        with open(os.path.join(OUTPUT_DIR, 'cover_letter.tex'), "w") as f: 
+            f.write(cl_rendered)
+        
+        cl_pdf = compile_latex('cover_letter.tex', 'cover_letter.pdf')
+    except Exception as e:
+        print(f" ! Error rendering cover letter: {e}")
 
     # --- STEP 2: COMPILE RESUME ---
-    with open(os.path.join(TEMPLATE_DIR, 'resume.tex'), 'r') as f: resume_content = f.read()
-    with open(os.path.join(OUTPUT_DIR, 'resume.tex'), "w") as f: f.write(resume_content)
-    resume_pdf = compile_latex('resume.tex', 'resume.pdf')
+    print("2. Generating Resume...")
+    resume_pdf = None
+    try:
+        with open(os.path.join(TEMPLATE_DIR, 'resume.tex'), 'r') as f: 
+            resume_content = f.read()
+        with open(os.path.join(OUTPUT_DIR, 'resume.tex'), "w") as f: 
+            f.write(resume_content)
+            
+        resume_pdf = compile_latex('resume.tex', 'resume.pdf')
+    except FileNotFoundError:
+        print(f" ! Error: 'resume.tex' not found in {TEMPLATE_DIR}.")
 
-    # --- STEP 3: MERGE & RENAME ---
+    # --- STEP 3: MERGE & ATTACH ---
     if cl_pdf and resume_pdf:
         merger = PdfWriter()
+        
         merger.append(cl_pdf)
         merger.append(resume_pdf)
         
-        print("\nProcessing Attachments...")
+        print("3. Processing Attachments...")
         for attachment in data.get("attachments", []):
+            fname = attachment
+            scale = 1.0
+            
+            # Parse Dictionary Format
             if isinstance(attachment, dict):
-                fname = attachment['file']
+                fname = attachment.get('file')
                 scale = attachment.get('scale', 1.0)
-                if scale < 1.0:
-                    scaled_pdf = create_scaled_pdf(fname, scale)
-                    if scaled_pdf: merger.append(scaled_pdf)
-                else:
-                    merger.append(os.path.join(OUTPUT_DIR, fname))
-            else:
-                merger.append(os.path.join(OUTPUT_DIR, attachment))
+            
+            file_path = os.path.join(OUTPUT_DIR, fname)
+            
+            # Check existence
+            if not os.path.exists(file_path):
+                print(f"  ! WARNING: '{fname}' not found in output folder. Skipping.")
+                continue
 
-        # --- DYNAMIC FILENAME LOGIC ---
-        # 1. Get company and role from data
-        company = sanitize_filename(data.get('recipient_company', 'Company'))
+            try:
+                # Apply Scaling logic
+                if scale < 1.0:
+                    scaled_pdf_path = create_scaled_pdf(fname, scale)
+                    if scaled_pdf_path and os.path.exists(scaled_pdf_path):
+                        print(f"  + Appending SCALED {fname}")
+                        merger.append(scaled_pdf_path)
+                    else:
+                        print(f"  ! Scaling failed for {fname}, appending original.")
+                        merger.append(file_path)
+                else:
+                    print(f"  + Appending {fname}")
+                    merger.append(file_path)
+                    
+            except Exception as e:
+                print(f"    ! Failed to append {fname}: {e}")
+
+        # --- OUTPUT ---
         role = sanitize_filename(data.get('job_position', 'Application'))
+        name = sanitize_filename(data.get('my_name', 'Applicant'))
+        company_clean = sanitize_filename(company)
         
-        # 2. Build the name: "Application_JuanMunoz_Zeiss_OpticalEngineer.pdf"
-        final_filename = f"Application_JuanMunoz_{company}_{role}.pdf"
+        final_filename = f"Application_{name}_{company_clean}_{role}.pdf"
         final_output_path = os.path.join(OUTPUT_DIR, final_filename)
 
         merger.write(final_output_path)
         merger.close()
         
-        print(f"\n✅ SUCCESS! Created: {final_filename}")
-        #try: subprocess.run(['open', final_output_path], check=False)
-        #except: pass
+        print(f"\n✅ SUCCESS! Generated: {final_output_path}")
+    else:
+        print("\n❌ FAILED: Could not compile basic documents.")
 
 if __name__ == "__main__":
     
-    # --- YOUR CONTROL SETUP ---
-    # You can now loop through multiple applications here
-    
+    # --- APP CONFIGURATION ---
     applications = [
         {
-            "my_name": "Juan Muñoz",
-            "recipient_name": "Dr. Smith",
-            "recipient_company": "Zeiss Meditec", # <--- Used for Filename
-            "job_position": "R&D Optical Engineer", # <--- Used for Filename
-            "body_text": "I am writing to apply for the R&D position...",
-            "attachments": ["id_card.pdf"]
-        },
-        {
-            "my_name": "Juan Muñoz",
-            "recipient_name": "Hiring Manager",
-            "recipient_company": "ASML", # <--- Used for Filename
-            "job_position": "Metrology Scientist", # <--- Used for Filename
-            "body_text": "I am fascinated by extreme UV lithography...",
-            "attachments": [] 
+            "my_name": "JuanMunoz",
+            "recipient_name": "Ms. Astrid Schernthaner",
+            "recipient_company": "Besi",
+            "job_position": "Senior Vision Engineer",
+            
+            # MAKE SURE THESE FILES EXIST IN 'assets/' FOLDER
+            "attachments": [
+                # Normal attachment
+                "msc_diploma.pdf",
+                "id_card.pdf",
+                
+                
+                # Scaled attachment (Object Format)
+                {"file": "passport.pdf", "scale": 0.5},
+                "ÖSD B2 schriftlich.pdf"
+            ]
         }
     ]
 
     for app in applications:
         generate_application(app)
-# %%

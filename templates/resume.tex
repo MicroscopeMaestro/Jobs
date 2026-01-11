@@ -1,17 +1,15 @@
 \documentclass[11pt,a4paper]{article}
 
 % --- PDFLATEX COMPATIBLE PREAMBLE ---
-\usepackage[utf8]{inputenc} % Handles special characters like 'ñ'
-\usepackage[T1]{fontenc}    % proper font encoding
-\usepackage[english]{babel} % English hyphenation
-\usepackage{helvet}         % Uses Helvetica (standard sans-serif)
-\renewcommand{\familydefault}{\sfdefault} % Set default font to sans-serif
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+\usepackage{helvet}         
+\renewcommand{\familydefault}{\sfdefault}
 
-\usepackage[a4paper, top=1.5cm, bottom=1.5cm, left=1.5cm, right=1.5cm]{geometry}
+% Standard margins for 2-page layout
+\usepackage[a4paper, top=2cm, bottom=2cm, left=2cm, right=2cm]{geometry}
 \usepackage{enumitem}
-\setlist[itemize]{label=-}
-
-% --- PACKAGES ---
 \usepackage{url}
 \usepackage[hidelinks]{hyperref} 
 \usepackage{ragged2e}
@@ -21,10 +19,8 @@
 \usepackage{xcolor} 
 \usepackage{tabularx}
 
-%-----------------------------------------------------------
-% Custom Colors & Styles
-%-----------------------------------------------------------
-\definecolor{TECHBLUE}{RGB}{0, 0, 0} % Keeping it professional black
+% --- FORMATTING ---
+\definecolor{TECHBLUE}{RGB}{0, 0, 0} 
 \definecolor{TEXTGRAY}{RGB}{60, 60, 60}
 
 \hyphenpenalty=10000
@@ -33,6 +29,7 @@
 
 % Section Styling
 \titleformat{\section}{\Large\bfseries\color{TECHBLUE}\uppercase}{}{0em}{}[\color{TECHBLUE}\titlerule]
+\titlespacing*{\section}{0pt}{18pt}{8pt}
 
 \pagestyle{empty}
 
@@ -43,10 +40,10 @@
 %-----------------------------------------------------------
 \noindent
 \begin{minipage}[c]{0.70\textwidth} 
-    {\Huge \bfseries \color{TECHBLUE} Juan David Mu\~{n}oz-Bola\~{n}os} \\ [6pt]
-    {\Large R\&D Optical Engineer | Machine Vision \& Metrology} \\ [6pt]
+    {\Huge \bfseries \color{TECHBLUE} J. David Muñoz-Bolaños} \\ [8pt]
+    {\Large R\&D Optical Engineer | Optical metrology specialist} \\ [8pt]
     {\color{TEXTGRAY} 
-    Rechenauerstra\ss{}e 42, Innsbruck, Austria (Tirol) \\
+    Rechenauerstraße 42, Innsbruck, Austria \\
     +43 676 9115145 \textbar{} \href{mailto:juan.munoz@i-med.ac.at}{juan.munoz@i-med.ac.at}
     }
 \end{minipage}%
@@ -54,43 +51,48 @@
 \begin{minipage}[c]{0.25\textwidth}
     \raggedleft
     \begin{tikzpicture}
-        % Photo Placeholder - Draws a circle with initials if photo is missing
-        % This ensures compilation works even without the image file
         \clip (0,0) circle (1.75cm); 
         \fill[black!10] (-2,-2) rectangle (2,2);
         \node[text=black!60, font=\bfseries\Huge] at (0,0) {JM};
-        % To use your real photo:
-        % 1. Save your photo as 'cv_photo.png' in the same folder
-        % 2. Uncomment the line below:
-        \node at (0,0) {\includegraphics[width=3.5cm]{cv_photo.png}}; 
+        % To use your photo, uncomment the line below:
+        % \node at (0,0) {\includegraphics[width=3.5cm]{cv_photo.png}}; 
     \end{tikzpicture}
 \end{minipage}
 
-\vspace{0.5cm} 
+\vspace{1cm} 
 
 %-----------------------------------------------------------
 % Summary
 %-----------------------------------------------------------
-\section*{Summary}
+\section*{Professional Summary}
 \justifying
-R\&D Optical Engineer based in **Tirol** with a dual background in **Industrial Machine Vision** and **High-Precision Microscopy**. Expert in designing optical inspection systems, implementing illumination solutions for defect inspection, and developing adaptive optics algorithms. Educated in **Germany** (M.Sc.) and **Austria** (Ph.D.). Proficient in transferring complex optical concepts---such as interferometry and wavefront shaping---into robust, high-speed hardware solutions suitable for semiconductor and industrial applications.
+R\&D Optical engineer based in **Innsbruck** with a magic combination of **Industrial Machine Vision** expertise 
+and **High-Precision Optical Metrology**. 
+Proven track record in developing illumination concepts, algorithmics (HALCON/Python), 
+and hardware integration for automated inspection systems (LabVIEW/FPGA). 
+
+Experience bridging the gap between "code" and "hardware," 
+from implementing inspection systems on high-speed industrial lines to correcting optical aberrations using MEMS devices. 
+Eager to apply expertise in **optics, vision, and algorithms** to Besi's next-generation systems.
 
 %-----------------------------------------------------------
-% Technical Skills
+% Technical Skills (Grouped for Besi)
 %-----------------------------------------------------------
-\section*{Technical Skills}
-\begin{description}[leftmargin=12pt, style=nextline, font=\bfseries\color{TECHBLUE}]
-    \item[Machine Vision \& Inspection]
-    MVTec HALCON, OCR (Optical Character Recognition), Laser Profilometry, Industrial Illumination Design, Camera Calibration, Defect Detection, Quality Control Systems.
+\section*{Technical Competencies}
+\begin{description}[leftmargin=12pt, style=nextline, font=\bfseries\color{TECHBLUE}, itemsep=4pt]
+    \item[Vision Technology \& Algorithmics]
+    MVTec HALCON (Industrial software), optical quality control implementation, Image Processing Pipelines, 
+    Python, GPU Acceleration (CuPy) for real-time processing, Laser Profilometry, Camera/Laser Calibration.
 
-    \item[Optical Engineering]
-    Adaptive Optics (SLM, Texas Instruments DMD), Interferometry (Phase-stepping), Spectrometers, Raman Microscopy, Multiphoton Imaging, Beam Shaping, Lithography concepts.
+    \item[Optics \& Lab Management]
+    Illumination/optical Design, Lab Maintenance \& Safety, Adaptive Optics (SLM, Texas Instruments DMD), 
+    Interferometry, Beam Shaping, System Integration, Lithography Concepts.
 
-    \item[Software \& Computing]
-    Python (NumPy, SciPy), LabVIEW (FPGA Real-time), GPU Computing (CuPy), MATLAB, Image Processing Algorithms.
+    \item[Hardware Control]
+    FPGA Real-time control (LabVIEW), Motion Control, High-speed Detectors (PMT/APD), Semiconductor-based MEMS integration.
 
     \item[Languages]
-    English (Proficient), German (B2/Working Proficiency), Spanish (Native).
+    English (Proficient), German (Intermediate/Working Proficiency), Spanish (Native).
 \end{description}
 
 %-----------------------------------------------------------
@@ -100,33 +102,42 @@ R\&D Optical Engineer based in **Tirol** with a dual background in **Industrial 
 
 \noindent
 \textbf{Medical University of Innsbruck} \hfill Innsbruck, Austria \\
-\textit{PhD Researcher - Adaptive Optics \& Metrology} \hfill Jan 2022 -- Present
-\begin{itemize}[leftmargin=12pt, itemsep=2pt, topsep=2pt]
-    \item \textbf{High-Precision Metrology:} Developed a setup using a novel transmissive Spatial Light Modulator (SLM) combined with phase-stepping interferometry to correct optical aberrations. Achieved high-resolution observation in two-photon microscopy (e.g., neuronal imaging).
-    \item \textbf{Deep Signal Restoration:} Engineered a system using Raman microscopy and transmissive wavefront shaping to restore optical signals at significant penetration depths in scattering media.
-    \item \textbf{High-Speed Hardware Control:} Currently implementing a \textbf{Texas Instruments DLP/DMD device} (reflection mode) to correct optical aberrations at high speeds, enabling real-time in-vivo image restoration.
-    \item \textbf{Algorithm Development:} Accelerated holographic algorithms using GPU computing (CuPy) for rapid phase retrieval.
+\textit{PhD Researcher - Optical Systems Engineering} \hfill Jan 2022 -- Present
+\begin{itemize}[leftmargin=12pt, itemsep=4pt, topsep=4pt]
+    \item \textbf{High-Speed Hardware Integration (DMD):} Designed and built a control system for 
+    a **Texas Instruments DLP/DMD** to correct optical aberrations. 
+    This work mirrors die-attach alignment tasks, requiring high-speed/precision actuation and 
+    real-time feedback loops.
+    \item \textbf{Algorithmics \& GPU Acceleration:} Developed GPU-accelerated algorithms (Python/CuPy) 
+    to restore imaging quality in complex media. Optimized processing pipelines to handle large image stacks efficiently.
+    \item \textbf{Optics Lab Management:} Responsible for the maintenance and improvement of the microscopy lab. Tasks include using laser safety protocols, handling fine optical components, and aligning complex beam paths for microscopic inspection.
+    \item \textbf{Precision Metrology:} Implemented phase-stepping interferometry for nanometer-precision sensing, ensuring the highest optical restoration.
 \end{itemize}
 
-\vspace{5pt}
+\vspace{8pt}
 
 \noindent
 \textbf{Leibniz Institute of Photonic Technology (IPHT)} \hfill Jena, Germany \\
-\textit{Assistant Researcher} \hfill Jun 2020 -- Dec 2021
-\begin{itemize}[leftmargin=12pt, itemsep=2pt, topsep=2pt]
-    \item Assembled multimodal setups for vibrational imaging (Raman/IR) applied to rapid diagnostics.
-    \item Integrated photothermal microscopy hardware for environmental microplastic detection.
+\textit{R\&D Assistant Researcher} \hfill Jun 2020 -- Dec 2021
+\begin{itemize}[leftmargin=12pt, itemsep=4pt, topsep=4pt]
+    \item \textbf{Prototyping:} Assembled multimodal imaging setups (Raman/Photothermal) from concept to functional prototype.
+    \item \textbf{Hardware Integration:} Collaborated with scientific partners to qualify new detection methods for environmental microplastic analysis.
 \end{itemize}
 
-\vspace{5pt}
+\vspace{8pt}
 
 \noindent
 \textbf{INTECOL S.A.S.} \hfill Medellin, Colombia \\
 \textit{Machine Vision Engineer} \hfill Mar 2018 -- Mar 2019
-\begin{itemize}[leftmargin=12pt, itemsep=2pt, topsep=2pt]
-    \item \textbf{Automated Quality Control (OCR):} Designed and deployed an inspection system for bottling lines. Implemented custom illumination and \textbf{HALCON} software algorithms to read and verify OCR codes on printed labels, ensuring 100\% traceability.
-    \item \textbf{Safety-Critical Metrology:} Developed a \textbf{laser profilometry system} to inspect the thickness of urban cable car lines (Metro de Medell\'in). Analyzed cable properties critical for public transportation safety.
-    \item Managed full project lifecycles, from selecting industrial cameras/optics to on-site installation and calibration.
+\begin{itemize}[leftmargin=12pt, itemsep=4pt, topsep=4pt]
+    \item \textbf{Industrial Deployment (OCR):} Led the full development cycle of a quality control system for bottling lines. 
+    Designed custom **LED illumination** concepts and programmed **HALCON** a
+    lgorithms to reliably read and verify OCR codes on printed labels, achieving high traceability.
+    \item \textbf{Safety-Critical Inspection:} Developed a **laser profilometry system** for 
+    the Metro de Medellin cable cars. Created the concept, integrated the vision hardware, 
+    and validated the system for measuring cable thickness in outdoor environments.
+    \item \textbf{Production Transfer:} Managed on-site installation, calibration, and provided technical support 
+    and training for operators.
 \end{itemize}
 
 %-----------------------------------------------------------
@@ -134,16 +145,16 @@ R\&D Optical Engineer based in **Tirol** with a dual background in **Industrial 
 %-----------------------------------------------------------
 \section*{Education}
 \noindent
-\textbf{Medical University of Innsbruck} \hfill Innsbruck, Austria \\
-\textit{Ph.D. Advanced Microscopy \& Optics} \hfill Expected 2026
+\textbf{Medical University of Innsbruck} \hfill Austria \\
+\textit{Ph.D. Advanced Microscopy \& Optics} \hfill Working available from March, 2026
 
-\vspace{2pt}
+\vspace{4pt}
 
 \noindent
-\textbf{Friedrich Schiller University Jena} \hfill Jena, Germany \\
+\textbf{Friedrich Schiller University Jena} \hfill Germany \\
 \textit{M.Sc. in Photonics} \hfill 2019 -- 2021
 
-\vspace{2pt}
+\vspace{4pt}
 
 \noindent
 \textbf{University of Cauca} \hfill Colombia \\
@@ -153,9 +164,9 @@ R\&D Optical Engineer based in **Tirol** with a dual background in **Industrial 
 % Selected Publications
 %-----------------------------------------------------------
 \section*{Selected Publications \& Awards}
-\begin{itemize}[leftmargin=12pt, itemsep=1pt]
-    \item \textbf{J. D. Mu\~{n}oz-Bola\~{n}os}, et al. "Scatter compensation for enabling deep two-photon microscopy using a MEMS phase light modulator," \textit{Proc. SPIE} (2026).
-    \item \textbf{J. D. Mu\~{n}oz-Bola\~{n}os}, et al. "Wavefront corrections over large fields of view via beam cone tomography." \textit{Proc. SPIE}, (2025).
+\begin{itemize}[leftmargin=12pt, itemsep=2pt]
+    \item \textbf{J. D. Muñoz-Bolaños}, et al. "Scatter compensation for enabling deep two-photon microscopy using a MEMS phase light modulator," \textit{Proc. SPIE} (2026).
+    \item \textbf{J. D. Muñoz-Bolaños}, et al. "Wavefront corrections over large fields of view via beam cone tomography." \textit{Proc. SPIE}, (2025).
     \item \textbf{Awards:} ZEISS Summer School (2025), COLFUTURO Grant (2019).
 \end{itemize}
 
@@ -165,7 +176,7 @@ R\&D Optical Engineer based in **Tirol** with a dual background in **Industrial 
 \section*{References}
 \noindent
 \begin{tabularx}{\textwidth}{@{} X X @{}}
-\textbf{Prof. Monika Ritsch-Marte} & \textbf{Prof. J\"{u}rgen Popp} \\
+\textbf{Prof. Monika Ritsch-Marte} & \textbf{Prof. Jürgen Popp} \\
 Medical University of Innsbruck & Leibniz Institute of Photonic Technology \\
 \href{mailto:monika.ritsch-marte@i-med.ac.at}{monika.ritsch-marte@i-med.ac.at} & \href{mailto:juergen.popp@leibniz-ipht.de}{juergen.popp@leibniz-ipht.de} \\
 \end{tabularx}
