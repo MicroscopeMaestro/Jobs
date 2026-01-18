@@ -23,15 +23,18 @@ def compile_latex(tex_filename, output_name):
     print(f"   Compiling LaTeX: {tex_filename} -> {output_name}...")
     tex_path = os.path.join(OUTPUT_DIR, tex_filename)
     
-    # Run pdflatex twice (quietly first, then verbose if needed)
+    # Run pdflatex once and capture all output
     cmd = ['pdflatex', '-output-directory', OUTPUT_DIR, '-interaction=nonstopmode', tex_path]
-    subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     process = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
     
     expected_pdf = os.path.join(OUTPUT_DIR, output_name)
     
-    if process.returncode != 0 and not os.path.isfile(expected_pdf):
+    if process.returncode != 0 or not os.path.isfile(expected_pdf):
         print(f"   ! CRITICAL ERROR compiling {tex_filename}")
+        print("--- pdflatex stdout ---")
+        print(process.stdout)
+        print("--- pdflatex stderr ---")
+        print(process.stderr)
         errors = [line for line in process.stdout.split('\n') if line.startswith('!')]
         for err in errors[:5]: print(f"     {err}")
         return None
@@ -176,7 +179,7 @@ if __name__ == "__main__":
     # --- APP CONFIGURATION ---
     applications = [
         {
-            "my_name": "JuanMunoz",
+            "my_name": "Juan Munoz",
             "recipient_name": "Ms. Astrid Schernthaner",
             "recipient_company": "Besi",
             "job_position": "Senior Vision Engineer",
@@ -184,16 +187,16 @@ if __name__ == "__main__":
             # MAKE SURE THESE FILES EXIST IN 'assets/' FOLDER
             "attachments": [
                 # Normal attachment
-                "msc_diploma.pdf",
-                "id_card.pdf",
-                
-                
-                # Scaled attachment (Object Format)
-                {"file": "passport.pdf", "scale": 0.5},
-                "ÖSD B2 schriftlich.pdf"
+                "master.pdf",
+                "resident_permit.pdf",
+                "passport.pdf",
+                "B2.pdf"
+                "intecol_spanish.pdf",
+                "intecol_german.pdf",
             ]
         }
     ]
 
     for app in applications:
         generate_application(app)
+# %%
