@@ -1,184 +1,135 @@
-\documentclass[11pt,a4paper]{article}
+\documentclass[a4paper,10pt]{article}
 
-% --- PDFLATEX COMPATIBLE PREAMBLE ---
+% --- PACKAGES ---
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
-\usepackage[english]{babel}
-\usepackage{helvet}         
+\usepackage{helvet}
 \renewcommand{\familydefault}{\sfdefault}
-
-% Standard margins for 2-page layout
-\usepackage[a4paper, top=2cm, bottom=2cm, left=2cm, right=2cm]{geometry}
+\usepackage[left=0.8in,top=0.6in,right=0.8in,bottom=0.6in]{geometry}
 \usepackage{enumitem}
-\usepackage{url}
-\usepackage[hidelinks]{hyperref} 
-\usepackage{ragged2e}
 \usepackage{titlesec}
+\usepackage{xcolor}
 \usepackage{graphicx}
-\usepackage{tikz} 
-\usepackage{xcolor} 
-\usepackage{tabularx}
+\usepackage{tikz} % REQUIRED FOR ROUND CROP
+\usepackage[hidelinks]{hyperref}
 
 % --- FORMATTING ---
-\definecolor{TECHBLUE}{RGB}{0, 0, 0} 
-\definecolor{TEXTGRAY}{RGB}{60, 60, 60}
-
-\hyphenpenalty=10000
-\exhyphenpenalty=10000
-\sloppy
+\pagestyle{empty}
+\raggedright
 
 % Section Styling
-\titleformat{\section}{\Large\bfseries\color{TECHBLUE}\uppercase}{}{0em}{}[\color{TECHBLUE}\titlerule]
-\titlespacing*{\section}{0pt}{18pt}{8pt}
+\titleformat{\section}{\large\bfseries}{}{0em}{}[\titlerule]
+\titlespacing{\section}{0pt}{12pt}{6pt}
 
-\pagestyle{empty}
+% Custom Entry Command
+\newcommand{\entry}[4]{
+  \textbf{#1} \hfill #2 \\
+  \textit{#3} \hfill \textit{#4} \\
+}
+
+% --- MACRO: ROUND PHOTO ---
+\newcommand{\roundpic}[1]{
+  \begin{tikzpicture}
+    \clip (0,0) circle (1.4cm); 
+    \node at (0,0) {\includegraphics[width=2.8cm]{#1}}; 
+  \end{tikzpicture}
+}
 
 \begin{document}
 
-%-----------------------------------------------------------
-% Header
-%-----------------------------------------------------------
+% --- HEADER WITH ROUND PHOTO ---
 \noindent
-\begin{minipage}[c]{0.70\textwidth} 
-    {\Huge \bfseries \color{TECHBLUE} J. David Muñoz-Bolaños} \\ [8pt]
-    {\Large R\&D Optical Engineer | Optical metrology specialist} \\ [8pt]
-    {\color{TEXTGRAY} 
+\begin{minipage}[c]{0.70\textwidth}
+    {\Huge \textbf{J. David Muñoz-Bolaños}} \\ \vspace{6pt}
+    \textbf{\large R\&D Optical Engineer | Optical Metrology Specialist} \\ \vspace{6pt}
     Rechenauerstraße 42, Innsbruck, Austria \\
-    +43 676 9115145 \textbar{} \href{mailto:juan.munoz@i-med.ac.at}{juan.munoz@i-med.ac.at}
-    }
+    +43 676 9115145 \\
+    \href{mailto:juan.munoz@i-med.ac.at}{juan.munoz@i-med.ac.at}
 \end{minipage}%
 \hfill
 \begin{minipage}[c]{0.25\textwidth}
-    \raggedleft
-    \begin{tikzpicture}
-        \clip (0,0) circle (1.75cm); 
-        \fill[black!10] (-2,-2) rectangle (2,2);
-        \node[text=black!60, font=\bfseries\Huge] at (0,0) {JM};
-        % To use your photo, uncomment the line below:
-        % \node at (0,0) {\includegraphics[width=3.5cm]{cv_photo.png}}; 
-    \end{tikzpicture}
+    \begin{flushright}
+        % Ensure 'photo.png' is in the SAME folder
+        \roundpic{photo.png}
+    \end{flushright}
 \end{minipage}
 
-\vspace{1cm} 
+\vspace{10pt}
 
-%-----------------------------------------------------------
-% Summary
-%-----------------------------------------------------------
-\section*{Professional Summary}
-\justifying
-R\&D Optical engineer based in **Innsbruck** with a magic combination of **Industrial Machine Vision** expertise 
-and **High-Precision Optical Metrology**. 
-Proven track record in developing illumination concepts, algorithmics (HALCON/Python), 
-and hardware integration for automated inspection systems (LabVIEW/FPGA). 
+% --- PROFESSIONAL SUMMARY ---
+\section{PROFESSIONAL SUMMARY}
+R\&D Optical engineer based in **Innsbruck** with a magic combination of **Industrial Machine Vision** expertise and **High-Precision Optical Metrology**. Proven track record in developing illumination concepts, algorithmics (Python), and hardware integration for automated inspection systems. Experience bridging the gap between "code" and "hardware," from implementing inspection systems on high-speed industrial lines to correcting optical aberrations using **MEMS devices**. Eager to apply expertise in **optics, vision, and algorithms** to TriLite's next-generation Laser Beam Scanning (LBS) systems.
 
-Experience bridging the gap between "code" and "hardware," 
-from implementing inspection systems on high-speed industrial lines to correcting optical aberrations using MEMS devices. 
-Eager to apply expertise in **optics, vision, and algorithms** to Besi's next-generation systems.
+% --- TECHNICAL COMPETENCIES ---
+\section{TECHNICAL COMPETENCIES}
 
-%-----------------------------------------------------------
-% Technical Skills (Grouped for Besi)
-%-----------------------------------------------------------
-\section*{Technical Competencies}
-\begin{description}[leftmargin=12pt, style=nextline, font=\bfseries\color{TECHBLUE}, itemsep=4pt]
-    \item[Vision Technology \& Algorithmics]
-    MVTec HALCON (Industrial software), optical quality control implementation, Image Processing Pipelines, 
-    Python, GPU Acceleration (CuPy) for real-time processing, Laser Profilometry, Camera/Laser Calibration.
+\textbf{Vision Technology \& Algorithmics} \\
+MVTec HALCON (Industrial software), Image Processing Pipelines, **Python**, GPU Acceleration (CuPy) for real-time processing, **Laser Profilometry**, Camera/Laser Calibration.
 
-    \item[Optics \& Lab Management]
-    Illumination/optical Design, Lab Maintenance \& Safety, Adaptive Optics (SLM, Texas Instruments DMD), 
-    Interferometry, Beam Shaping, System Integration, Lithography Concepts.
+\vspace{6pt}
+\textbf{Optics \& Lab Management} \\
+Illumination/Optical Design, **Zemax OpticStudio** (Simulation \& Tolerance Analysis), Adaptive Optics (**Texas Instruments DMD**, SLM), Interferometry, **Laser Beam Shaping**, System Integration, Prototyping.
 
-    \item[Hardware Control]
-    FPGA Real-time control (LabVIEW), Motion Control, High-speed Detectors (PMT/APD), Semiconductor-based MEMS integration.
+\vspace{6pt}
+\textbf{Hardware Control} \\
+FPGA Real-time control (LabVIEW), Motion Control, High-speed Detectors (PMT/APD), Semiconductor-based **MEMS integration**.
 
-    \item[Languages]
-    English (Proficient), German (Intermediate/Working Proficiency), Spanish (Native).
-\end{description}
+\vspace{6pt}
+\textbf{Languages} \\
+English (Proficient), German (Intermediate/Working Proficiency), Spanish (Native).
 
-%-----------------------------------------------------------
-% Experience
-%-----------------------------------------------------------
-\section*{Professional Experience}
+% --- PROFESSIONAL EXPERIENCE ---
+\section{PROFESSIONAL EXPERIENCE}
 
-\noindent
-\textbf{Medical University of Innsbruck} \hfill Innsbruck, Austria \\
-\textit{PhD Researcher - Optical Systems Engineering} \hfill Jan 2022 -- Present
-\begin{itemize}[leftmargin=12pt, itemsep=4pt, topsep=4pt]
-    \item \textbf{High-Speed Hardware Integration (DMD):} Designed and built a control system for 
-    a **Texas Instruments DLP/DMD** to correct optical aberrations. 
-    This work mirrors die-attach alignment tasks, requiring high-speed/precision actuation and 
-    real-time feedback loops.
-    \item \textbf{Algorithmics \& GPU Acceleration:} Developed GPU-accelerated algorithms (Python/CuPy) 
-    to restore imaging quality in complex media. Optimized processing pipelines to handle large image stacks efficiently.
-    \item \textbf{Optics Lab Management:} Responsible for the maintenance and improvement of the microscopy lab. Tasks include using laser safety protocols, handling fine optical components, and aligning complex beam paths for microscopic inspection.
-    \item \textbf{Precision Metrology:} Implemented phase-stepping interferometry for nanometer-precision sensing, ensuring the highest optical restoration.
+\entry{Medical University of Innsbruck}{Innsbruck, Austria}{PhD Researcher - Optical Systems Engineering}{Jan 2022 -- Present}
+\begin{itemize}[leftmargin=*, noitemsep, topsep=3pt]
+    \item \textbf{High-Speed Hardware Integration (MEMS):} Designed and built a control system for a **Texas Instruments DLP/DMD** to correct optical aberrations. This work mirrors laser beam scanning tasks, requiring high-speed/precision actuation and real-time feedback loops.
+    \item \textbf{Algorithmics \& GPU Acceleration:} Developed GPU-accelerated algorithms (Python/CuPy) to restore imaging quality in complex media. Optimized processing pipelines to handle large image stacks efficiently.
+    \item \textbf{Optics Lab Management:} Responsible for the maintenance and improvement of the microscopy lab, including laser safety protocols, handling fine optical components, and aligning complex beam paths.
 \end{itemize}
 
 \vspace{8pt}
 
-\noindent
-\textbf{Leibniz Institute of Photonic Technology (IPHT)} \hfill Jena, Germany \\
-\textit{R\&D Assistant Researcher} \hfill Jun 2020 -- Dec 2021
-\begin{itemize}[leftmargin=12pt, itemsep=4pt, topsep=4pt]
+\entry{Leibniz Institute of Photonic Technology (IPHT)}{Jena, Germany}{R\&D Assistant Researcher}{Jun 2020 -- Dec 2021}
+\begin{itemize}[leftmargin=*, noitemsep, topsep=3pt]
     \item \textbf{Prototyping:} Assembled multimodal imaging setups (Raman/Photothermal) from concept to functional prototype.
     \item \textbf{Hardware Integration:} Collaborated with scientific partners to qualify new detection methods for environmental microplastic analysis.
 \end{itemize}
 
 \vspace{8pt}
 
-\noindent
-\textbf{INTECOL S.A.S.} \hfill Medellin, Colombia \\
-\textit{Machine Vision Engineer} \hfill Mar 2018 -- Mar 2019
-\begin{itemize}[leftmargin=12pt, itemsep=4pt, topsep=4pt]
-    \item \textbf{Industrial Deployment (OCR):} Led the full development cycle of a quality control system for bottling lines. 
-    Designed custom **LED illumination** concepts and programmed **HALCON** a
-    lgorithms to reliably read and verify OCR codes on printed labels, achieving high traceability.
-    \item \textbf{Safety-Critical Inspection:} Developed a **laser profilometry system** for 
-    the Metro de Medellin cable cars. Created the concept, integrated the vision hardware, 
-    and validated the system for measuring cable thickness in outdoor environments.
-    \item \textbf{Production Transfer:} Managed on-site installation, calibration, and provided technical support 
-    and training for operators.
+\entry{INTECOL S.A.S.}{Medellin, Colombia}{Machine Vision Engineer}{Mar 2018 -- Mar 2019}
+\begin{itemize}[leftmargin=*, noitemsep, topsep=3pt]
+    \item \textbf{Industrial Deployment (OCR):} Led the full development cycle of a quality control system for bottling lines. Designed custom **LED illumination** concepts and programmed **HALCON** algorithms to reliably read and verify OCR codes on printed labels.
+    \item \textbf{Safety-Critical Inspection:} Developed a **laser profilometry system** for the Metro de Medellin cable cars. Created the concept, integrated the vision hardware, and validated the system for outdoor environments.
+    \item \textbf{Production Transfer:} Managed on-site installation, calibration, and provided technical support and training for operators.
 \end{itemize}
 
-%-----------------------------------------------------------
-% Education
-%-----------------------------------------------------------
-\section*{Education}
-\noindent
-\textbf{Medical University of Innsbruck} \hfill Austria \\
-\textit{Ph.D. Advanced Microscopy \& Optics} \hfill Working available from March, 2026
+% --- EDUCATION ---
+\section{EDUCATION}
 
-\vspace{4pt}
+\entry{Medical University of Innsbruck}{Austria}{Ph.D. Advanced Microscopy \& Optics (Available from March 2026)}{Jan 2022 -- Present}
 
-\noindent
-\textbf{Friedrich Schiller University Jena} \hfill Germany \\
-\textit{M.Sc. in Photonics} \hfill 2019 -- 2021
+\entry{Friedrich Schiller University Jena}{Germany}{M.Sc. in Photonics}{2019 -- 2021}
 
-\vspace{4pt}
+\entry{University of Cauca}{Colombia}{B.Sc. in Physics Engineering}{2012 -- 2018}
 
-\noindent
-\textbf{University of Cauca} \hfill Colombia \\
-\textit{B.Sc. in Physics Engineering} \hfill 2012 -- 2018
-
-%-----------------------------------------------------------
-% Selected Publications
-%-----------------------------------------------------------
-\section*{Selected Publications \& Awards}
-\begin{itemize}[leftmargin=12pt, itemsep=2pt]
-    \item \textbf{J. D. Muñoz-Bolaños}, et al. "Scatter compensation for enabling deep two-photon microscopy using a MEMS phase light modulator," \textit{Proc. SPIE} (2026).
-    \item \textbf{J. D. Muñoz-Bolaños}, et al. "Wavefront corrections over large fields of view via beam cone tomography." \textit{Proc. SPIE}, (2025).
+% --- SELECTED PUBLICATIONS & AWARDS ---
+\section{SELECTED PUBLICATIONS \& AWARDS} % Fixed: \& instead of &
+\begin{itemize}[leftmargin=*, noitemsep, topsep=3pt]
+    \item J. D. Muñoz-Bolaños, et al. "\textbf{Scatter compensation} for enabling deep two-photon microscopy using a **MEMS phase light modulator**," Proc. SPIE (2026).
+    \item J. D. Muñoz-Bolaños, et al. "**Wavefront corrections** over large fields of view via beam cone tomography." Proc. SPIE (2025).
     \item \textbf{Awards:} ZEISS Summer School (2025), COLFUTURO Grant (2019).
 \end{itemize}
 
-%-----------------------------------------------------------
-% References
-%-----------------------------------------------------------
-\section*{References}
-\noindent
-\begin{tabularx}{\textwidth}{@{} X X @{}}
-\textbf{Prof. Monika Ritsch-Marte} & \textbf{Prof. Jürgen Popp} \\
-Medical University of Innsbruck & Leibniz Institute of Photonic Technology \\
-\href{mailto:monika.ritsch-marte@i-med.ac.at}{monika.ritsch-marte@i-med.ac.at} & \href{mailto:juergen.popp@leibniz-ipht.de}{juergen.popp@leibniz-ipht.de} \\
-\end{tabularx}
+% --- REFERENCES ---
+\section{REFERENCES}
+\textbf{Prof. Monika Ritsch-Marte} \hfill Medical University of Innsbruck \\
+\href{mailto:monika.ritsch-marte@i-med.ac.at}{monika.ritsch-marte@i-med.ac.at}
+
+\vspace{6pt}
+
+\textbf{Prof. Jürgen Popp} \hfill Leibniz Institute of Photonic Technology \\
+\href{mailto:juergen.popp@leibniz-ipht.de}{juergen.popp@leibniz-ipht.de}
 
 \end{document}

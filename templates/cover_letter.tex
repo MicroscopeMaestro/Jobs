@@ -1,82 +1,110 @@
 \documentclass[11pt,a4paper]{article}
+
+% --- PDFLATEX COMPATIBLE PREAMBLE ---
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
-\usepackage[left=2.5cm,right=2.5cm,top=2cm,bottom=2cm]{geometry}
-\usepackage{parskip} % Adds vertical space between paragraphs
-\usepackage{hyperref}  % For clickable emails
-\usepackage{enumitem}  % For customizing lists
-\usepackage{xcolor}
-
-% Font setting (optional - Helvetica/Arial style is common for CVs)
-\usepackage{helvet}
+\usepackage[english]{babel}
+\usepackage{helvet}         
 \renewcommand{\familydefault}{\sfdefault}
 
+% Adjusted margins to fit everything nicely on one page
+\usepackage[left=0.9in,top=0.8in,right=0.9in,bottom=0.8in]{geometry}
+\usepackage{url}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{xcolor}
+
+% Custom Colors 
+\definecolor{TECHBLUE}{RGB}{0, 0, 0} 
+
+% Prevent hyphenation 
+\hyphenpenalty=10000
+\exhyphenpenalty=10000
+\sloppy
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=black,
+    urlcolor=black,
+}
+
+\pagestyle{empty}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.6em} % Reduced slightly to fit one page
+
 \begin{document}
+%-----------------------------------------------------------
+% Sender Information
+%-----------------------------------------------------------
+\textbf{\large Juan David Muñoz-Bolaños} \\
+Rechenauerstraße 42, Innsbruck, Austria (Tirol) \\
++43 676 9115145 \\
+\href{mailto:juan.munoz@i-med.ac.at}{juan.munoz@i-med.ac.at}
 
-% --- Header / Contact Info ---
-\begin{center}
-    {\LARGE \textbf{Juan David Muñoz-Bolaños}} \\[0.5em]
-    Rechenauerstraße 42, Innsbruck, Austria (Tirol) \\
-    +43 676 9115145 $\cdot$ \href{mailto:juan.munoz@i-med.ac.at}{juan.munoz@i-med.ac.at}
-\end{center}
+\vspace{12pt}
 
-\vspace{1cm}
+%-----------------------------------------------------------
+% Recipient Information
+%-----------------------------------------------------------
+\textbf{TriLite Technologies GmbH} \\
+Attn: HR / Recruiting Team \\
+Frankenberggasse 13 \\
+1040 Vienna, Austria
 
-% --- Recipient Block ---
-\begin{flushleft}
-    Ms. Astrid Schernthaner \\
-    HR Business Partner \\
-    Besi Austria GmbH \\
-    Innstraße 16 \\
-    6241 Radfeld, Austria
-\end{flushleft}
+\vspace{12pt}
 
-\vspace{0.5cm}
+%-----------------------------------------------------------
+% Subject Line
+%-----------------------------------------------------------
+\textbf{Subject: Application for Senior Optical Engineer (Vienna)}
 
-% --- Date (Automatic or Manual) ---
-\begin{flushright}
-    \today
-\end{flushright}
+\vspace{6pt}
 
-\vspace{0.5cm}
+%-----------------------------------------------------------
+% Body
+%-----------------------------------------------------------
+Dear Hiring Team,
 
-% --- Subject Line ---
-\textbf{Subject: Application for Senior Vision Engineer (Job ID: 257595)}
+I am writing to express my enthusiasm for the \textbf{Senior Optical Engineer} position at TriLite Technologies. 
+As an R\&D Optical Engineer specializing in laser beam shaping and MEMS-based optical systems, 
+I have followed TriLite’s development of the world's smallest projection displays with great interest. 
+Your mission to unlock the Augmented Reality revolution aligns perfectly with my background in high-precision laser optics and prototyping.
 
-\vspace{0.5cm}
+The position requires a candidate who can drive the "design and realization of prototypes" while managing complex optical simulations. 
+My career at the intersection of industrial vision and advanced microscopy prepares me to contribute immediately:
 
-% --- Salutation ---
-Dear Ms. Schernthaner,
+\textbf{1. Laser Beam Manipulation \& MEMS Integration:} \\
+TriLite’s technology relies on precise laser beam scanning. 
+In my current PhD research, I design complex optical setups utilizing **Adaptive Optics** and **SLM/DMD (MEMS)** technology. 
+I currently integrate high-speed Texas Instruments MEMS devices to correct optical aberrations and shape laser wavefronts. 
+This hands-on experience with beam steering and shaping is directly transferable to the LBS (Laser Beam Scanning) challenges in AR display systems.
 
-% --- Intro ---
-I am writing to show my interest for the Senior Vision Engineer position at Besi Austria. As an R\&D Optical Engineer currently living in \textbf{Innsbruck}, I offer a seamless transition into a full-time role.
+\textbf{2. Optical Simulation \& Tolerance Analysis:} \\
+I bridge the gap between theoretical modeling and physical realization. 
+I have extensive experience simulating complex optical paths (including shaped simulations and phase analysis) to predict system performance before prototyping. 
+I am eager to apply this expertise to perform the tolerance analysis and Zemax simulations required for your projection modules, ensuring alignment with your rigorous performance targets.
 
-I have followed Besi's leadership in high-precision die-attach technology with interest, and the opportunity to drive the development of alignment systems in Radfeld aligns with my background in industrial vision and advanced metrology.
+\textbf{3. Industry Experience \& Agility:} \\
+Prior to my research, I worked as a Machine Vision Engineer at INTECOL S.A.S., where I delivered robust **MVTec HALCON** solutions for high-speed industrial lines. 
+This industrial background ensures I understand the difference between a "lab experiment" and a "product-ready" system. 
+I thrive in dynamic, cross-functional environments and look forward to the "startup-like culture" at TriLite, collaborating with electronics and mechanical teams to push the technology envelope.
 
-If I am not wrong, the position requires a candidate who can bridge the gap between ``algorithmics'' and ``optics hardware.'' My career has been defined by this intersection:
+\textbf{4. Local Integration:} \\
+I am currently based in Austria and, with a MINT degree from Germany and an Austrian PhD, I qualify for the **Red-White-Red Card (High-Skilled)**. 
+This ensures a straightforward hiring process. 
+I am eager to relocate to Vienna to join your international team and contribute to the next generation of display technology.
 
-% --- Body Points ---
-\begin{enumerate}[leftmargin=*, label=\textbf{\arabic*.}]
-    \item \textbf{Proven Industrial Vision Experience:} \\
-    Before my M.Sc., I worked as a Machine Vision Engineer at INTECOL S.A.S. I successfully implemented \textbf{MVTec HALCON} solutions for high-speed bottling lines, designing custom illumination concepts to ensure robust \textbf{OCR} inspection. We implemented a safety-critical \textbf{laser profilometry} project for urban cable cars in Metro de Medellin. This experience ensures I can ``create proofs of concept'' that are reliable enough for production transfer.
-
-    \item \textbf{Advanced Optics \& Lab Development:} \\
-    During my PhD in Innsbruck and my Master's in Jena, I specialized in the extreme precision required for semiconductor-scale inspection. I design and maintain complex optical labs featuring \textbf{Adaptive Optics} and \textbf{SLM/DMD} technology. I am currently integrating high-speed/precision Texas Instruments MEMS devices to correct optical aberrations, mirroring the high-speed alignment needs of modern die bonders.
-
-    \item \textbf{Local \& Legal Integration:} \\
-    With a MINT degree from Germany and an upcoming Austrian PhD, I qualify for the Red-White-Red Card (High-Skilled / Shortage Occupation). This ensures a straightforward hiring process, similar to EU candidate. Living in Innsbruck, I am already integrated into the Tyrolean region, with appreciation for the local quality of life: skiing, biking and dancing are my passions. I am committed to a long-term future in Tyrol.
-\end{enumerate}
-
-% --- Closing ---
-I would be grateful to bring my ``capacity for excellence'' to Besi, translating my expertise in precision optics and industrial inspection into the next generation of chip placement machines.
-
+I would be welcome the opportunity to discuss how my experience in precision laser optics can support TriLite’s growth ambitions. 
 Thank you for considering my application.
 
-\vspace{1cm}
+\vspace{18pt}
 
+%-----------------------------------------------------------
+% Closing
+%-----------------------------------------------------------
 Sincerely,
 
-\vspace{1.5cm} % Space for signature
+\vspace{12pt}
 
 \textbf{Juan David Muñoz-Bolaños} \\
 R\&D Optical Engineer \\

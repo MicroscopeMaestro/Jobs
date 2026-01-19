@@ -3,8 +3,11 @@ import os
 import shutil
 import subprocess
 import re
+import sys
 from jinja2 import Environment, FileSystemLoader
-from pypdf import PdfWriter
+
+# --- CORRECT IMPORT FOR PyPDF2 3.0+ ---
+from PyPDF2 import PdfMerger
 
 # --- Configuration ---
 TEMPLATE_DIR = 'templates'
@@ -35,8 +38,6 @@ def compile_latex(tex_filename, output_name):
         print(process.stdout)
         print("--- pdflatex stderr ---")
         print(process.stderr)
-        errors = [line for line in process.stdout.split('\n') if line.startswith('!')]
-        for err in errors[:5]: print(f"     {err}")
         return None
         
     return expected_pdf
@@ -47,14 +48,12 @@ def create_scaled_pdf(filename, scale=0.8):
     """
     print(f"   -> Scaling {filename} to {scale*100}%...")
     
-    # 1. Clean filename logic to prevent "file.pdf.pdf" errors
-    base_name = os.path.splitext(filename)[0] # "id_card"
-    wrapper_tex_name = f"scaled_{base_name}.tex" # "scaled_id_card.tex"
-    wrapper_pdf_name = f"scaled_{base_name}.pdf" # "scaled_id_card.pdf"
+    base_name = os.path.splitext(filename)[0]
+    wrapper_tex_name = f"scaled_{base_name}.tex"
+    wrapper_pdf_name = f"scaled_{base_name}.pdf"
     
     wrapper_path = os.path.join(OUTPUT_DIR, wrapper_tex_name)
     
-    # 2. Create the wrapper LaTeX file
     tex_content = fr"""
 \documentclass[a4paper]{{article}}
 \usepackage{{graphicx}}
@@ -64,14 +63,13 @@ def create_scaled_pdf(filename, scale=0.8):
 \begin{{document}}
     \vspace*{{\fill}}
     \begin{{center}}
-        % keepaspectratio ensures it doesn't distort
         \includegraphics[width={scale}\textwidth, keepaspectratio]{{{filename}}}
     \end{{center}}
     \vspace*{{\fill}}
 \end{{document}}
     """
     
-    with open(wrapper_path, "w") as f:
+    with open(wrapper_path, "w", encoding='utf-8') as f:
         f.write(tex_content)
         
     return compile_latex(wrapper_tex_name, wrapper_pdf_name)
@@ -81,7 +79,6 @@ def generate_application(data):
     print(f"\n--- Generating Application for: {company} ---")
 
     # --- STEP 0: PREPARE ASSETS ---
-    # Copy files from assets/ to generated/ so LaTeX can find them
     if os.path.exists(ASSETS_DIR):
         for item in os.listdir(ASSETS_DIR):
             s = os.path.join(ASSETS_DIR, item)
@@ -98,7 +95,8 @@ def generate_application(data):
         env = Environment(loader=FileSystemLoader(TEMPLATE_DIR), block_start_string=r'\BLOCK{', variable_start_string=r'\VAR{')
         cl_rendered = env.get_template("cover_letter.tex").render(data)
         
-        with open(os.path.join(OUTPUT_DIR, 'cover_letter.tex'), "w") as f: 
+        # Added encoding='utf-8' for special characters like 'ñ'
+        with open(os.path.join(OUTPUT_DIR, 'cover_letter.tex'), "w", encoding='utf-8') as f: 
             f.write(cl_rendered)
         
         cl_pdf = compile_latex('cover_letter.tex', 'cover_letter.pdf')
@@ -109,9 +107,10 @@ def generate_application(data):
     print("2. Generating Resume...")
     resume_pdf = None
     try:
-        with open(os.path.join(TEMPLATE_DIR, 'resume.tex'), 'r') as f: 
+        # Added encoding='utf-8'
+        with open(os.path.join(TEMPLATE_DIR, 'resume.tex'), 'r', encoding='utf-8') as f: 
             resume_content = f.read()
-        with open(os.path.join(OUTPUT_DIR, 'resume.tex'), "w") as f: 
+        with open(os.path.join(OUTPUT_DIR, 'resume.tex'), "w", encoding='utf-8') as f: 
             f.write(resume_content)
             
         resume_pdf = compile_latex('resume.tex', 'resume.pdf')
@@ -120,7 +119,8 @@ def generate_application(data):
 
     # --- STEP 3: MERGE & ATTACH ---
     if cl_pdf and resume_pdf:
-        merger = PdfWriter()
+        # FIX: Using PdfMerger class
+        merger = PdfMerger()
         
         merger.append(cl_pdf)
         merger.append(resume_pdf)
@@ -130,27 +130,24 @@ def generate_application(data):
             fname = attachment
             scale = 1.0
             
-            # Parse Dictionary Format
             if isinstance(attachment, dict):
                 fname = attachment.get('file')
                 scale = attachment.get('scale', 1.0)
             
             file_path = os.path.join(OUTPUT_DIR, fname)
             
-            # Check existence
             if not os.path.exists(file_path):
-                print(f"  ! WARNING: '{fname}' not found in output folder. Skipping.")
+                print(f"  ! WARNING: '{fname}' not found. Skipping.")
                 continue
 
             try:
-                # Apply Scaling logic
                 if scale < 1.0:
                     scaled_pdf_path = create_scaled_pdf(fname, scale)
                     if scaled_pdf_path and os.path.exists(scaled_pdf_path):
                         print(f"  + Appending SCALED {fname}")
                         merger.append(scaled_pdf_path)
                     else:
-                        print(f"  ! Scaling failed for {fname}, appending original.")
+                        print(f"  ! Scaling failed, appending original.")
                         merger.append(file_path)
                 else:
                     print(f"  + Appending {fname}")
@@ -176,24 +173,20 @@ def generate_application(data):
 
 if __name__ == "__main__":
     
-    # --- APP CONFIGURATION ---
     applications = [
         {
             "my_name": "Juan Munoz",
-            "recipient_name": "Ms. Astrid Schernthaner",
-            "recipient_company": "Besi",
-            "job_position": "Senior Vision Engineer",
-            
-            # MAKE SURE THESE FILES EXIST IN 'assets/' FOLDER
+            "recipient_name": "Recruitment Team",
+            "recipient_company": "TriLite",
+            "job_position": "Senior Optical Engineer",
+            # Add attachments here if you have any in the assets folder
             "attachments": [
-                # Normal attachment
-                "master.pdf",
-                "resident_permit.pdf",
+                "master.pdf", 
                 "passport.pdf",
-                "B2.pdf"
-                "intecol_spanish.pdf",
-                "intecol_german.pdf",
-            ]
+                "resident_permit.pdf",
+                "B2.pdf",
+                "intecol_english.pdf",
+                ] 
         }
     ]
 
