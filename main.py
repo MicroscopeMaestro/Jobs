@@ -16,6 +16,41 @@ OUTPUT_DIR = 'generated'
 
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
+def compress_pdf(input_path, output_path, power=3):
+    """
+    Tries Ghostscript first, falls back to PyPDF2 internal compression.
+    power 3 = /ebook (150 dpi), power 4 = /screen (72 dpi)
+    """
+    quality = {1: '/prepress', 2: '/printer', 3: '/ebook', 4: '/screen'}
+    gs_settings = quality.get(power, '/ebook')
+    
+    # 1. Try Ghostscript (The Heavy Lifter)
+    gs_cmd = 'gs' if sys.platform != 'win32' else 'gswin64c'
+    cmd = [
+        gs_cmd, '-sDEVICE=pdfwrite', '-dCompatibilityLevel=1.4',
+        f'-dPDFSETTINGS={gs_settings}', '-dNOPAUSE', '-dQUIET', '-dBATCH',
+        f'-sOutputFile={output_path}', input_path
+    ]
+    
+    try:
+        subprocess.run(cmd, check=True)
+        print(f"   Success: Compressed via Ghostscript ({gs_settings})")
+        return True
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        print("   ! Ghostscript not found or failed. Falling back to PyPDF2 compression...")
+        
+        # 2. Fallback: PyPDF2 Internal (Lossless, less effective but works everywhere)
+        from PyPDF2 import PdfReader, PdfWriter
+        reader = PdfReader(input_path)
+        writer = PdfWriter()
+        for page in reader.pages:
+            page.compress_content_streams() # This zips the text/vector data
+            writer.add_page(page)
+        
+        with open(output_path, "wb") as f:
+            writer.write(f)
+        return True
+    
 def sanitize_filename(text):
     clean = re.sub(r'[^a-zA-Z0-9]', '_', text)
     clean = re.sub(r'_+', '_', clean)
@@ -167,7 +202,15 @@ def generate_application(data):
         merger.write(final_output_path)
         merger.close()
         
-        print(f"\n✅ SUCCESS! Generated: {final_output_path}")
+        # --- NEW: COMPRESSION STEP ---
+        if data.get('compress', False):
+            compressed_path = os.path.join(OUTPUT_DIR, f"Compressed_{final_filename}")
+            # Use power=3 for a good balance (Ebook quality)
+            compress_pdf(final_output_path, compressed_path, power=3)
+            print(f"✅ SUCCESS! Compressed version: {compressed_path}")
+        else:
+            print(f"✅ SUCCESS! Generated: {final_output_path}")
+
     else:
         print("\n❌ FAILED: Could not compile basic documents.")
 
@@ -179,6 +222,7 @@ if __name__ == "__main__":
             "recipient_name": "Ms. Beuler",
             "recipient_company": "Zeiss_Meditec",
             "job_position": "Expert_Vision_Science",
+            "compress": True,  # <--- Added this
             # Add attachments here if you have any in the assets folder
             "attachments": [
                 "master.pdf", 
