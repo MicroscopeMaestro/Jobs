@@ -176,16 +176,19 @@ if __name__ == "__main__":
     applications = [
         {
             "my_name": "Juan Munoz",
-            "recipient_name": "Recruitment Team",
-            "recipient_company": "TriLite",
-            "job_position": "Senior Optical Engineer",
+            "recipient_name": "Ms. Beuler",
+            "recipient_company": "Zeiss_Meditec",
+            "job_position": "Expert_Vision_Science",
             # Add attachments here if you have any in the assets folder
             "attachments": [
                 "master.pdf", 
                 "passport.pdf",
                 "resident_permit.pdf",
                 "B2.pdf",
+                "Zeiss_Summer_School.pdf",
                 "intecol_english.pdf",
+                "IPHT1.pdf",
+                "IPHT2.pdf"
                 ] 
         }
     ]

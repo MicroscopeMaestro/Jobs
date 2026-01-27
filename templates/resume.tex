@@ -5,13 +5,13 @@
 \usepackage[T1]{fontenc}
 \usepackage{helvet}
 \renewcommand{\familydefault}{\sfdefault}
-\usepackage[left=0.8in,top=0.6in,right=0.8in,bottom=0.6in]{geometry}
+\usepackage[left=0.85in,top=0.7in,right=0.85in,bottom=0.7in]{geometry}
 \usepackage{enumitem}
 \usepackage{titlesec}
 \usepackage{xcolor}
 \usepackage{graphicx}
-\usepackage{tikz} % REQUIRED FOR ROUND CROP
-\usepackage[hidelinks]{hyperref}
+\usepackage{tikz} 
+\usepackage[hidelinks]{hyperref} 
 
 % --- FORMATTING ---
 \pagestyle{empty}
@@ -19,7 +19,7 @@
 
 % Section Styling
 \titleformat{\section}{\large\bfseries}{}{0em}{}[\titlerule]
-\titlespacing{\section}{0pt}{12pt}{6pt}
+\titlespacing{\section}{0pt}{14pt}{8pt} 
 
 % Custom Entry Command
 \newcommand{\entry}[4]{
@@ -31,25 +31,25 @@
 \newcommand{\roundpic}[1]{
   \begin{tikzpicture}
     \clip (0,0) circle (1.4cm); 
-    \node at (0,0) {\includegraphics[width=2.8cm]{#1}}; 
+    \node at (0,0) {\includegraphics[width=2.9cm]{#1}}; 
   \end{tikzpicture}
 }
 
 \begin{document}
 
-% --- HEADER WITH ROUND PHOTO ---
+% --- HEADER ---
 \noindent
 \begin{minipage}[c]{0.70\textwidth}
-    {\Huge \textbf{J. David Muñoz-Bolaños}} \\ \vspace{6pt}
-    \textbf{\large R\&D Optical Engineer | Optical Metrology Specialist} \\ \vspace{6pt}
+    {\Huge \textbf{Juan David Munoz-Bolanos} \vspace{2pt}} \\ \vspace{8pt}
+    \textbf{\large Biomedical Optical Engineer | Medical Imaging \& Vision Science} \\ \vspace{8pt}
     Rechenauerstraße 42, Innsbruck, Austria \\
     +43 676 9115145 \\
-    \href{mailto:juan.munoz@i-med.ac.at}{juan.munoz@i-med.ac.at}
+    \href{mailto:juan.munoz@i-med.ac.at}{juan.munoz@i-med.ac.at} \ \textbf{|} \ \href{https://www.linkedin.com/in/juan-mu\%C3\%B1oz-microscopy/}{LinkedIn Profile}
 \end{minipage}%
 \hfill
 \begin{minipage}[c]{0.25\textwidth}
     \begin{flushright}
-        % Ensure 'photo.png' is in the SAME folder
+        % Ensure photo.png is in the same folder
         \roundpic{photo.png}
     \end{flushright}
 \end{minipage}
@@ -58,21 +58,33 @@
 
 % --- PROFESSIONAL SUMMARY ---
 \section{PROFESSIONAL SUMMARY}
-R\&D Optical engineer based in **Innsbruck** with a magic combination of **Industrial Machine Vision** expertise and **High-Precision Optical Metrology**. Proven track record in developing illumination concepts, algorithmics (Python), and hardware integration for automated inspection systems. Experience bridging the gap between "code" and "hardware," from implementing inspection systems on high-speed industrial lines to correcting optical aberrations using **MEMS devices**. Eager to apply expertise in **optics, vision, and algorithms** to TriLite's next-generation Laser Beam Scanning (LBS) systems.
+Biomedical engineer based in **Innsbruck** with hands-on 
+**Medical optical microscopy** and **Computer Vision**. Hands-on 
+confocal, spectroscopy and two-photon imaging for clinical applications 
+, and analytical image processing pipelines.  
 
 % --- TECHNICAL COMPETENCIES ---
+
 \section{TECHNICAL COMPETENCIES}
 
-\textbf{Vision Technology \& Algorithmics} \\
-MVTec HALCON (Industrial software), Image Processing Pipelines, **Python**, GPU Acceleration (CuPy) for real-time processing, **Laser Profilometry**, Camera/Laser Calibration.
+\textbf{Biomedical Optics \& Medical simulation} \\
+Optical desing - End-to-end optical system modeling by numerical estimations
+and Zemax OpticStudio, including tolerance analysis. 
+Optical prototyping experience, following for example ISO 10110. 
+Adaptive optics for optical aberration correction. 
 
 \vspace{6pt}
-\textbf{Optics \& Lab Management} \\
-Illumination/Optical Design, **Zemax OpticStudio** (Simulation \& Tolerance Analysis), Adaptive Optics (**Texas Instruments DMD**, SLM), Interferometry, **Laser Beam Shaping**, System Integration, Prototyping.
+\textbf{Vision Technology \& Digital Metrology} \\
+Image Processing Pipelines using tailored **Python** pipelines, 
+and computational/holography imaging with
+GPU Acceleration (Jax/Cupy). 
 
 \vspace{6pt}
-\textbf{Hardware Control} \\
-FPGA Real-time control (LabVIEW), Motion Control, High-speed Detectors (PMT/APD), Semiconductor-based **MEMS integration**.
+\textbf{Hardware Control \& Medical Systems} \\
+Biomedical imaging for deep tissue imaging using 
+infrarred light.
+Embedded control knowledge using FPGA and
+optomechanical devices. 
 
 \vspace{6pt}
 \textbf{Languages} \\
@@ -81,55 +93,83 @@ English (Proficient), German (Intermediate/Working Proficiency), Spanish (Native
 % --- PROFESSIONAL EXPERIENCE ---
 \section{PROFESSIONAL EXPERIENCE}
 
-\entry{Medical University of Innsbruck}{Innsbruck, Austria}{PhD Researcher - Optical Systems Engineering}{Jan 2022 -- Present}
-\begin{itemize}[leftmargin=*, noitemsep, topsep=3pt]
-    \item \textbf{High-Speed Hardware Integration (MEMS):} Designed and built a control system for a **Texas Instruments DLP/DMD** to correct optical aberrations. This work mirrors laser beam scanning tasks, requiring high-speed/precision actuation and real-time feedback loops.
-    \item \textbf{Algorithmics \& GPU Acceleration:} Developed GPU-accelerated algorithms (Python/CuPy) to restore imaging quality in complex media. Optimized processing pipelines to handle large image stacks efficiently.
-    \item \textbf{Optics Lab Management:} Responsible for the maintenance and improvement of the microscopy lab, including laser safety protocols, handling fine optical components, and aligning complex beam paths.
+% Medical University
+\entry{\href{https://www.i-med.ac.at/dpmp/bmp/staff/}{Medical University of Innsbruck}}{Innsbruck, Austria}{PhD Researcher - Optical Systems Engineering}{Jan 2022 -- Present}
+\begin{itemize}[leftmargin=*, topsep=2pt, itemsep=1pt, parsep=1pt]
+    \item \textbf{Biomedical Optics \& Adaptive Optics:} 
+    Designed control system for the optical microscopes to correct optical 
+    aberrations and thus imaging deeper in biological tissue.
+    \item \textbf{Algorithmics \& GPU Acceleration:} 
+    Image processing of phase aberrations and GPU numerical estimations of
+    image enhancement.
+    \item \textbf{Optics Lab Management:} Responsible for the maintenance 
+    and improvement of the microscopy lab, 
+    including handling fine optical components, 
+    ensuring operational standards in 
+    biomedical research.
 \end{itemize}
 
-\vspace{8pt}
+\vspace{10pt}
 
-\entry{Leibniz Institute of Photonic Technology (IPHT)}{Jena, Germany}{R\&D Assistant Researcher}{Jun 2020 -- Dec 2021}
-\begin{itemize}[leftmargin=*, noitemsep, topsep=3pt]
-    \item \textbf{Prototyping:} Assembled multimodal imaging setups (Raman/Photothermal) from concept to functional prototype.
-    \item \textbf{Hardware Integration:} Collaborated with scientific partners to qualify new detection methods for environmental microplastic analysis.
+% Leibniz IPHT
+\entry{\href{https://www.leibniz-ipht.de/en/homepage/}{Leibniz Institute of Photonic Technology (IPHT)}}{Jena, Germany}{R\&D Assistant Researcher}{Jun 2020 -- Dec 2021}
+\begin{itemize}[leftmargin=*, topsep=2pt, itemsep=1pt, parsep=1pt]
+    \item \textbf{Prototyping:} Medical Imaging Prototyping: assembling multimodal imaging 
+    strategies for bladder cancer identification.
+    \item \textbf{System Integration:} Collaboration with 
+    collegeus to create data analysis strategies, 
+    such as machine learning to detect the cancer.
 \end{itemize}
 
-\vspace{8pt}
+\vspace{10pt}
 
-\entry{INTECOL S.A.S.}{Medellin, Colombia}{Machine Vision Engineer}{Mar 2018 -- Mar 2019}
-\begin{itemize}[leftmargin=*, noitemsep, topsep=3pt]
-    \item \textbf{Industrial Deployment (OCR):} Led the full development cycle of a quality control system for bottling lines. Designed custom **LED illumination** concepts and programmed **HALCON** algorithms to reliably read and verify OCR codes on printed labels.
-    \item \textbf{Safety-Critical Inspection:} Developed a **laser profilometry system** for the Metro de Medellin cable cars. Created the concept, integrated the vision hardware, and validated the system for outdoor environments.
-    \item \textbf{Production Transfer:} Managed on-site installation, calibration, and provided technical support and training for operators.
+% INTECOL
+\entry{\href{https://intecol.com.co/}{INTECOL S.A.S.}}{Medellin, Colombia}{Computer Vision Engineer}{Mar 2018 -- Mar 2019}
+\begin{itemize}[leftmargin=*, topsep=2pt, itemsep=1pt, parsep=1pt]
+    \item \textbf{Digital Measurement \& Reliability:} 
+    Development cycle of quality control systems using computer vision by 
+    means of industrial camera, illumination and processing data algorithms. 
+    \item \textbf{Safety-Critical Inspection:} 
+    Manage the product lifecycle from concept to industrial validation, 
+    ensuring reliability in safety-critical public areas. 
 \end{itemize}
 
+\newpage
 % --- EDUCATION ---
 \section{EDUCATION}
 
-\entry{Medical University of Innsbruck}{Austria}{Ph.D. Advanced Microscopy \& Optics (Available from March 2026)}{Jan 2022 -- Present}
+\entry{Medical University of Innsbruck}{Austria}{Ph.D. Biomedical Microscopy \& Optics (Exp. March 2026)}{Jan 2022 -- Present}
 
+\vspace{4pt}
 \entry{Friedrich Schiller University Jena}{Germany}{M.Sc. in Photonics}{2019 -- 2021}
 
+\vspace{4pt}
 \entry{University of Cauca}{Colombia}{B.Sc. in Physics Engineering}{2012 -- 2018}
 
 % --- SELECTED PUBLICATIONS & AWARDS ---
-\section{SELECTED PUBLICATIONS \& AWARDS} % Fixed: \& instead of &
-\begin{itemize}[leftmargin=*, noitemsep, topsep=3pt]
-    \item J. D. Muñoz-Bolaños, et al. "\textbf{Scatter compensation} for enabling deep two-photon microscopy using a **MEMS phase light modulator**," Proc. SPIE (2026).
-    \item J. D. Muñoz-Bolaños, et al. "**Wavefront corrections** over large fields of view via beam cone tomography." Proc. SPIE (2025).
+\section{SELECTED PUBLICATIONS \& AWARDS}
+\begin{itemize}[leftmargin=*, topsep=2pt, itemsep=2pt]
     \item \textbf{Awards:} ZEISS Summer School (2025), COLFUTURO Grant (2019).
+    \item Muñoz-Bolaños, J. D., et al. Design of a dispersive 1064 nm fiber 
+    probe Raman imaging spectrometer and its application to human bladder resectates. 
+    Applied Sciences, 14(11), 4726.
+    \item Muñoz-Bolaños, J. D. et al. Confocal Raman Microscopy with Adaptive Optics. 
+    ACS Photonics 2025, 12 (1), 176–184.
 \end{itemize}
 
 % --- REFERENCES ---
 \section{REFERENCES}
+
 \textbf{Prof. Monika Ritsch-Marte} \hfill Medical University of Innsbruck \\
+\textit{Head of Institute for Biomedical Physics} \\
 \href{mailto:monika.ritsch-marte@i-med.ac.at}{monika.ritsch-marte@i-med.ac.at}
 
-\vspace{6pt}
+\vspace{10pt}
 
-\textbf{Prof. Jürgen Popp} \hfill Leibniz Institute of Photonic Technology \\
-\href{mailto:juergen.popp@leibniz-ipht.de}{juergen.popp@leibniz-ipht.de}
+\textbf{Prof.  Christoph Krafft} \hfill Leibniz Institute of Photonic Technology \\
+\textit{Group leader: spectroscopy imaging \& Histopathology} \\
+\href{mailto:christoph.krafft@leibniz-ipht.de}{christoph.krafft@leibniz-ipht.de}
+
+\vspace{10pt}
 
 \end{document}
