@@ -30,8 +30,8 @@
 % --- MACRO: ROUND PHOTO ---
 \newcommand{\roundpic}[1]{
   \begin{tikzpicture}
-    \clip (0,0) circle (1.4cm); 
-    \node at (0,0) {\includegraphics[width=2.9cm]{#1}}; 
+    \clip (0,0) circle (1.5cm); 
+    \node at (0,0) {\includegraphics[width=3.0cm]{#1}}; 
   \end{tikzpicture}
 }
 
@@ -40,11 +40,11 @@
 % --- HEADER ---
 \noindent
 \begin{minipage}[c]{0.70\textwidth}
-    {\Huge \textbf{Juan David Munoz-Bolanos} \vspace{2pt}} \\ \vspace{8pt}
-    \textbf{\large Biomedical Optical Engineer | Medical Imaging \& Vision Science} \\ \vspace{8pt}
-    Rechenauerstraße 42, Innsbruck, Austria \\
-    +43 676 9115145 \\
-    \href{mailto:juan.munoz@i-med.ac.at}{juan.munoz@i-med.ac.at} \ \textbf{|} \ \href{https://www.linkedin.com/in/juan-mu\%C3\%B1oz-microscopy/}{LinkedIn Profile}
+    {\Huge \textbf{<< my_name >>} \vspace{2pt}} \\ \vspace{8pt}
+    \textbf{\large << my_title >> | Adaptive Optics} \\ \vspace{8pt}
+    << my_address >> \\
+    << my_phone >> \\
+    \href{mailto:<< my_email >>}{<< my_email >>} \ \textbf{|} \ \href{https://www.linkedin.com/in/juan-mu\%C3\%B1oz-microscopy/}{LinkedIn Profile}
 \end{minipage}%
 \hfill
 \begin{minipage}[c]{0.25\textwidth}
@@ -58,118 +58,69 @@
 
 % --- PROFESSIONAL SUMMARY ---
 \section{PROFESSIONAL SUMMARY}
-Biomedical engineer based in **Innsbruck** with hands-on 
-**Medical optical microscopy** and **Computer Vision**. Hands-on 
-confocal, spectroscopy and two-photon imaging for clinical applications 
-, and analytical image processing pipelines.  
+<< resume.summary >>
 
 % --- TECHNICAL COMPETENCIES ---
 
 \section{TECHNICAL COMPETENCIES}
 
-\textbf{Biomedical Optics \& Medical simulation} \\
-Optical desing - End-to-end optical system modeling by numerical estimations
-and Zemax OpticStudio, including tolerance analysis. 
-Optical prototyping experience, following for example ISO 10110. 
-Adaptive optics for optical aberration correction. 
+(( for comp in resume.competencies ))
+\textbf{<< comp.category >>} \\
+<< comp.details >> 
 
 \vspace{6pt}
-\textbf{Vision Technology \& Digital Metrology} \\
-Image Processing Pipelines using tailored **Python** pipelines, 
-and computational/holography imaging with
-GPU Acceleration (Jax/Cupy). 
-
-\vspace{6pt}
-\textbf{Hardware Control \& Medical Systems} \\
-Biomedical imaging for deep tissue imaging using 
-infrarred light.
-Embedded control knowledge using FPGA and
-optomechanical devices. 
-
-\vspace{6pt}
-\textbf{Languages} \\
-English (Proficient), German (Intermediate/Working Proficiency), Spanish (Native).
+(( endfor ))
 
 % --- PROFESSIONAL EXPERIENCE ---
 \section{PROFESSIONAL EXPERIENCE}
 
-% Medical University
-\entry{\href{https://www.i-med.ac.at/dpmp/bmp/staff/}{Medical University of Innsbruck}}{Innsbruck, Austria}{PhD Researcher - Optical Systems Engineering}{Jan 2022 -- Present}
+(( for job in resume.experience ))
+% << job.institution >>
+\entry{\href{<< job.link >>}{<< job.institution >>}}
+{<< job.location >>}{<< job.position >>}\
+{<< job.dates >>}
 \begin{itemize}[leftmargin=*, topsep=2pt, itemsep=1pt, parsep=1pt]
-    \item \textbf{Biomedical Optics \& Adaptive Optics:} 
-    Designed control system for the optical microscopes to correct optical 
-    aberrations and thus imaging deeper in biological tissue.
-    \item \textbf{Algorithmics \& GPU Acceleration:} 
-    Image processing of phase aberrations and GPU numerical estimations of
-    image enhancement.
-    \item \textbf{Optics Lab Management:} Responsible for the maintenance 
-    and improvement of the microscopy lab, 
-    including handling fine optical components, 
-    ensuring operational standards in 
-    biomedical research.
+    (( for bullet in job.bullets ))
+    \item << bullet >>
+    (( endfor ))
 \end{itemize}
 
 \vspace{10pt}
-
-% Leibniz IPHT
-\entry{\href{https://www.leibniz-ipht.de/en/homepage/}{Leibniz Institute of Photonic Technology (IPHT)}}{Jena, Germany}{R\&D Assistant Researcher}{Jun 2020 -- Dec 2021}
-\begin{itemize}[leftmargin=*, topsep=2pt, itemsep=1pt, parsep=1pt]
-    \item \textbf{Prototyping:} Medical Imaging Prototyping: assembling multimodal imaging 
-    strategies for bladder cancer identification.
-    \item \textbf{System Integration:} Collaboration with 
-    collegeus to create data analysis strategies, 
-    such as machine learning to detect the cancer.
-\end{itemize}
-
-\vspace{10pt}
-
-% INTECOL
-\entry{\href{https://intecol.com.co/}{INTECOL S.A.S.}}{Medellin, Colombia}{Computer Vision Engineer}{Mar 2018 -- Mar 2019}
-\begin{itemize}[leftmargin=*, topsep=2pt, itemsep=1pt, parsep=1pt]
-    \item \textbf{Digital Measurement \& Reliability:} 
-    Development cycle of quality control systems using computer vision by 
-    means of industrial camera, illumination and processing data algorithms. 
-    \item \textbf{Safety-Critical Inspection:} 
-    Manage the product lifecycle from concept to industrial validation, 
-    ensuring reliability in safety-critical public areas. 
-\end{itemize}
+(( endfor ))
 
 \newpage
 % --- EDUCATION ---
 \section{EDUCATION}
 
-\entry{Medical University of Innsbruck}{Austria}{Ph.D. Biomedical Microscopy \& Optics (Exp. March 2026)}{Jan 2022 -- Present}
+(( for edu in resume.education ))
+\entry{<< edu.institution >>}{<< edu.location >>}{<< edu.degree >>}{<< edu.dates >>}
 
 \vspace{4pt}
-\entry{Friedrich Schiller University Jena}{Germany}{M.Sc. in Photonics}{2019 -- 2021}
-
-\vspace{4pt}
-\entry{University of Cauca}{Colombia}{B.Sc. in Physics Engineering}{2012 -- 2018}
+(( endfor ))
 
 % --- SELECTED PUBLICATIONS & AWARDS ---
-\section{SELECTED PUBLICATIONS \& AWARDS}
+\section{PUBLICATIONS \& AWARDS}
 \begin{itemize}[leftmargin=*, topsep=2pt, itemsep=2pt]
-    \item \textbf{Awards:} ZEISS Summer School (2025), COLFUTURO Grant (2019).
-    \item Muñoz-Bolaños, J. D., et al. Design of a dispersive 1064 nm fiber 
-    probe Raman imaging spectrometer and its application to human bladder resectates. 
-    Applied Sciences, 14(11), 4726.
-    \item Muñoz-Bolaños, J. D. et al. Confocal Raman Microscopy with Adaptive Optics. 
-    ACS Photonics 2025, 12 (1), 176–184.
+    (( for item in resume.publications_awards ))
+    \item << item >>
+    (( endfor ))
 \end{itemize}
+
+\vspace{6pt}
+\section{LANGUAGES} 
+(( for lang in resume.languages ))
+<< lang >>(( if not loop.last )), (( endif ))
+(( endfor ))
 
 % --- REFERENCES ---
 \section{REFERENCES}
 
-\textbf{Prof. Monika Ritsch-Marte} \hfill Medical University of Innsbruck \\
-\textit{Head of Institute for Biomedical Physics} \\
-\href{mailto:monika.ritsch-marte@i-med.ac.at}{monika.ritsch-marte@i-med.ac.at}
+(( for ref in resume.references ))
+\textbf{<< ref.name >>} \hfill << ref.institution >> \\
+\textit{<< ref.role >>} \\
+\href{mailto:<< ref.email >>}{<< ref.email >>}
 
 \vspace{10pt}
-
-\textbf{Prof.  Christoph Krafft} \hfill Leibniz Institute of Photonic Technology \\
-\textit{Group leader: spectroscopy imaging \& Histopathology} \\
-\href{mailto:christoph.krafft@leibniz-ipht.de}{christoph.krafft@leibniz-ipht.de}
-
-\vspace{10pt}
+(( endfor ))
 
 \end{document}

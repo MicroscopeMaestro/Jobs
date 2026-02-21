@@ -1,2 +1,4 @@
 jinja2
 pypdf
+pyyaml
+watchdog

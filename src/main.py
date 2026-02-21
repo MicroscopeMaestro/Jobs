@@ -10,9 +10,11 @@ from jinja2 import Environment, FileSystemLoader
 from PyPDF2 import PdfMerger
 
 # --- Configuration ---
-TEMPLATE_DIR = 'templates'
-ASSETS_DIR = 'assets'
-OUTPUT_DIR = 'generated'
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+TEMPLATE_DIR = os.path.join(PROJECT_ROOT, 'templates')
+ASSETS_DIR = os.path.join(PROJECT_ROOT, 'assets')
+OUTPUT_DIR = os.path.join(PROJECT_ROOT, 'generated')
+DATA_FILE = os.path.join(PROJECT_ROOT, 'data', 'data.json')
 
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
@@ -75,6 +77,14 @@ def compile_latex(tex_filename, output_name):
         print(process.stderr)
         return None
         
+    # Cleanup intermediate files
+    base_name = os.path.splitext(tex_filename)[0]
+    extensions = ['.aux', '.log', '.out', '.synctex.gz', '.fdb_latexmk', '.fls']
+    for ext in extensions:
+        temp_file = os.path.join(OUTPUT_DIR, base_name + ext)
+        if os.path.exists(temp_file):
+            os.remove(temp_file)
+            
     return expected_pdf
 
 def create_scaled_pdf(filename, scale=0.8):
@@ -127,7 +137,15 @@ def generate_application(data):
     print("1. Generating Cover Letter...")
     cl_pdf = None
     try:
-        env = Environment(loader=FileSystemLoader(TEMPLATE_DIR), block_start_string=r'\BLOCK{', variable_start_string=r'\VAR{')
+        env = Environment(
+            loader=FileSystemLoader(TEMPLATE_DIR),
+            block_start_string='((',
+            block_end_string='))',
+            variable_start_string='<<',
+            variable_end_string='>>',
+            comment_start_string='((#',
+            comment_end_string='#))'
+        )
         cl_rendered = env.get_template("cover_letter.tex").render(data)
         
         # Added encoding='utf-8' for special characters like 'ñ'
@@ -142,15 +160,15 @@ def generate_application(data):
     print("2. Generating Resume...")
     resume_pdf = None
     try:
-        # Added encoding='utf-8'
-        with open(os.path.join(TEMPLATE_DIR, 'resume.tex'), 'r', encoding='utf-8') as f: 
-            resume_content = f.read()
+        # Added encoding='utf-8' and dynamic rendering
+        resume_rendered = env.get_template("resume.tex").render(data)
+        
         with open(os.path.join(OUTPUT_DIR, 'resume.tex'), "w", encoding='utf-8') as f: 
-            f.write(resume_content)
+            f.write(resume_rendered)
             
         resume_pdf = compile_latex('resume.tex', 'resume.pdf')
-    except FileNotFoundError:
-        print(f" ! Error: 'resume.tex' not found in {TEMPLATE_DIR}.")
+    except Exception as e:
+        print(f" ! Error rendering resume: {e}")
 
     # --- STEP 3: MERGE & ATTACH ---
     if cl_pdf and resume_pdf:
@@ -207,35 +225,39 @@ def generate_application(data):
             compressed_path = os.path.join(OUTPUT_DIR, f"Compressed_{final_filename}")
             # Use power=3 for a good balance (Ebook quality)
             compress_pdf(final_output_path, compressed_path, power=3)
-            print(f"✅ SUCCESS! Compressed version: {compressed_path}")
+            print(f"SUCCESS! Compressed version: {compressed_path}")
         else:
-            print(f"✅ SUCCESS! Generated: {final_output_path}")
+            print(f"SUCCESS! Generated: {final_output_path}")
 
     else:
-        print("\n❌ FAILED: Could not compile basic documents.")
+        print("\nFAILED: Could not compile basic documents.")
 
 if __name__ == "__main__":
+    import json
+    import yaml
     
-    applications = [
-        {
-            "my_name": "Juan Munoz",
-            "recipient_name": "Ms. Beuler",
-            "recipient_company": "Zeiss_Meditec",
-            "job_position": "Expert_Vision_Science",
-            "compress": True,  # <--- Added this
-            # Add attachments here if you have any in the assets folder
-            "attachments": [
-                "master.pdf", 
-                "passport.pdf",
-                "resident_permit.pdf",
-                "B2.pdf",
-                "Zeiss_Summer_School.pdf",
-                "intecol_english.pdf",
-                "IPHT1.pdf",
-                "IPHT2.pdf"
-                ] 
-        }
-    ]
+    # Try YAML first, then JSON
+    data_file_yaml = DATA_FILE.replace('.json', '.yaml')
+    
+    if os.path.exists(data_file_yaml):
+        try:
+            with open(data_file_yaml, 'r', encoding='utf-8') as f:
+                applications = yaml.safe_load(f)
+            print(f"--- Loaded data from {data_file_yaml} ---")
+        except Exception as e:
+            print(f"Error reading {data_file_yaml}: {e}")
+            sys.exit(1)
+    elif os.path.exists(DATA_FILE):
+        try:
+            with open(DATA_FILE, 'r', encoding='utf-8') as f:
+                applications = json.load(f)
+            print(f"--- Loaded data from {DATA_FILE} ---")
+        except Exception as e:
+            print(f"Error reading {DATA_FILE}: {e}")
+            sys.exit(1)
+    else:
+        print(f"Error: No data file found (tried .yaml and .json).")
+        sys.exit(1)
 
     for app in applications:
         generate_application(app)

@@ -36,95 +36,51 @@
 %-----------------------------------------------------------
 % Sender Information
 %-----------------------------------------------------------
-\textbf{\large Juan David Muñoz-Bolaños} \\
-Rechenauerstraße 42, Innsbruck, Austria (Tirol) \\
-+43 676 9115145 \\
-\href{mailto:juan.munoz@i-med.ac.at}{juan.munoz@i-med.ac.at}
+\textbf{\large << my_name >>} \\
+<< my_address >> \\
+<< my_phone >> \\
+\href{mailto:<< my_email >>}{<< my_email >>}
 
 \vspace{12pt}
 
 %-----------------------------------------------------------
 % Recipient Information
 %-----------------------------------------------------------
-\textbf{Carl Zeiss Vision GmbH} \\
-Attn: Hiring Team \\
-Gartenstraße 97 \\
-73430 Aalen, Germany
+\textbf{<< recipient_company >>} \\
+<< recipient_name >> \\
+(( for line in recipient_address.split('\n') ))<< line >> \\
+(( endfor ))
 
 \vspace{12pt}
 
 %-----------------------------------------------------------
 % Subject Line
 %-----------------------------------------------------------
-\textbf{Subject: Application for the Expert Vision Science Position}
+\textbf{Subject: << subject >>}
 
 \vspace{6pt}
 
 %-----------------------------------------------------------
 % Body
 %-----------------------------------------------------------
-Dear Ms. Beutler,
+<< salutation >>
 
-Following my participation in the **ZEISS Summer School 2025**, I am
-motivated to bring my expertise in biomedical 
-optics to the Vision Care team in Aalen. 
-As an Biomedical Optical Engineer concluding my PhD at the Medical University
-of Innsbruck. I am writting to apply for the Expert Vision Science position.  
-My background in adaptive optics/microscopy and vision
-aligns with the technical requirements of your Aalen-based team.
+(( for paragraph in body_paragraphs ))
+<< paragraph >>
 
-During my PhD research in Innsbruck, I used adaptive optics to correct optical 
-aberrations from the microscope and biological tissue, this is 
-similar to the human eye aberrations. In my master in Jena, 
-I imaged cancer tissue to identify malignant tissue by using 
-machine learning algorithms. I also 
-explored the industry in Medellin dealing with computation and
-machine vision systems. 
-
-I have the following skills that I believe would be valuable to your team:
-
-\textbf{Practical Vision Science \& Solving problems:} \\
-Experience desining and implementing optical microscopes for 
-improving medical imaging.
-My work has studied cancer identification by machine learning algorithms and
-mouse brain imaging using adaptive optics. 
-
-\textbf{Optical Simulation \& Tolerance Analysis:} \\
-I can offer a bridge between physical-based 
-modeling and Ophtalmic reality.
-My experience in simulating computationally 
-complex bio-optical systems allows me 
-to forseen biological and optical interactions. 
-
-\textbf{Physiological Optics} \\
-My research in cancer imaging in Leibniz IPHT Jena and 
-adaptive optics for image restoration in Innsbruck show me 
-the foundation necessary to understand and optimize
-human vision, sharpeness, binocular, confort.
-
-I am Colombian national with a German master's degree in Photonics,
-and soon PhD in Biomedical Optics with good B2 German certificated skills.
-This makes me qualify as graduated from austrian/german university 
-which makes hiring process seemless. Adittionally, 
-I have the willness to relocate to Aalen.
-
-I am availabe for an interview at your convenience and 
-look forward to chatting how my expertise in vision science and 
-biomedical optics expertise can contribute to ZEISS's. 
-My earliest possible start date is from April/May 2026.
-Thank you for considering my application.
+(( endfor ))
 
 \vspace{18pt}
 
 %-----------------------------------------------------------
 % Closing
 %-----------------------------------------------------------
-Sincerely,
+<< closing >>
 
 \vspace{12pt}
 
-\textbf{Juan David Muñoz-Bolaños} \\
-Biomedical Optical Engineer \\
-Medical University of Innsbruck
+\textbf{<< my_name >>} \\
+<< my_title >> \\
+<< my_affiliation >>
 
 \end{document}

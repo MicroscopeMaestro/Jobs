@@ -8,6 +8,9 @@ venv/
 *.out
 *.fls
 *.fdb_latexmk
+*.synctex.gz
+generated/scaled_*.tex
+generated/scaled_*.pdf
 
 # Generated output
 generated/
