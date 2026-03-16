@@ -5,49 +5,43 @@
   my_title: "Optical System Engineer"
   my_affiliation: "Medical University of Innsbruck"
   recipient_name: "Hiring Team"
-  recipient_company: "Quantum Technology Laboratories GmbH"
+  recipient_company: "ASML"
   recipient_address: |
-    Clemens-Holzmeister-Straße 6
-    1100 Vienna, Austria
-  job_position: "System Engineer - Optical Ground Station"
-  subject: "Application for System Engineer - Optical Ground Station"
+    De Run 6501
+    5504 PE Veldhoven, Netherlands
+  job_position: "Optical / System Engineer"
+  subject: "Application for Optical / System Engineer position"
   salutation: "Dear Hiring Team,"
   body_paragraphs:
     - |
-      I am writing to express my enthusiasm for the system Engineer 
-      position at QTlabs. As a Photonics Engineer currently concluding 
-      my PhD in Innsbruck, I want to pivot my technical expertise 
-      with adaptive optics, optics setups, and computational pipelines. 
-      I can contribute to your mission of securing global networks 
-      through robust Optical Ground Stations (OGS).
+      I am writing to express my strong enthusiasm for an Optical/System Engineer position at ASML. As a Photonics Engineer concluding my PhD in Innsbruck, I want to leverage my technical expertise in adaptive optics, high-performance microscopic optical systems, and computational pipelines to contribute to ASML's cutting-edge lithography equipment. I am excited about the opportunity to push the boundaries of semiconductor manufacturing through precision engineering and advanced optics.
     - |
-      Although my recent research focuses on correcting 
-      optical aberrations, quantum physics and laser knowledge 
-      remain at the core of my background. My experience and 
-      knowledge can be transferred to the challenges of your OGS team.
+      My research is deeply rooted in correcting complex optical aberrations and managing light-matter interactions. Designing and implementing closed-loop optical systems has provided me with hands-on experience in managing high-power lasers, wavefront control, and precise optical alignment, which directly translates to the multidisciplinary challenges of ASML's optical modules and EUV/DUV systems.
     - |
-      \textbf{Adaptive Optics \& Turbulence Mitigation:} \\ 
-      Your role requires expertise dealing with atmospheric turbulence. During my PhD, I implemented adaptive optics using hardware/software to compensate aberrations induced by tissue scattering. This skill is transferable to atmospheric distortions in satellite-to-ground links.
+      \textbf{Adaptive Optics \& Wavefront Control:} \\ 
+      ASML's lithography systems require exceptional control over metrology and projection optics. Over the past few years, I have architected adaptive optics setups using spatial light modulators and precision optomechanics to mitigate severe aberrations. My expertise in diagnosing and dynamically correcting wavefront errors maps directly to the precision optical tuning required for next-generation systems.
     - |
-      \textbf{Advanced Detection \& Noise Management:} \\ I understand that high-performance OGS solutions rely on ultra-low-noise detection. My work with advanced optical microscopy systems (two-photon absorption and Raman) involved detecting few counts from weak signals similar to single-photon detection.
+      \textbf{High-Precision metrology \& Low-Light Detection:} \\ 
+      Achieving nanometer-level precision demands robust metrology and sensor technology. In my work with advanced nonlinear microscopy (two-photon and Raman), I have optimized signal-to-noise ratios in photon-starved regimes. This experience has honed my ability to design sensitive detection pathways, analogous to the highly sensitive wafer alignment and inspection sensors developed at ASML.
     - |
-      \textbf{System Integration \& Computer Vision:} \\ Beyond the lab, I explored the industry in Medellin where I worked with machine/computer vision systems, dealing with industrial/NIR/VIS cameras, illumination techniques and intelligent computational systems. These experiences provides me with the algorithmic foundation necessary for the tracking and pointing control concepts for Low-Earth Orbit satellites.
+      \textbf{System Integration \& Computational Control Pipelines:} \\ 
+      I bridge the gap between optical hardware and software. Through my PhD and previous industry experience as a Machine Vision Engineer, I have built hardware control algorithms and GPU-accelerated pipelines in Python for high-performance data processing. My capability to integrate industrial cameras, illumination strategies, and intelligent computational systems makes me well-suited for improving and optimizing complex, multi-component optical machines.
     - |
-      About me, I am Colombian living in Innsbruck with a German Master's in Photonics, and upcoming PhD in optical microscopy and adaptive optics. After finishing my PhD, I will get an Austrian graduated working permit that makes the hiring process seamless to you, equivalent to EU citizen. I am available after april/may and I am open to chat how my expertise in optics and solving problems can support the QTlabs mission. I hope you enjoyed the description and thank you for your time.
+      About me, I am a Colombian living in Innsbruck with a German Master's in Photonics, and an upcoming PhD in optical microscopy and adaptive optics. After finishing my PhD, I will get an Austrian graduate working permit that makes the hiring process seamless to you, equivalent to an EU citizen. I am available after April/May and I am open to chat about how my expertise in optics and solving problems can support ASML's mission. Thank you for your time and consideration.
   closing: "Sincerely,"
   resume:
     summary: |
-      Optical Systems Engineer with specialization in Adaptive Optics (AO). 
-      Expertise in correcting optical aberrations in microscopy, transferable to
-      Free-Space Optical communications. My background spans nonlinear optics (two-photon microscopy), 
-      hands-on GPU-accelerated simulations and machine vision tracking.
+      Optical Systems Engineer specializing in Adaptive Optics (AO) and high-precision optical setups. 
+      Expertise in diagnosing and correcting complex optical aberrations, directly transferable to 
+      precision lithography and metrology systems. Background spans nonlinear optics, 
+      hardware-software integration, GPU-accelerated pipelines, and machine vision.
     competencies:
       - category: 'Optical Engineering \& Adaptive Optics'
-        details: "Wavefront control: Design of closed-loop AO systems, involving microscopic optical setups such as spatial light modulators, lasers and NIR optics. Knowledge in optical modeling and simulations in scattering media such as atmosphere. Also aware of ISO implementations."
-      - category: 'Quantum/Low-Light Detection'
-        details: "Nonlinear optics: Managing signal-to-noise ratios in photon-starved regimes (analogous to QKD single-photon). Hardware: Photomultipliers (PMTs), spectrometers, single fibers."
-      - category: 'Control \& Data Analysis'
-        details: "Computing: High-performance image processing pipelines using Python(Jax) for GPU acceleration. Embedded: FPGA (LabView) hands-on for real-time control."
+        details: "Wavefront control: Design of closed-loop AO systems using spatial light modulators, lasers, and precision optomechanics. Experience in optical modeling, system alignment, aberration correction, and mitigating optical distortions."
+      - category: 'Precision Detection \& Imaging'
+        details: "Nonlinear optics \\& Spectroscopy: Managing signal-to-noise ratios in photon-starved regimes. Hardware integration: Photomultipliers (PMTs), spectrometers, single-mode fibers, and advanced imaging detectors."
+      - category: 'Control, Data Analysis \& Machine Vision'
+        details: "Computing: High-performance image processing pipelines using Python (JAX/CuPy) for GPU acceleration. Systems Integration: Industrial cameras, illumination control, and intelligent machine vision. Embedded: FPGA (LabView) hands-on for real-time control."
     experience:
       - institution: "Medical University of Innsbruck"
         link: "https://www.i-med.ac.at/dpmp/bmp/staff/"
@@ -55,25 +49,25 @@
         position: "PhD Researcher - Optical Engineering"
         dates: "Jan 2022 -- Present"
         bullets:
-          - '\textbf{Adaptive Optics} Engineered control systems for optical microscopes to correct severe aberrations induced by deep biological tissue.'
-          - '\textbf{Nonlinear system design:} Two-Photon microscopes implementation. Balanced high-power lasers (analogous to Beacon lasers) with efficient and sensitive detection.'
-          - '\textbf{Lab Management:} Maintained high-precision optical infrastructure, ensuring operational standards similar to OGS facility requirements.'
+          - '\textbf{Adaptive Optics:} Engineered closed-loop control systems for optical microscopes to correct severe optical aberrations dynamically.'
+          - '\textbf{Advanced Optical System Design:} Implemented Two-Photon microscopes, balancing high-power laser delivery with highly efficient, sensitive detection pathways.'
+          - '\textbf{Lab Management \& Precision Alignment:} Maintained high-precision optical infrastructure, ensuring strict operational standards and continuous system optimization.'
       - institution: "Leibniz Institute of Photonic Technology (IPHT)"
         link: "https://www.leibniz-ipht.de/en/homepage/"
         location: "Jena, Germany"
         position: 'R\&D Assistant Researcher'
         dates: "Jun 2020 -- Dec 2021"
         bullets:
-          - '\textbf{System Prototyping:} Assembled vibrational imaging prototypes with the integration of spectrometers, fiber probes and CW lasers.'
-          - '\textbf{Data Analysis:} Data analysis using machine learning methods to identify signal patterns from noise datasets.'
+          - '\textbf{System Prototyping:} Assembled and integrated vibrational imaging prototypes utilizing spectrometers, fiber probes, and CW lasers.'
+          - '\textbf{Data Analysis:} Processed large datasets using machine learning methods to identify weak signal patterns from high-noise environments.'
       - institution: "INTECOL S.A.S."
         link: "https://intecol.com.co/"
         location: "Medellin, Colombia"
         position: "Machine Vision System Engineer"
         dates: "Mar 2018 -- Mar 2019"
         bullets:
-          - '\textbf{Tracking Systems:} Developed industrial quality control systems using computer vision, industrial cameras, and illumination control.'
-          - '\textbf{Safety-Critical Logic:} Managed product lifecycles for safety-critical inspection systems.'
+          - '\textbf{Optical Metrology \& Tracking:} Developed industrial quality control systems utilizing computer vision, industrial cameras, and custom illumination.'
+          - '\textbf{Systems Integration:} Managed product lifecycles and physical deployment for safety-critical automated inspection systems.'
     education:
       - institution: "Medical University of Innsbruck"
         location: "Austria"
