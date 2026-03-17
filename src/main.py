@@ -65,7 +65,7 @@ def compile_latex(tex_filename, output_name):
     
     # Run pdflatex once and capture all output
     cmd = ['pdflatex', '-output-directory', OUTPUT_DIR, '-interaction=nonstopmode', tex_path]
-    process = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
+    process = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True, errors='replace')
     
     expected_pdf = os.path.join(OUTPUT_DIR, output_name)
     
@@ -124,8 +124,12 @@ def generate_application(data):
     print(f"\n--- Generating Application for: {company} ---")
 
     # --- STEP 0: PREPARE ASSETS ---
+    # Only copy non-PDF files (e.g., photo.png) that LaTeX templates need.
+    # PDFs stay in assets/ and are read from there directly to avoid duplication.
     if os.path.exists(ASSETS_DIR):
         for item in os.listdir(ASSETS_DIR):
+            if item.lower().endswith('.pdf'):
+                continue  # PDFs are read directly from assets/, never copied
             s = os.path.join(ASSETS_DIR, item)
             d = os.path.join(OUTPUT_DIR, item)
             if os.path.isfile(s):
@@ -134,7 +138,7 @@ def generate_application(data):
         print(f" ! Warning: '{ASSETS_DIR}' folder missing.")
 
     # --- STEP 1: COMPILE LETTER ---
-    print("1. Generating Cover Letter...")
+    print("1. Generating Motivation Letter...")
     cl_pdf = None
     try:
         env = Environment(
@@ -146,15 +150,15 @@ def generate_application(data):
             comment_start_string='((#',
             comment_end_string='#))'
         )
-        cl_rendered = env.get_template("cover_letter.tex").render(data)
+        cl_rendered = env.get_template("motivation_letter.tex").render(data)
         
         # Added encoding='utf-8' for special characters like 'ñ'
-        with open(os.path.join(OUTPUT_DIR, 'cover_letter.tex'), "w", encoding='utf-8') as f: 
+        with open(os.path.join(OUTPUT_DIR, 'motivation_letter.tex'), "w", encoding='utf-8') as f: 
             f.write(cl_rendered)
         
-        cl_pdf = compile_latex('cover_letter.tex', 'cover_letter.pdf')
+        cl_pdf = compile_latex('motivation_letter.tex', 'motivation_letter.pdf')
     except Exception as e:
-        print(f" ! Error rendering cover letter: {e}")
+        print(f" ! Error rendering motivation letter: {e}")
 
     # --- STEP 2: COMPILE RESUME ---
     print("2. Generating Resume...")
@@ -187,7 +191,10 @@ def generate_application(data):
                 fname = attachment.get('file')
                 scale = attachment.get('scale', 1.0)
             
-            file_path = os.path.join(OUTPUT_DIR, fname)
+            # Look in assets/ first, then fall back to generated/ for compiled files
+            file_path = os.path.join(ASSETS_DIR, fname)
+            if not os.path.exists(file_path):
+                file_path = os.path.join(OUTPUT_DIR, fname)
             
             if not os.path.exists(file_path):
                 print(f"  ! WARNING: '{fname}' not found. Skipping.")
@@ -236,27 +243,26 @@ if __name__ == "__main__":
     import json
     import yaml
     
-    # Try YAML first, then JSON
-    data_file_yaml = DATA_FILE.replace('.json', '.yaml')
+    applications = []
     
-    if os.path.exists(data_file_yaml):
-        try:
-            with open(data_file_yaml, 'r', encoding='utf-8') as f:
-                applications = yaml.safe_load(f)
-            print(f"--- Loaded data from {data_file_yaml} ---")
-        except Exception as e:
-            print(f"Error reading {data_file_yaml}: {e}")
-            sys.exit(1)
-    elif os.path.exists(DATA_FILE):
-        try:
-            with open(DATA_FILE, 'r', encoding='utf-8') as f:
-                applications = json.load(f)
-            print(f"--- Loaded data from {DATA_FILE} ---")
-        except Exception as e:
-            print(f"Error reading {DATA_FILE}: {e}")
-            sys.exit(1)
-    else:
-        print(f"Error: No data file found (tried .yaml and .json).")
+    data_en = os.path.join(PROJECT_ROOT, 'data', 'data_en.yaml')
+    data_de = os.path.join(PROJECT_ROOT, 'data', 'data_de.yaml')
+    
+    for lang, file_path in [('en', data_en), ('de', data_de)]:
+        if os.path.exists(file_path):
+            try:
+                with open(file_path, 'r', encoding='utf-8') as f:
+                    apps = yaml.safe_load(f) or []
+                    for app in apps:
+                        app['language'] = lang # explicitly tag the application with its language
+                    applications.extend(apps)
+                print(f"--- Loaded {len(apps)} {lang} applications from {file_path} ---")
+            except Exception as e:
+                print(f"Error reading {file_path}: {e}")
+                sys.exit(1)
+                
+    if not applications:
+        print("Error: No applications found in either data_en.yaml or data_de.yaml.")
         sys.exit(1)
 
     for app in applications:

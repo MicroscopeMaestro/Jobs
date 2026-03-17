@@ -8,7 +8,7 @@
 \renewcommand{\familydefault}{\sfdefault}
 
 % Adjusted margins to fit everything nicely on one page
-\usepackage[left=0.9in,top=0.8in,right=0.9in,bottom=0.8in]{geometry}
+\usepackage[left=0.75in,top=0.6in,right=0.75in,bottom=0.6in]{geometry}
 \usepackage{url}
 \usepackage{hyperref}
 \usepackage{enumitem}
@@ -30,7 +30,7 @@
 
 \pagestyle{empty}
 \setlength{\parindent}{0pt}
-\setlength{\parskip}{0.6em} % Reduced slightly to fit one page
+\setlength{\parskip}{0.5em} % Reduced slightly to fit one page
 
 \begin{document}
 %-----------------------------------------------------------
@@ -41,7 +41,7 @@
 << my_phone >> \\
 \href{mailto:<< my_email >>}{<< my_email >>}
 
-\vspace{12pt}
+\vspace{8pt}
 
 %-----------------------------------------------------------
 % Recipient Information
@@ -51,14 +51,14 @@
 (( for line in recipient_address.split('\n') ))<< line >> \\
 (( endfor ))
 
-\vspace{12pt}
+\vspace{8pt}
 
 %-----------------------------------------------------------
 % Subject Line
 %-----------------------------------------------------------
 \textbf{Subject: << subject >>}
 
-\vspace{6pt}
+\vspace{4pt}
 
 %-----------------------------------------------------------
 % Body
@@ -70,14 +70,14 @@
 
 (( endfor ))
 
-\vspace{18pt}
+\vspace{12pt}
 
 %-----------------------------------------------------------
 % Closing
 %-----------------------------------------------------------
 << closing >>
 
-\vspace{12pt}
+\vspace{8pt}
 
 \textbf{<< my_name >>} \\
 << my_title >> \\
