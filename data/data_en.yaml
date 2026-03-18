@@ -1,0 +1,143 @@
+- my_name: Juan David Muñoz-Bolaños
+  my_address: Rechenauerstraße 42, Innsbruck, Austria (Tirol)
+  my_phone: +43 676 9115145
+  my_email: juan.munoz@i-med.ac.at
+  my_title: Optical Metrology Engineer
+  my_affiliation: Medical University of Innsbruck
+  recipient_name: Hiring Manager
+  recipient_company: Iventim Solutions GmbH
+  recipient_address: 'Munich
+
+    Germany
+
+    '
+  job_position: Optical Metrology Engineer
+  subject: Application for Optical Metrology Engineer
+  salutation: Dear Hiring Manager,
+  body_paragraphs:
+  - 'As a physicist and optical engineer with a strong background in precision metrology,
+    I am motivated to apply for the Optical Metrology Engineer position at
+    your Munich Lab. Bringing measurement systems from concept to automated, fully
+    functional prototypes is my core strength, and I would be glad to apply this expertise
+    to develop next-generation measurement instruments with your R\&D team.
+
+    '
+  - 'During my Ph.D. at the Medical University of Innsbruck, I developed a system-level
+    understanding of complex optical instruments. I designed and built an automated
+    wavefront sensing and phase retrieval system from scratch, automating the optical
+    benchtop configuration using Python and C++. To understand the aberration sensitivity
+    of these custom optics, I routinely performed systematic optical modeling and
+    tolerance analysis using ZEMAX OpticStudio alongside custom wavefield simulations.
+
+    '
+  - 'At the Leibniz Institute of Photonic Technology (IPHT) in Jena, I deepened my
+    instrumentation and spectroscopy expertise by building a dispersive 1064 nm fiber
+    probe Raman spectrometer. Beyond optical layout and detector calibration, I heavily
+    utilized Python (Pandas, NumPy, Scikit-learn) to perform rigorous mathematical
+    data analysis on hyperspectral images. This end-to-end approach ensured precise
+    measurement validation and directly guided the engineering design.
+
+    '
+  - 'Having spent the last four years in the tirol region, I am integrated into
+    the german/austrian working culture and continuously improving my German (B2). I am completing
+    my Ph.D. this May and for now I have a researscher resident permit that it would be seamlessly easy to adapt for a working permit. 
+    I would welcome the opportunity to discuss how my hands-on
+    metrology experience can contribute to your automated machine vision solutions.
+
+    '
+  closing: Sincerely,
+  resume:
+    summary: 'Optical Metrology Engineer with a specialized background in high-precision
+      metrology, optical simulation, and Python/C++ automation. Proven expertise in
+      building automated optical test setups from scratch and performing rigorous
+      mathematical data analysis to guide engineering design.
+
+      '
+    competencies:
+    - category: Optical Metrology \& Simulation
+      details: Knowledge of Zemax OpticStudio for tolerance analysis, wavefield
+        simulations, and characterizing complex aberrations.
+    - category: Optical System Automation
+      details: Proven ability to automate optical benchtop experiments and metrology
+        setups using Python and C++.
+    - category: Data Analysis \& Programming
+      details: Proficient in Python (NumPy, Pandas, Scikit-learn) and MATLAB for rigorous
+        data evaluation and spectroscopy processing.
+    - category: System Integration
+      details: End-to-end R\&D experience bringing optical setups from concept to
+        fully functional automated prototypes.
+    experience:
+    - institution: Medical University of Innsbruck
+      link: https://www.i-med.ac.at/dpmp/bmp/staff/
+      location: Innsbruck, Austria
+      position: PhD Researcher - Optical Metrology \& Automation
+      dates: Jan 2022 -- Present
+      bullets:
+      - \textbf{Automated Metrology Setups:} Designed and built from scratch an automated
+        wavefront sensing and phase retrieval system, writing the full C++/Python/LabVIEW
+        control stack and interfacing scientific cameras with deformable mirrors.
+      - \textbf{Optical Modeling \& Tolerancing:} Performed systematic tolerance analysis
+        in ZEMAX to characterize aberration sensitivity of custom microscope objectives,
+        alongside Python wave-field simulations (Zernike decomposition).
+      - \textbf{Project Management:} Managed specification and procurement of high-precision
+        opto-mechanical components from Thorlabs and Edmund Optics, maintaining technical
+        spec sheets and rigorous incoming inspection protocols.
+    - institution: Leibniz Institute of Photonic Technology (IPHT)
+      link: https://www.leibniz-ipht.de/en/homepage/
+      location: Jena, Germany
+      position: R\&D Researcher (Photonics \& Data)
+      dates: Jun 2020 -- Dec 2021
+      bullets:
+      - \textbf{System Prototyping:} Designed and built a dispersive 1064 nm fiber
+        probe Raman spectrometer for clinical applications, handling end-to-end optical
+        layout and detector calibration.
+      - \textbf{Data Analysis \& AI:} Applied supervised ML (custom Python packages)
+        to 2D hyperspectral Raman images, achieving high-accuracy classification and
+        significantly accelerating the experimental characterization loop.
+    education:
+    - institution: Medical University of Innsbruck
+      location: Austria
+      degree: Ph.D. in Adaptive Optics \& Microscopy
+      dates: Jan 2022 -- Present
+    - institution: Friedrich Schiller University Jena
+      location: Germany
+      degree: M.Sc. in Photonics
+      dates: 2019 -- 2021
+    - institution: University of Cauca
+      location: Colombia
+      degree: B.Sc. in Physics Engineering
+      dates: 2012 -- 2018
+    publications_awards:
+    - \textbf{Awards and Selections:} Selected for ASML and ZEISS Summer Schools;
+      awarded COLFUTURO Grant 2026 for best Colombian professionals.
+    - Muñoz-Bolaños, J. D. et al. Confocal Raman Microscopy with Adaptive Optics.
+      ACS Photonics 12(1), 176–184 (2025).
+    - Muñoz-Bolaños, J. D., et al. Design of a dispersive 1064 nm fiber probe Raman
+      imaging spectrometer. Applied Sciences, 14(11), 4726 (2024).
+    - Sohmen, M., Muñoz-Bolaños, J. D., et al. Optofluidic adaptive optics in multi-photon
+      microscopy. Biomedical Optics Express 14(4), 1562–1578 (2023).
+    languages:
+    - English (Fluent / Professional)
+    - German (B2 - Working Proficiency)
+    - Spanish (Native)
+    references:
+    - name: Prof. Monika Ritsch-Marte
+      institution: Medical University of Innsbruck
+      role: Head of Institute for Biomedical Physics
+      email: monika.ritsch-marte@i-med.ac.at
+    - name: Dr. Christoph Krafft
+      institution: Leibniz Institute of Photonic Technology
+      role: 'Group leader: Spectroscopy Imaging'
+      email: christoph.kraft@leibniz-ipht.de
+  compress: true
+  attachments:
+  - IPHT1.pdf
+  - IPHT0.pdf
+  - intecol_english.pdf
+  - master.pdf
+  - Bachelor Diploma.pdf
+  - Zeiss_Summer_School.pdf
+  - B2.pdf
+  - Mündliche_test.pdf
+  - passport.pdf
+  - resident_permit.pdf

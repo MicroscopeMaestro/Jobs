@@ -41,7 +41,7 @@
 \noindent
 \begin{minipage}[c]{0.70\textwidth}
     {\Huge \textbf{<< my_name >>} \vspace{2pt}} \\ \vspace{8pt}
-    \textbf{\large << my_title >> | Adaptive Optics} \\ \vspace{8pt}
+    \textbf{\large << my_title >>} \\ \vspace{8pt}
     << my_address >> \\
     << my_phone >> \\
     \href{mailto:<< my_email >>}{<< my_email >>} \ \textbf{|} \ \href{https://www.linkedin.com/in/juan-mu\%C3\%B1oz-microscopy/}{LinkedIn Profile}
@@ -76,9 +76,7 @@
 
 (( for job in resume.experience ))
 % << job.institution >>
-\entry{\href{<< job.link >>}{<< job.institution >>}}
-{<< job.location >>}{<< job.position >>}\
-{<< job.dates >>}
+\entry{<< job.institution >>}{<< job.location >>}{<< job.position >>}{<< job.dates >>}
 \begin{itemize}[leftmargin=*, topsep=2pt, itemsep=1pt, parsep=1pt]
     (( for bullet in job.bullets ))
     \item << bullet >>
@@ -88,7 +86,6 @@
 \vspace{10pt}
 (( endfor ))
 
-\newpage
 % --- EDUCATION ---
 \section{EDUCATION}
 

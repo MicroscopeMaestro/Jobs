@@ -1,0 +1,469 @@
+- my_name: Juan David Muñoz-Bolaños
+  my_address: Rechenauerstraße 42, Innsbruck, Austria (Tirol)
+  my_phone: +43 676 9115145
+  my_email: juan.munoz@i-med.ac.at
+  my_title: Prozessingenieur Messtechnologie
+  my_affiliation: Medizinische Universität Innsbruck
+  recipient_name: Frau Edith Memeti
+  recipient_company: JENOPTIK AG (SwissOptic)
+  recipient_address: 'Heinrich-Wild-Strasse
+
+    9435 Heerbrugg
+
+    Schweiz
+
+    '
+  job_position: Prozessingenieur Messtechnologie 100\% (m/w/d)
+  subject: Application as Process Engineer Metrology 100\% (m/f/d)
+  salutation: Dear Ms. Memeti,
+  body_paragraphs:
+  - 'As a PhD physicist with deep expertise in optical metrology, I am applying for the
+    position of Process Engineer at your Heerbrugg site. I am specifically seeking
+    a role where I can apply my analytical skills to ensure your manufacturing processes
+    operate at the highest level of precision.
+    '
+  - 'During my PhD, my focus was on building and validating high-resolution optical
+    measurement systems (interferometry, wavefront analysis). To ensure high process
+    stability, I use LabVIEW and Python extensively for the automation of calibration
+    procedures. Previously, at INTECOL S.A.S., I was responsible for the design of
+    industrial inspection systems in compliance with industry standards (e.g., ISO
+    10110).
+    '
+  - 'Fully integrated into the DACH work culture, I will be available for employment
+    from May 2026. I look forward to sustainably optimizing development and qualification
+    processes at SwissOptic/Jenoptik.
+    '
+  closing: Sincerely,
+  resume:
+    summary: 'Physicist and Optical Engineer with extensive expertise in precision
+      metrology, interferometry, and high-resolution instrument development. Proven
+      track record in bringing complex optical systems from concept to industrial-grade
+      prototypes. Strong foundation in Python/C++ automation, ZEMAX simulation, and
+      quality assurance under industrial norms (ISO 10110/9001).
+      '
+    competencies:
+    - category: Optical Metrology \& System Design
+      details: End-to-end design and assembly of multiphoton/confocal microscopes and
+        interferometric setups. Expertise in wavefront sensing and diffraction-limited
+        system alignment.
+    - category: Simulation \& Tolerancing
+      details: Advanced use of ZEMAX OpticStudio for systematic tolerance analysis,
+        sensitivity characterization of custom objectives, and Zernike-based wave-field
+        simulations in Python.
+    - category: Software \& Automation
+      details: Expert proficiency in C++, Python (NumPy, Pandas, Scikit-learn, JAX),
+        and LabVIEW/FPGA for real-time hardware control, detector calibration, and
+        automation of calibration routines.
+    - category: Industrial Vision \& QA
+      details: Hands-on experience with Halcon and Cognex VisionPro for production-line
+        inspection. Proficient in MSA (Gage R\&R) and designing custom illumination
+        concepts (Bright-field/Dark-field).
+    - category: Standards \& Compliance
+      details: Strong awareness of ISO 10110 and ISO 9001 standards. Experienced in
+        managing EH\&S compliance and maintaining technical documentation for high-power
+        laser environments.
+    experience:
+    - institution: Medical University of Innsbruck
+      link: https://www.i-med.ac.at/dpmp/bmp/staff/
+      location: Innsbruck, Austria
+      position: PhD Researcher - Optical Metrology \& Automation
+      dates: Jan 2022 -- Present
+      bullets:
+      - \textbf{Metrology System Build:} Designed and automated a custom wavefront
+        sensing and phase retrieval system from scratch; wrote complete control stacks
+        in C++/Python to interface cameras with deformable mirrors.
+      - \textbf{Optical Characterization:} Performed rigorous ZEMAX tolerance analysis
+        to characterize aberration sensitivity in custom-built microscope objectives,
+        validated via experimental interferometry.
+      - \textbf{R\&D Project Leadership:} Led the hardware-software integration of
+        a multiphoton microscope system, achieving diffraction-limited performance
+        while managing vendor qualifications (Thorlabs, Edmund Optics).
+      - \textbf{Lab Operations:} Primary operator for a high-power laser lab, managing
+        safety compliance (EH\&S), equipment maintenance logs, and technical spec-sheet
+        documentation.
+    - institution: Leibniz Institute of Photonic Technology (IPHT)
+      link: https://www.leibniz-ipht.de/en/homepage/
+      location: Jena, Germany
+      position: R\&D Researcher (Photonics \& Data)
+      dates: Jun 2020 -- Dec 2021
+      bullets:
+      - \textbf{Spectrometer Prototyping:} Designed and built a 1064 nm fiber-probe
+        Raman spectrometer for non-invasive clinical use; handled end-to-end optical
+        layout, dispersive optic alignment, and detector calibration.
+      - \textbf{Data Science \& ML:} Applied supervised Machine Learning to hyperspectral
+        photonic data using custom Python packages, achieving high-accuracy tissue
+        classification and accelerating experimental validation loops.
+      - \textbf{Interdisciplinary Research:} Collaborated on clinical spectroscopy
+        projects, resulting in two peer-reviewed publications in Applied Sciences
+        and ACS Photonics.
+    - institution: INTECOL S.A.S.
+      link: https://intecol.com.co/
+      location: Medellín, Colombia
+      position: Junior Machine Vision System Engineer
+      dates: Mar 2018 -- Mar 2019
+      bullets:
+      - \textbf{Industrial Vision Pipelines:} Engineered Halcon pipelines for fast-moving
+        production lines (glass bottle inspection), implementing custom illumination
+        concepts to solve liquid level and label printing quality issues.
+      - \textbf{System Commissioning:} Successfully deployed automated inspection
+        solutions for clients like Renault, utilizing Cognex VisionPro for robotic
+        part recognition and flame-surface treatment.
+      - \textbf{Process Reliability:} Conducted feasibility studies and Gage R\&R
+        assessments to ensure measurement traceability and process stability under
+        industrial conditions.
+    education:
+    - institution: Medical University of Innsbruck
+      location: Austria
+      degree: Ph.D. in Adaptive Optics \& Microscopy
+      dates: Jan 2022 -- Present
+    - institution: Friedrich Schiller University Jena
+      location: Germany
+      degree: M.Sc. in Photonics
+      dates: 2019 -- 2021
+    - institution: University of Cauca
+      location: Colombia
+      degree: B.Sc. in Physics Engineering
+      dates: 2012 -- 2018
+    publications_awards:
+    - \textbf{Awards:} Selected for ASML and ZEISS Summer Schools; awarded COLFUTURO
+      Grant 2026 for top Colombian professionals.
+    - Muñoz-Bolaños, J. D. et al. Confocal Raman Microscopy with Adaptive Optics.
+      ACS Photonics 12(1), 176--184 (2025).
+    - Muñoz-Bolaños, J. D., et al. Design of a dispersive 1064 nm fiber probe Raman
+      imaging spectrometer. Applied Sciences, 14(11), 4726 (2024).
+    - Sohmen, M., Muñoz-Bolaños, J. D., et al. Optofluidic adaptive optics in multi-photon
+      microscopy. Biomedical Optics Express 14(4), 1562--1578 (2023).
+    languages:
+    - English (Fluent / Professional)
+    - German (B2 - Working Proficiency)
+    - Spanish (Native)
+    references:
+    - name: Prof. Monika Ritsch-Marte
+      institution: Medical University of Innsbruck
+      role: Head of Institute for Biomedical Physics
+      email: monika.ritsch-marte@i-med.ac.at
+    - name: Dr. Christoph Krafft
+      institution: Leibniz Institute of Photonic Technology
+      role: 'Group leader: Spectroscopy Imaging'
+      email: christoph.kraft@leibniz-ipht.de
+  compress: true
+  attachments:
+  - IPHT1.pdf
+  - IPHT0.pdf
+  - intecol_english.pdf
+  - master.pdf
+  - Bachelor Diploma.pdf
+  - Zeiss_Summer_School.pdf
+  - B2.pdf
+  - Mündliche_test.pdf
+  - passport.pdf
+  - resident_permit.pdf
+
+- my_name: Juan David Muñoz-Bolaños
+  my_address: Rechenauerstraße 42, Innsbruck, Österreich (Tirol)
+  my_phone: +43 676 9115145
+  my_email: juan.munoz@i-med.ac.at
+  my_title: Optical Metrology Engineer
+  my_affiliation: Medizinische Universität Innsbruck
+  recipient_name: Hiring Manager
+  recipient_company: Iventim Solutions GmbH
+  recipient_address: 'München
+
+    Deutschland
+
+    '
+  job_position: Optical Metrology Engineer
+  subject: Application for Optical Metrology Engineer
+  salutation: Dear Hiring Manager,
+  body_paragraphs:
+  - 'As a physicist and optical engineer with a focus on precision metrology, I am
+    applying for the position of Optical Metrology Engineer in your team. My focus
+    is on leading measurement systems from concept to automated, functional prototypes
+    – a strength I can optimally contribute to your R\&D projects.
+    '
+  - 'During my PhD, I designed an automated wavefront measurement system from scratch
+    and controlled it with Python/C++. Daily modeling and tolerance analysis with
+    ZEMAX OpticStudio were as much part of my repertoire as building a Raman spectrometer
+    at IPHT Jena. This end-to-end approach ensures precise measurement results and
+    well-founded design decisions.
+    '
+  - 'Fully integrated into the DACH work culture, I will be available at short notice
+    following the completion of my PhD in May 2026. I look forward to bringing my
+    experience in optical automation to Iventim.
+    '
+  closing: Sincerely,
+  resume:
+    summary: 'Optical Metrology Engineer with a specialized background in high-precision
+      metrology, optical simulation, and Python/C++ automation. Proven expertise in
+      building automated optical test setups from scratch and performing rigorous
+      mathematical data analysis to guide technical design and system integration.
+      '
+    competencies:
+    - category: Optical Metrology \& Simulation
+      details: Expert in wavefront sensing, phase retrieval, and ZEMAX OpticStudio
+        tolerancing. Proficient in characterizing aberration sensitivity of high-NA
+        microscope objectives.
+    - category: System Automation \& Control
+      details: Experience building C++/Python/LabVIEW control stacks for adaptive
+        optics, scientific cameras (sCMOS), and opto-mechanical stages.
+    - category: Data Science for Optics
+      details: Application of supervised ML and AI algorithms to hyperspectral imaging
+        data. Proficient with NumPy, Pandas, Scikit-learn, and JAX for high-performance
+        computation.
+    - category: Hardware Integration \& Sourcing
+      details: End-to-end R\&D experience in multi-photon microscope assembly. Competent
+        in technical component specification (Thorlabs, Edmund Optics) and incoming
+        QA.
+    - category: Process Reliability
+      details: Hands-on experience with industrial vision solutions (Halcon) and ensuring
+        measurement traceability via Gage R\&R assessments.
+    experience:
+    - institution: Medical University of Innsbruck
+      link: https://www.i-med.ac.at/dpmp/bmp/staff/
+      location: Innsbruck, Austria
+      position: PhD Researcher - Optical Metrology \& Automation
+      dates: Jan 2022 -- Present
+      bullets:
+      - \textbf{Automated Metrology Setups:} Designed and built an automated wavefront
+        sensing system; developed the full software control stack to unify scientific
+        cameras and wavefront modulators.
+      - \textbf{Optical Modeling \& Design:} Performed systematic ZEMAX tolerance
+        analysis to optimize the process of custom objective lens characterization and
+        aberrometry.
+      - \textbf{Integration \& Alignment:} Achieved diffraction-limited performance
+        in a custom-built nonlinear microscope by precisely aligning galvo scanners,
+        femtosecond lasers, and PMT detectors.
+      - \textbf{Technical Documentation:} Managed technical specification sheets and
+        qualified vendors (Hammamatsu, Thorlabs) for high-precision opto-mechanical
+        integration.
+    - institution: Leibniz Institute of Photonic Technology (IPHT)
+      link: https://www.leibniz-ipht.de/en/homepage/
+      location: Jena, Germany
+      position: R\&D Researcher (Photonics \& Data)
+      dates: Jun 2020 -- Dec 2021
+      bullets:
+      - \textbf{Spectrometer Build:} Handled the end-to-end optical layout and detector
+        calibration of a 1064 nm fiber-probe Raman spectrometer prototype.
+      - \textbf{AI-Driven Data Analysis:} Leveraged custom Python packages for Machine
+        Learning classification on hyperspectral tissue images, accelerating experimental
+        turnaround.
+      - \textbf{Published Research:} Contributed to the development of non-invasive
+        clinical diagnostic tools, results documented in peer-reviewed journals (Applied
+        Sciences, ACS Photonics).
+    - institution: INTECOL S.A.S.
+      link: https://intecol.com.co/
+      location: Medellín, Colombia
+      position: Junior Machine Vision System Engineer
+      dates: Mar 2018 -- Mar 2019
+      bullets:
+      - \textbf{Industrial Machine Vision:} Engineered Halcon inspection systems for
+        beverage production lines; solved critical label and sealing quality issues
+        via custom illumination design.
+      - \textbf{Hardware Commissioning:} Optimized robotic vision for auto-part recognition
+        using Cognex VisionPro, directly impacting production efficiency at client
+        sites like Renault.
+      - \textbf{Gage R\&R Assessments:} Verified system accuracy and process stability
+        within industrial quality control frameworks.
+    education:
+    - institution: Medical University of Innsbruck
+      location: Austria
+      degree: Ph.D. in Adaptive Optics \& Microscopy
+      dates: Jan 2022 -- Present
+    - institution: Friedrich Schiller University Jena
+      location: Germany
+      degree: M.Sc. in Photonics
+      dates: 2019 -- 2021
+    - institution: University of Cauca
+      location: Colombia
+      degree: B.Sc. in Physics Engineering
+      dates: 2012 -- 2018
+    publications_awards:
+    - \textbf{Awards:} Selected for ASML and ZEISS Summer Schools; awarded COLFUTURO
+      Grant 2026.
+    - Muñoz-Bolaños, J. D. et al. Confocal Raman Microscopy with Adaptive Optics.
+      ACS Photonics 12(1), 176--184 (2025).
+    - Muñoz-Bolaños, J. D., et al. Design of a dispersive 1064 nm fiber probe Raman
+      imaging spectrometer. Applied Sciences, 14(11), 4726 (2024).
+    - Sohmen, M., Muñoz-Bolaños, J. D., et al. Optofluidic adaptive optics in multi-photon
+      microscopy. Biomedical Optics Express 14(4), 1562--1578 (2023).
+    languages:
+    - English (Fluent / Professional)
+    - German (B2 - Working Proficiency)
+    - Spanish (Native)
+    references:
+    - name: Prof. Monika Ritsch-Marte
+      institution: Medical University of Innsbruck
+      role: Head of Institute for Biomedical Physics
+      email: monika.ritsch-marte@i-med.ac.at
+    - name: Dr. Christoph Krafft
+      institution: Leibniz Institute of Photonic Technology
+      role: 'Group leader: Spectroscopy Imaging'
+      email: christoph.kraft@leibniz-ipht.de
+  compress: true
+  attachments:
+  - IPHT1.pdf
+  - IPHT0.pdf
+  - intecol_english.pdf
+  - master.pdf
+  - Bachelor Diploma.pdf
+  - Zeiss_Summer_School.pdf
+  - B2.pdf
+  - Mündliche_test.pdf
+  - passport.pdf
+  - resident_permit.pdf
+
+- my_name: Juan David Muñoz-Bolaños
+  my_address: Rechenauerstraße 42, Innsbruck, Österreich (Tirol)
+  my_phone: +43 676 9115145
+  my_email: juan.munoz@i-med.ac.at
+  my_title: Application Engineer Image Processing
+  my_affiliation: Medizinische Universität Innsbruck
+  recipient_name: Frau Tugce Zabun
+  recipient_company: Mühlbauer GmbH \& Co. KG
+  recipient_address: 'Josef-Mühlbauer-Platz 1
+
+    93426 Roding
+
+    Deutschland
+
+    '
+  job_position: Application Engineer Image Processing (m/f/d)
+  subject: Application for Application Engineer Image Processing (m/f/d)
+  salutation: Dear Ms. Zabun,
+  body_paragraphs:
+  - 'As a physics engineer specialized in high-precision metrology and industrial machine
+    vision, I am applying for the Application Engineer position at your Roding site.
+    Your focus on hardware and optical development over pure software programming
+    perfectly aligns with my passion for building and optimizing physical optical
+    systems.
+    '
+  - 'In my previous industrial experience at INTECOL S.A.S., I successfully integrated
+    vision systems for clients like Renault, where I was responsible for selecting
+    the optimal combination of sensors, telecentric lenses, and custom illumination.
+    During my PhD, I pushed this further by building automated wavefront sensing setups
+    from scratch, qualifying high-end optomechanical components from vendors like
+    Thorlabs and Edmund Optics. This hands-on experience in precise system alignment
+    and hardware validation enables me to bridge the gap between complex optical designs
+    and reliable industrial assembly.
+    '
+  - 'With a strong background in QA processes and a proven ability to design rigorous
+    test structures, I would be glad to help optimize Mühlbauer’s vision systems. I am
+    fully integrated into the DACH work culture and, as requested, highly willing
+    to support international service assignments. I look forward to contributing
+    my technical expertise to your team.
+    '
+  closing: Sincerely,
+  resume:
+    summary: 'Experienced Physics Engineer specialized in industrial machine vision,
+      optical design, and hardware-software integration. Proven background in commissioning
+      custom vision solutions on production lines. Expert in choosing the right illumination,
+      cameras, and lenses to ensure high-performance quality assurance in automated
+      manufacturing environments.
+      '
+    competencies:
+    - category: Machine Vision Hardware
+      details: Mastering of CMOS/CCD camera integration, lens selection (telecentric,
+        macro), and custom illumination design (Dark-field, Bright-field, coaxial).
+    - category: Image Processing Libraries
+      details: Advanced proficiency in Halcon and Cognex VisionPro for real-time inspection,
+        part recognition, and measurement. Familiar with OpenCV and Python-based vision
+        pipelines.
+    - category: System Alignment \& Justage
+      details: Hands-on experience in the precise alignment of complex opto-mechanical
+        setups (Laser sources, scanners, detectors). Expert in qualifying components
+        from market-leading vendors.
+    - category: Automation \& Integration
+      details: Skilled in automating optical systems with Python, C++, and LabVIEW.
+        Experienced in ensuring Gage R\&R and measurement reliability in harsh industrial
+        environments.
+    - category: R\&D Methodology
+      details: Experience bringing systems from concept to series prototypes, including
+        ZEMAX modeling, procurement management, and technical documentation.
+    experience:
+    - institution: INTECOL S.A.S.
+      link: https://intecol.com.co/
+      location: Medellín, Colombia
+      position: Junior Machine Vision System Engineer
+      dates: Mar 2018 -- Mar 2019
+      bullets:
+      - \textbf{Vision Pipeline Engineering:} Designed and implemented Halcon-based
+        beverage bottle inspection systems; developed custom illumination strategies
+        to reliably detect liquid levels and printing defects.
+      - \textbf{Industrial Integration:} Commissioned Cognex VisionPro systems for
+        auto-part recognition at Renault; integrated vision sensors with robotic arms
+        for flame-surface treatment processes.
+      - \textbf{QA \& Feasibility:} Performed systematic Gage R\&R assessments and
+        feasibility studies for new industrial clients, ensuring 24/7 reliability of
+        vision components on the floor.
+    - institution: Medical University of Innsbruck
+      link: https://www.i-med.ac.at/dpmp/bmp/staff/
+      location: Innsbruck, Austria
+      position: PhD Researcher – Optical Metrology \& Automation
+      dates: Jan 2022 -- Present
+      bullets:
+      - \textbf{System Build \& Justage:} Led the end-to-end assembly of a custom
+        multiphoton microscope; adjusted galvo scanners, laser sources, and PMTs to
+        achieved sub-micron resolution.
+      - \textbf{Adaptive Optics Control:} Programmed a Python/C++ control stack to
+        synchronize scientific cameras with active wavefront correctors for real-time
+        sample characterization.
+      - \textbf{Vendor \& Component QM:} Managed technical specification sheets and
+        qualified precision hardware from Thorlabs and Edmund Optics as part of system
+        procurement.
+    - institution: Leibniz Institute of Photonic Technology (IPHT)
+      link: https://www.leibniz-ipht.de/en/homepage/
+      location: Jena, Germany
+      position: R\&D Researcher (Photonics \& Data)
+      dates: Jun 2020 -- Dec 2021
+      bullets:
+      - \textbf{Instrumentation Design:} Prototyping of a dispersed fiber-probe Raman
+        spectrometer; handled optical layout justage and hardware-software calibration.
+      - \textbf{Data Evaluation Hooks:} Integrated computational data analysis (Python
+        ML) with hardware sensors to optimize measurement throughput and validation.
+    education:
+    - institution: Medical University of Innsbruck
+      location: Austria
+      degree: Ph.D. in Adaptive Optics \& Microscopy
+      dates: Jan 2022 -- Present
+    - institution: Friedrich Schiller University Jena
+      location: Germany
+      degree: M.Sc. in Photonics
+      dates: 2019 -- 2021
+    - institution: University of Cauca
+      location: Colombia
+      degree: B.Sc. in Physics Engineering
+      dates: 2012 -- 2018
+    publications_awards:
+    - \textbf{Awards:} ASML \& ZEISS Summer Schools participant; COLFUTURO Grant 2026
+      awardee.
+    - Muñoz-Bolaños, J. D. et al. Confocal Raman Microscopy with Adaptive Optics.
+      ACS Photonics 12(1), 176--184 (2025).
+    - Muñoz-Bolaños, J. D., et al. Design of a dispersive 1064 nm fiber probe Raman
+      imaging spectrometer. Applied Sciences, 14(11), 4726 (2024).
+    - Sohmen, M., Muñoz-Bolaños, J. D., et al. Optofluidic adaptive optics in multi-photon
+      microscopy. Biomedical Optics Express 14(4), 1562--1578 (2023).
+    languages:
+    - English (Professional)
+    - German (B2 - Working Proficiency)
+    - Spanish (Native)
+    references:
+    - name: Prof. Monika Ritsch-Marte
+      institution: Medical University of Innsbruck
+      role: Head of Institute
+      email: monika.ritsch-marte@i-med.ac.at
+    - name: Dr. Christoph Krafft
+      institution: Leibniz Institute of Photonic Technology
+      role: Spectroscopy Group Leader
+      email: christoph.kraft@leibniz-ipht.de
+  compress: true
+  attachments:
+  - IPHT1.pdf
+  - IPHT0.pdf
+  - intecol_english.pdf
+  - master.pdf
+  - Bachelor Diploma.pdf
+  - Zeiss_Summer_School.pdf
+  - B2.pdf
+  - Mündliche_test.pdf
+  - passport.pdf
+  - resident_permit.pdf
