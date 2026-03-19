@@ -11,9 +11,3 @@ venv/
 *.synctex.gz
 generated/scaled_*.tex
 generated/scaled_*.pdf
-
-# Generated output
-generated/
-
-# Sensitive Assets (Optional but recommended)
-assets/
