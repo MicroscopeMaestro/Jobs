@@ -227,14 +227,23 @@ def generate_application(data):
         merger.write(final_output_path)
         merger.close()
         
+        # --- NEW: Save stand-alone resume ---
+        standalone_resume_name = f"Resume_{name}_{company_clean}_{role}.pdf"
+        standalone_resume_path = os.path.join(OUTPUT_DIR, standalone_resume_name)
+        shutil.copy2(os.path.join(OUTPUT_DIR, 'resume.pdf'), standalone_resume_path)
+
         # --- NEW: COMPRESSION STEP ---
         if data.get('compress', False):
             compressed_path = os.path.join(OUTPUT_DIR, f"Compressed_{final_filename}")
-            # Use power=3 for a good balance (Ebook quality)
             compress_pdf(final_output_path, compressed_path, power=3)
-            print(f"SUCCESS! Compressed version: {compressed_path}")
+            print(f"SUCCESS! Compressed combined version: {compressed_path}")
+            
+            compressed_resume_path = os.path.join(OUTPUT_DIR, f"Compressed_{standalone_resume_name}")
+            compress_pdf(standalone_resume_path, compressed_resume_path, power=3)
+            print(f"SUCCESS! Compressed stand-alone version: {compressed_resume_path}")
         else:
-            print(f"SUCCESS! Generated: {final_output_path}")
+            print(f"SUCCESS! Generated combined version: {final_output_path}")
+            print(f"SUCCESS! Generated stand-alone version: {standalone_resume_path}")
 
     else:
         print("\nFAILED: Could not compile basic documents.")

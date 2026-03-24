@@ -1,103 +1,66 @@
-- my_name: Juan David Muñoz-Bolaños
+- my_name: Juan David Munoz Bolanos
   my_address: Rechenauerstraße 42, Innsbruck, Austria (Tirol)
   my_phone: +43 676 9115145
   my_email: juan.munoz@i-med.ac.at
-  my_title: Optical Metrology Engineer
+  my_title: Optical Systems Engineer
   my_affiliation: Medical University of Innsbruck
   recipient_name: Hiring Manager
-  recipient_company: Iventim Solutions GmbH
-  recipient_address: 'Munich
-
-    Germany
-
-    '
-  job_position: Optical Metrology Engineer
-  subject: Application for Optical Metrology Engineer
+  recipient_company: ASML
+  recipient_address: |
+    De Run 6501
+    5504 Veldhoven
+    Netherlands
+  job_position: Optical Systems Engineer
+  subject: Application for Optical Systems Engineer
   salutation: Dear Hiring Manager,
   body_paragraphs:
-  - 'As a physicist and optical engineer with a strong background in precision metrology,
-    I am motivated to apply for the Optical Metrology Engineer position at
-    your Munich Lab. Bringing measurement systems from concept to automated, fully
-    functional prototypes is my core strength, and I would be glad to apply this expertise
-    to develop next-generation measurement instruments with your R\&D team.
-
-    '
-  - 'During my Ph.D. at the Medical University of Innsbruck, I developed a system-level
-    understanding of complex optical instruments. I designed and built an automated
-    wavefront sensing and phase retrieval system from scratch, automating the optical
-    benchtop configuration using Python and C++. To understand the aberration sensitivity
-    of these custom optics, I routinely performed systematic optical modeling and
-    tolerance analysis using ZEMAX OpticStudio alongside custom wavefield simulations.
-
-    '
-  - 'At the Leibniz Institute of Photonic Technology (IPHT) in Jena, I deepened my
-    instrumentation and spectroscopy expertise by building a dispersive 1064 nm fiber
-    probe Raman spectrometer. Beyond optical layout and detector calibration, I heavily
-    utilized Python (Pandas, NumPy, Scikit-learn) to perform rigorous mathematical
-    data analysis on hyperspectral images. This end-to-end approach ensured precise
-    measurement validation and directly guided the engineering design.
-
-    '
-  - 'Having spent the last four years in the tirol region, I am integrated into
-    the german/austrian working culture and continuously improving my German (B2). I am completing
-    my Ph.D. this May and for now I have a researscher resident permit that it would be seamlessly easy to adapt for a working permit. 
-    I would welcome the opportunity to discuss how my hands-on
-    metrology experience can contribute to your automated machine vision solutions.
-
-    '
+  - 'As an optical engineer with a Ph.D. specializing in wavefront sensing, interferometric metrology, and opto-mechatronic system integration, I am eager to bring my expertise to ASML. I am drawn to ASML''s mission of pushing the physical limits of precision optical systems, and I am confident that my hands-on experience in diffraction-limited metrology and system integration aligns directly with the challenges your teams face in EUV lithography development.'
+  - 'During my Ph.D. at the Medical University of Innsbruck, I designed and built from scratch a fully automated wavefront sensing and phase-retrieval system — writing the complete C++/Python/LabVIEW control stack, integrating 63-actuator Deformable Phase Plates and spatial light modulators, and implementing iterative interferometric (F-SHARP) algorithms to achieve diffraction-limited resolution. Optical performance was validated through custom Python wave-field simulations based on Zernike decomposition, supported by familiarity with ZEMAX OpticStudio for tolerancing. This work resulted in two peer-reviewed publications (ACS Photonics 2025, Biomedical Optics Express 2023) and directly mirrors the kind of precision optical sensing and aberration-correction challenges tackled in EUV lithography systems.'
+  - 'Prior to my Ph.D., I prototyped a dispersive 1064 nm fiber probe Raman spectrometer at IPHT Jena — handling optical layout through detector calibration — and deployed Halcon-based machine vision inspection pipelines in a high-speed industrial setting at INTECOL S.A.S. This combination of academic photonics depth, hands-on metrology, and industrial systems thinking positions me well to contribute to ASML''s optical module development and qualification workflows.'
+  - 'I am completing my Ph.D. in May 2026 and am available to relocate to Veldhoven. I would welcome the opportunity to discuss how my background in high-precision optical metrology and system integration can support your teams.'
   closing: Sincerely,
   resume:
-    summary: 'Optical Metrology Engineer with a specialized background in high-precision
-      metrology, optical simulation, and Python/C++ automation. Proven expertise in
-      building automated optical test setups from scratch and performing rigorous
-      mathematical data analysis to guide engineering design.
-
-      '
+    summary: 'Optical Systems Engineer with a Ph.D. in adaptive optics and a track record of end-to-end precision instrument development: from interferometric wavefront sensing through C++/Python/LabVIEW integration and peer-reviewed validation. Deep expertise in optical wave-field simulation and Zernike-based aberration modeling; familiar with ZEMAX OpticStudio for tolerancing. ZEISS Summer School alumnus. Available May 2026.'
     competencies:
-    - category: Optical Metrology \& Simulation
-      details: Knowledge of Zemax OpticStudio for tolerance analysis, wavefield
-        simulations, and characterizing complex aberrations.
-    - category: Optical System Automation
-      details: Proven ability to automate optical benchtop experiments and metrology
-        setups using Python and C++.
-    - category: Data Analysis \& Programming
-      details: Proficient in Python (NumPy, Pandas, Scikit-learn) and MATLAB for rigorous
-        data evaluation and spectroscopy processing.
-    - category: System Integration
-      details: End-to-end R\&D experience bringing optical setups from concept to
-        fully functional automated prototypes.
+    - category: Wavefront Sensing \& Interferometric Metrology
+      details: Designed and deployed interferometry and wavefront optimization for sub-wavelength aberration correction. Novel spatial-shift algorithm (''3N method'') enabling high-accuracy phase retrieval in diffraction-limited systems.
+    - category: Optical Simulation \& Modeling
+      details: Deep knowledge of wave-field propagation modeling and Zernike polynomial decomposition, implemented in custom Python simulation frameworks. Familiar with ZEMAX OpticStudio for optical tolerancing and aberration sensitivity analysis.
+    - category: Opto-Mechatronic Integration \& Automation
+      details: Full hardware-software integration of adaptive optics systems (deformable mirrors, SLMs, galvo scanners, scientific cameras) via C++/Python/LabVIEW. Automated calibration and alignment routines ensuring repeatable, high-precision performance.
+    - category: Machine Vision \& Industrial Inspection
+      details: Industrial deployment of Halcon and OpenCV pipelines for high-speed automated inspection and defect detection. Custom illumination design (bright-field, dark-field, ring-light) for challenging surface-inspection tasks.
     experience:
     - institution: Medical University of Innsbruck
       link: https://www.i-med.ac.at/dpmp/bmp/staff/
       location: Innsbruck, Austria
-      position: PhD Researcher - Optical Metrology \& Automation
+      position: Optical Systems Engineer (PhD Researcher)
       dates: Jan 2022 -- Present
       bullets:
-      - \textbf{Automated Metrology Setups:} Designed and built from scratch an automated
-        wavefront sensing and phase retrieval system, writing the full C++/Python/LabVIEW
-        control stack and interfacing scientific cameras with deformable mirrors.
-      - \textbf{Optical Modeling \& Tolerancing:} Performed systematic tolerance analysis
-        in ZEMAX to characterize aberration sensitivity of custom microscope objectives,
-        alongside Python wave-field simulations (Zernike decomposition).
-      - \textbf{Project Management:} Managed specification and procurement of high-precision
-        opto-mechanical components from Thorlabs and Edmund Optics, maintaining technical
-        spec sheets and rigorous incoming inspection protocols.
+      - \textbf{Wavefront Sensing System (ACS Photonics '25 / Biomed. Opt. Expr. '23):} Designed and built from scratch a fully automated interferometric wavefront sensing platform. Integrated 63-actuator Deformable Phase Plates and TI Phase Light Modulators via a custom C++/Python/LabVIEW stack. Achieved diffraction-limited resolution in multi-photon deep-tissue imaging, validated through two peer-reviewed publications.
+      - \textbf{Interferometry \& Phase Retrieval:} Implemented wavefront interferometry and developed a novel spatial-shift estimation algorithm (''3N method'') enabling high-fidelity Zernike decomposition of experimental aberrations. Benchmarked against custom Python wave-propagation simulations.
+      - \textbf{Optical Simulation \& Tolerancing:} Built custom Python wave-field simulation frameworks using Zernike decomposition to predict and characterise aberration sensitivity throughout the optical path. Familiar with ZEMAX OpticStudio for optical tolerancing support.
+      - \textbf{System Procurement \& Qualification:} Specified and procured high-precision opto-mechanical components, DAQ electronics, and interferometric sensors. Validated incoming components against technical specifications before integration into live experiments.
     - institution: Leibniz Institute of Photonic Technology (IPHT)
       link: https://www.leibniz-ipht.de/en/homepage/
       location: Jena, Germany
-      position: R\&D Researcher (Photonics \& Data)
+      position: R\&D Researcher -- Photonics \& Spectroscopy
       dates: Jun 2020 -- Dec 2021
       bullets:
-      - \textbf{System Prototyping:} Designed and built a dispersive 1064 nm fiber
-        probe Raman spectrometer for clinical applications, handling end-to-end optical
-        layout and detector calibration.
-      - \textbf{Data Analysis \& AI:} Applied supervised ML (custom Python packages)
-        to 2D hyperspectral Raman images, achieving high-accuracy classification and
-        significantly accelerating the experimental characterization loop.
+      - \textbf{Dispersive Spectrometer Design (Applied Sciences '24):} Led optical layout, ZEMAX tolerancing, and construction of a 1064 nm fiber probe Raman spectrometer for clinical tissue applications. Handled detector alignment, wavelength calibration, and fiber coupling from prototype to published instrument.
+      - \textbf{Hyperspectral ML Classification:} Applied supervised machine learning to 2D hyperspectral Raman tissue images, achieving high-accuracy cancer vs. healthy cell separation. Accelerated experimental characterization loops significantly.
+    - institution: INTECOL S.A.S.
+      link: https://intecol.com.co/
+      location: Medellín, Colombia
+      position: Junior Machine Vision System Engineer
+      dates: Mar 2018 -- Mar 2019
+      bullets:
+      - \textbf{Industrial Vision Pipelines:} Deployed Halcon-based inspection systems on high-speed glass-bottle production lines. Engineered custom bright-field, dark-field, and ring-light illumination schemes; resolved label-verification and liquid-level failures. System reached full customer sign-off.
+      - \textbf{Hardware Specification:} Selected industrial cameras, lenses, and sensors; implemented and validated full optical inspection setups on live production lines.
     education:
     - institution: Medical University of Innsbruck
       location: Austria
-      degree: Ph.D. in Adaptive Optics \& Microscopy
+      degree: Ph.D. in Adaptive Optics \& Precision Optical Metrology
       dates: Jan 2022 -- Present
     - institution: Friedrich Schiller University Jena
       location: Germany
@@ -108,14 +71,10 @@
       degree: B.Sc. in Physics Engineering
       dates: 2012 -- 2018
     publications_awards:
-    - \textbf{Awards and Selections:} Selected for ASML and ZEISS Summer Schools;
-      awarded COLFUTURO Grant 2026 for best Colombian professionals.
-    - Muñoz-Bolaños, J. D. et al. Confocal Raman Microscopy with Adaptive Optics.
-      ACS Photonics 12(1), 176–184 (2025).
-    - Muñoz-Bolaños, J. D., et al. Design of a dispersive 1064 nm fiber probe Raman
-      imaging spectrometer. Applied Sciences, 14(11), 4726 (2024).
-    - Sohmen, M., Muñoz-Bolaños, J. D., et al. Optofluidic adaptive optics in multi-photon
-      microscopy. Biomedical Optics Express 14(4), 1562–1578 (2023).
+    - \textbf{Awards:} Competitively selected for ZEISS Summer School (precision optics engineering, Oberkochen). Awarded COLFUTURO Grant 2026 for top Colombian professionals.
+    - Juan David Munoz Bolanos et al. Confocal Raman Microscopy with Adaptive Optics. ACS Photonics 12(1), 176--184 (2025). Integrated adaptive optics into a confocal Raman system; experimentally resolved and corrected phase aberrations for diffraction-limited deep-tissue imaging.
+    - Juan David Munoz Bolanos et al. Design of a dispersive 1064 nm fiber probe Raman imaging spectrometer. Applied Sciences, 14(11), 4726 (2024). Full optical design, tolerancing, construction, and clinical validation of a custom dispersive fiber probe spectrometer.
+    - Sohmen M., Juan David Munoz Bolanos et al. Optofluidic adaptive optics in multi-photon microscopy. Biomedical Optics Express 14(4), 1562--1578 (2023). Integrated optofluidic tuneable lenses into a multiphoton microscope with custom Python/LabVIEW control for fast, aberration-free focusing.
     languages:
     - English (Fluent / Professional)
     - German (B2 - Working Proficiency)
@@ -127,7 +86,7 @@
       email: monika.ritsch-marte@i-med.ac.at
     - name: Dr. Christoph Krafft
       institution: Leibniz Institute of Photonic Technology
-      role: 'Group leader: Spectroscopy Imaging'
+      role: Group leader for Spectroscopy Imaging
       email: christoph.kraft@leibniz-ipht.de
   compress: true
   attachments:
