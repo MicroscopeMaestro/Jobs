@@ -1,12 +1,7 @@
-#%%
 import os
 import shutil
 import subprocess
-import re
 import sys
-from jinja2 import Environment, FileSystemLoader
-
-# --- CORRECT IMPORT FOR PyPDF2 3.0+ ---
 from PyPDF2 import PdfMerger
 
 # --- Configuration ---
@@ -14,9 +9,32 @@ PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TEMPLATE_DIR = os.path.join(PROJECT_ROOT, 'templates')
 ASSETS_DIR = os.path.join(PROJECT_ROOT, 'assets')
 OUTPUT_DIR = os.path.join(PROJECT_ROOT, 'generated')
-DATA_FILE = os.path.join(PROJECT_ROOT, 'data', 'data.json')
 
 os.makedirs(OUTPUT_DIR, exist_ok=True)
+
+# Define categories
+ATTACHMENTS = {
+    "professional_experience": [
+        "IPHT0.pdf",
+        "IPHT1.pdf"
+    ],
+    "education": [
+        "Bachelor Diploma.pdf",
+        "master.pdf"
+    ],
+    "certificates": [
+        "B2.pdf",
+        "Mündliche_test.pdf",
+        "Zeiss_Summer_School.pdf",
+        "intecol_english.pdf",
+        "intecol_german.pdf",
+        "intecol_spanish.pdf"
+    ],
+    "others": [
+        "passport.pdf",
+        "resident_permit.pdf"
+    ]
+}
 
 def compress_pdf(input_path, output_path, power=3):
     """
@@ -26,7 +44,6 @@ def compress_pdf(input_path, output_path, power=3):
     quality = {1: '/prepress', 2: '/printer', 3: '/ebook', 4: '/screen'}
     gs_settings = quality.get(power, '/ebook')
     
-    # 1. Try Ghostscript (The Heavy Lifter)
     gs_cmd = 'gs' if sys.platform != 'win32' else 'gswin64c'
     cmd = [
         gs_cmd, '-sDEVICE=pdfwrite', '-dCompatibilityLevel=1.4',
@@ -40,41 +57,42 @@ def compress_pdf(input_path, output_path, power=3):
         return True
     except (subprocess.CalledProcessError, FileNotFoundError):
         print("   ! Ghostscript not found or failed. Falling back to PyPDF2 compression...")
-        
-        # 2. Fallback: PyPDF2 Internal (Lossless, less effective but works everywhere)
         from PyPDF2 import PdfReader, PdfWriter
         reader = PdfReader(input_path)
         writer = PdfWriter()
         for page in reader.pages:
-            page.compress_content_streams() # This zips the text/vector data
+            try:
+                page.compress_content_streams()
+            except Exception:
+                pass
             writer.add_page(page)
         
         with open(output_path, "wb") as f:
             writer.write(f)
         return True
-    
-def sanitize_filename(text):
-    clean = re.sub(r'[^a-zA-Z0-9]', '_', text)
-    clean = re.sub(r'_+', '_', clean)
-    return clean.strip('_')
 
 def compile_latex(tex_filename, output_name):
-    """ Compiles a .tex file inside OUTPUT_DIR to PDF. """
+    """ Compiles a .tex file inside TARGET_DIR to PDF via pdflatex. """
+    tex_path = os.path.join(TEMPLATE_DIR, tex_filename)
+    if not os.path.exists(tex_path):
+        print(f"   ! LaTeX file not found: {tex_path}")
+        return None
+
     print(f"   Compiling LaTeX: {tex_filename} -> {output_name}...")
-    tex_path = os.path.join(OUTPUT_DIR, tex_filename)
     
-    # Run pdflatex once and capture all output
     cmd = ['pdflatex', '-output-directory', OUTPUT_DIR, '-interaction=nonstopmode', tex_path]
     process = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True, errors='replace')
     
-    expected_pdf = os.path.join(OUTPUT_DIR, output_name)
+    expected_pdf = os.path.join(OUTPUT_DIR, tex_filename.replace('.tex', '.pdf'))
+    final_output = os.path.join(OUTPUT_DIR, output_name)
     
-    if process.returncode != 0 or not os.path.isfile(expected_pdf):
+    if os.path.exists(expected_pdf):
+        if expected_pdf != final_output:
+            shutil.move(expected_pdf, final_output)
+    else:
         print(f"   ! CRITICAL ERROR compiling {tex_filename}")
         print("--- pdflatex stdout ---")
-        print(process.stdout)
-        print("--- pdflatex stderr ---")
-        print(process.stderr)
+        print(process.stdout[:1000] + "\n...")
         return None
         
     # Cleanup intermediate files
@@ -83,188 +101,100 @@ def compile_latex(tex_filename, output_name):
     for ext in extensions:
         temp_file = os.path.join(OUTPUT_DIR, base_name + ext)
         if os.path.exists(temp_file):
-            os.remove(temp_file)
-            
-    return expected_pdf
-
-def create_scaled_pdf(filename, scale=0.8):
-    """ 
-    Wraps a PDF/Image in a LaTeX container to resize and center it. 
-    """
-    print(f"   -> Scaling {filename} to {scale*100}%...")
-    
-    base_name = os.path.splitext(filename)[0]
-    wrapper_tex_name = f"scaled_{base_name}.tex"
-    wrapper_pdf_name = f"scaled_{base_name}.pdf"
-    
-    wrapper_path = os.path.join(OUTPUT_DIR, wrapper_tex_name)
-    
-    tex_content = fr"""
-\documentclass[a4paper]{{article}}
-\usepackage{{graphicx}}
-\usepackage[margin=1in]{{geometry}}
-\pagestyle{{empty}} 
-
-\begin{{document}}
-    \vspace*{{\fill}}
-    \begin{{center}}
-        \includegraphics[width={scale}\textwidth, keepaspectratio]{{{filename}}}
-    \end{{center}}
-    \vspace*{{\fill}}
-\end{{document}}
-    """
-    
-    with open(wrapper_path, "w", encoding='utf-8') as f:
-        f.write(tex_content)
-        
-    return compile_latex(wrapper_tex_name, wrapper_pdf_name)
-
-def generate_application(data):
-    company = data.get('recipient_company', 'Company')
-    print(f"\n--- Generating Application for: {company} ---")
-
-    # --- STEP 0: PREPARE ASSETS ---
-    # Only copy non-PDF files (e.g., photo.png) that LaTeX templates need.
-    # PDFs stay in assets/ and are read from there directly to avoid duplication.
-    if os.path.exists(ASSETS_DIR):
-        for item in os.listdir(ASSETS_DIR):
-            if item.lower().endswith('.pdf'):
-                continue  # PDFs are read directly from assets/, never copied
-            s = os.path.join(ASSETS_DIR, item)
-            d = os.path.join(OUTPUT_DIR, item)
-            if os.path.isfile(s):
-                shutil.copy2(s, d)
-    else:
-        print(f" ! Warning: '{ASSETS_DIR}' folder missing.")
-
-    # --- STEP 1: COMPILE LETTER ---
-    print("1. Generating Motivation Letter...")
-    cl_pdf = None
-    try:
-        env = Environment(
-            loader=FileSystemLoader(TEMPLATE_DIR),
-            block_start_string='((',
-            block_end_string='))',
-            variable_start_string='<<',
-            variable_end_string='>>',
-            comment_start_string='((#',
-            comment_end_string='#))'
-        )
-        cl_rendered = env.get_template("motivation_letter.tex").render(data)
-        
-        # Added encoding='utf-8' for special characters like 'ñ'
-        with open(os.path.join(OUTPUT_DIR, 'motivation_letter.tex'), "w", encoding='utf-8') as f: 
-            f.write(cl_rendered)
-        
-        cl_pdf = compile_latex('motivation_letter.tex', 'motivation_letter.pdf')
-    except Exception as e:
-        print(f" ! Error rendering motivation letter: {e}")
-
-    # --- STEP 2: COMPILE RESUME ---
-    print("2. Generating Resume...")
-    resume_pdf = None
-    try:
-        # Added encoding='utf-8' and dynamic rendering
-        resume_rendered = env.get_template("resume.tex").render(data)
-        
-        with open(os.path.join(OUTPUT_DIR, 'resume.tex'), "w", encoding='utf-8') as f: 
-            f.write(resume_rendered)
-            
-        resume_pdf = compile_latex('resume.tex', 'resume.pdf')
-    except Exception as e:
-        print(f" ! Error rendering resume: {e}")
-
-    # --- STEP 3: MERGE & ATTACH ---
-    if cl_pdf and resume_pdf:
-        # FIX: Using PdfMerger class
-        merger = PdfMerger()
-        
-        merger.append(cl_pdf)
-        merger.append(resume_pdf)
-        
-        print("3. Processing Attachments...")
-        for attachment in data.get("attachments", []):
-            fname = attachment
-            scale = 1.0
-            
-            if isinstance(attachment, dict):
-                fname = attachment.get('file')
-                scale = attachment.get('scale', 1.0)
-            
-            # Look in assets/ first, then fall back to generated/ for compiled files
-            file_path = os.path.join(ASSETS_DIR, fname)
-            if not os.path.exists(file_path):
-                file_path = os.path.join(OUTPUT_DIR, fname)
-            
-            if not os.path.exists(file_path):
-                print(f"  ! WARNING: '{fname}' not found. Skipping.")
-                continue
-
             try:
-                if scale < 1.0:
-                    scaled_pdf_path = create_scaled_pdf(fname, scale)
-                    if scaled_pdf_path and os.path.exists(scaled_pdf_path):
-                        print(f"  + Appending SCALED {fname}")
-                        merger.append(scaled_pdf_path)
-                    else:
-                        print(f"  ! Scaling failed, appending original.")
-                        merger.append(file_path)
-                else:
-                    print(f"  + Appending {fname}")
-                    merger.append(file_path)
-                    
+                os.remove(temp_file)
+            except OSError:
+                pass
+            
+    return final_output
+
+def merge_pdfs(pdf_list, output_filename):
+    if not pdf_list:
+        return None
+        
+    merger = PdfMerger()
+    merged_count = 0
+    
+    for pdf in pdf_list:
+        if os.path.exists(pdf):
+            try:
+                merger.append(pdf)
+                merged_count += 1
             except Exception as e:
-                print(f"    ! Failed to append {fname}: {e}")
-
-        # --- OUTPUT ---
-        role = sanitize_filename(data.get('job_position', 'Application'))
-        name = sanitize_filename(data.get('my_name', 'Applicant'))
-        company_clean = sanitize_filename(company)
-        
-        final_filename = f"Application_{name}_{company_clean}_{role}.pdf"
-        final_output_path = os.path.join(OUTPUT_DIR, final_filename)
-
-        merger.write(final_output_path)
-        merger.close()
-        
-        # --- NEW: COMPRESSION STEP ---
-        if data.get('compress', False):
-            compressed_path = os.path.join(OUTPUT_DIR, f"Compressed_{final_filename}")
-            # Use power=3 for a good balance (Ebook quality)
-            compress_pdf(final_output_path, compressed_path, power=3)
-            print(f"SUCCESS! Compressed version: {compressed_path}")
+                print(f"    ! Failed to merge {pdf}: {e}")
         else:
-            print(f"SUCCESS! Generated: {final_output_path}")
+            print(f"    ! WARNING: Missing file to merge: {pdf}")
+            
+    if merged_count > 0:
+        output_path = os.path.join(OUTPUT_DIR, output_filename)
+        merger.write(output_path)
+        merger.close()
+        print(f"   -> Merged {merged_count} files into {output_filename}")
+        return output_path
+        
+    merger.close()
+    return None
 
-    else:
-        print("\nFAILED: Could not compile basic documents.")
+def build_all():
+    print(f"\\n--- Building Application Documents ---\\n")
+    
+    # 1. Compile LaTeX files (Resume, CV, Motivation Letter if they exist)
+    compiled_docs = []
+    
+    resume_pdf = compile_latex("resume.tex", "resume.pdf")
+    if resume_pdf: compiled_docs.append(resume_pdf)
+        
+    cv_pdf = compile_latex("cv.tex", "cv.pdf")
+    if cv_pdf: compiled_docs.append(cv_pdf)
+    
+    # Add Motivation Letter if present
+    ml_pdf = compile_latex("motivation_letter.tex", "motivation_letter.pdf")
+    
+    # 2. Merge motivation_letter_and_resume.pdf
+    ml_and_resume = []
+    if ml_pdf: ml_and_resume.append(ml_pdf)
+    if resume_pdf: ml_and_resume.append(resume_pdf)
+    if ml_and_resume:
+        merge_pdfs(ml_and_resume, "motivation_letter_and_resume.pdf")
 
+    # 2b. Merge cv_and_resume.pdf (if cv exists)
+    cv_and_resume = []
+    if cv_pdf: cv_and_resume.append(cv_pdf)
+    if resume_pdf: cv_and_resume.append(resume_pdf)
+    if cv_and_resume:
+        merge_pdfs(cv_and_resume, "cv_and_resume.pdf")
+        
+    # 3. Merge Category attachments
+    all_attachments = []
+    
+    for category, filenames in ATTACHMENTS.items():
+        cat_files = []
+        for f in filenames:
+            path = os.path.join(ASSETS_DIR, f)
+            if os.path.exists(path):
+                cat_files.append(path)
+                all_attachments.append(path)
+        if cat_files:
+            merge_pdfs(cat_files, f"{category}.pdf")
+            
+    # 4. Merge all_attachments.pdf
+    if all_attachments:
+        all_attach_pdf = merge_pdfs(all_attachments, "all_attachments.pdf")
+    
+    # 5. Merge full_application.pdf
+    full_docs = []
+    if ml_pdf: full_docs.append(ml_pdf)
+    if cv_pdf: full_docs.append(cv_pdf)
+    if resume_pdf: full_docs.append(resume_pdf)
+    full_docs.extend(all_attachments)
+    
+    if full_docs:
+        full_app = merge_pdfs(full_docs, "full_application.pdf")
+        if full_app:
+            # Compress final
+            comp_app = os.path.join(OUTPUT_DIR, "Compressed_full_application.pdf")
+            compress_pdf(full_app, comp_app, power=3)
+            print(f"\\nSUCCESS! Final application ready at: {comp_app}")
+            
 if __name__ == "__main__":
-    import json
-    import yaml
-    
-    applications = []
-    
-    data_en = os.path.join(PROJECT_ROOT, 'data', 'data_en.yaml')
-    data_de = os.path.join(PROJECT_ROOT, 'data', 'data_de.yaml')
-    
-    for lang, file_path in [('en', data_en), ('de', data_de)]:
-        if os.path.exists(file_path):
-            try:
-                with open(file_path, 'r', encoding='utf-8') as f:
-                    apps = yaml.safe_load(f) or []
-                    for app in apps:
-                        app['language'] = lang # explicitly tag the application with its language
-                    applications.extend(apps)
-                print(f"--- Loaded {len(apps)} {lang} applications from {file_path} ---")
-            except Exception as e:
-                print(f"Error reading {file_path}: {e}")
-                sys.exit(1)
-                
-    if not applications:
-        print("Error: No applications found in either data_en.yaml or data_de.yaml.")
-        sys.exit(1)
-
-    for app in applications:
-        generate_application(app)
-# %%
+    build_all()
