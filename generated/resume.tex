@@ -1,0 +1,197 @@
+\documentclass[a4paper,10pt]{article}
+
+% --- PACKAGES ---
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{helvet}
+\renewcommand{\familydefault}{\sfdefault}
+\usepackage[left=0.85in,top=0.7in,right=0.85in,bottom=0.7in]{geometry}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage{tikz} 
+\usepackage[hidelinks]{hyperref} 
+
+% --- FORMATTING ---
+\pagestyle{empty}
+\raggedright
+
+% Section Styling
+\titleformat{\section}{\large\bfseries}{}{0em}{}[\titlerule]
+\titlespacing{\section}{0pt}{14pt}{8pt} 
+
+% Custom Entry Command
+\newcommand{\entry}[4]{
+  \textbf{#1} \hfill #2 \\
+  \textit{#3} \hfill \textit{#4} \\
+}
+
+% --- MACRO: ROUND PHOTO ---
+\newcommand{\roundpic}[1]{
+  \begin{tikzpicture}
+    \clip (0,0) circle (1.5cm); 
+    \node at (0,0) {\includegraphics[width=3.0cm]{#1}}; 
+  \end{tikzpicture}
+}
+
+\begin{document}
+
+% --- HEADER ---
+\noindent
+\begin{minipage}[c]{0.70\textwidth}
+    {\Huge \textbf{Juan David Muñoz-Bolaños} \vspace{14pt}} \\ \vspace{18pt}
+    \textbf{\large Application Engineer Image Processing} \\ \vspace{8pt}
+    Rechenauerstraße 42, Innsbruck, Österreich (Tirol) \\
+    +43 676 9115145 \\
+    \href{mailto:juan.munoz@i-med.ac.at}{juan.munoz@i-med.ac.at} \ \textbf{|} \ \href{https://www.linkedin.com/in/juan-mu\%C3\%B1oz-microscopy/}{LinkedIn Profile}
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.25\textwidth}
+    \begin{flushright}
+        % Ensure photo.png is in the same folder
+        \roundpic{photo.png}
+    \end{flushright}
+\end{minipage}
+
+\vspace{10pt}
+
+% --- PROFESSIONAL SUMMARY ---
+\section{PROFESSIONAL SUMMARY}
+Experienced Physics Engineer specialized in industrial machine vision, optical design, and hardware-software integration. Proven background in commissioning custom vision solutions on production lines. Expert in choosing the right illumination, cameras, and lenses to ensure high-performance quality assurance in automated manufacturing environments. 
+
+% --- TECHNICAL COMPETENCIES ---
+
+\section{TECHNICAL COMPETENCIES}
+
+
+\textbf{Machine Vision Hardware} \\
+Mastering of CMOS/CCD camera integration, lens selection (telecentric, macro), and custom illumination design (Dark-field, Bright-field, coaxial). 
+
+\vspace{6pt}
+
+\textbf{Image Processing Libraries} \\
+Advanced proficiency in Halcon and Cognex VisionPro for real-time inspection, part recognition, and measurement. Familiar with OpenCV and Python-based vision pipelines. 
+
+\vspace{6pt}
+
+\textbf{System Alignment \& Justage} \\
+Hands-on experience in the precise alignment of complex opto-mechanical setups (Laser sources, scanners, detectors). Expert in qualifying components from market-leading vendors. 
+
+\vspace{6pt}
+
+\textbf{Automation \& Integration} \\
+Skilled in automating optical systems with Python, C++, and LabVIEW. Experienced in ensuring Gage R\&R and measurement reliability in harsh industrial environments. 
+
+\vspace{6pt}
+
+\textbf{R\&D Methodology} \\
+Experience bringing systems from concept to series prototypes, including ZEMAX modeling, procurement management, and technical documentation. 
+
+\vspace{6pt}
+
+
+% --- PROFESSIONAL EXPERIENCE ---
+\section{PROFESSIONAL EXPERIENCE}
+
+
+% INTECOL S.A.S.
+\entry{INTECOL S.A.S.}{Medellín, Colombia}{Junior Machine Vision System Engineer}{Mar 2018 -- Mar 2019}
+\begin{itemize}[leftmargin=*, topsep=2pt, itemsep=1pt, parsep=1pt]
+    
+    \item \textbf{Vision Pipeline Engineering:} Designed and implemented Halcon-based beverage bottle inspection systems; developed custom illumination strategies to reliably detect liquid levels and printing defects.
+    
+    \item \textbf{Industrial Integration:} Commissioned Cognex VisionPro systems for auto-part recognition at Renault; integrated vision sensors with robotic arms for flame-surface treatment processes.
+    
+    \item \textbf{QA \& Feasibility:} Performed systematic Gage R\&R assessments and feasibility studies for new industrial clients, ensuring 24/7 reliability of vision components on the floor.
+    
+\end{itemize}
+
+\vspace{10pt}
+
+% Medical University of Innsbruck
+\entry{Medical University of Innsbruck}{Innsbruck, Austria}{PhD Researcher – Optical Metrology \& Automation}{Jan 2022 -- Present}
+\begin{itemize}[leftmargin=*, topsep=2pt, itemsep=1pt, parsep=1pt]
+    
+    \item \textbf{System Build \& Justage:} Led the end-to-end assembly of a custom multiphoton microscope; adjusted galvo scanners, laser sources, and PMTs to achieved sub-micron resolution.
+    
+    \item \textbf{Adaptive Optics Control:} Programmed a Python/C++ control stack to synchronize scientific cameras with active wavefront correctors for real-time sample characterization.
+    
+    \item \textbf{Vendor \& Component QM:} Managed technical specification sheets and qualified precision hardware from Thorlabs and Edmund Optics as part of system procurement.
+    
+\end{itemize}
+
+\vspace{10pt}
+
+% Leibniz Institute of Photonic Technology (IPHT)
+\entry{Leibniz Institute of Photonic Technology (IPHT)}{Jena, Germany}{R\&D Researcher (Photonics \& Data)}{Jun 2020 -- Dec 2021}
+\begin{itemize}[leftmargin=*, topsep=2pt, itemsep=1pt, parsep=1pt]
+    
+    \item \textbf{Instrumentation Design:} Prototyping of a dispersed fiber-probe Raman spectrometer; handled optical layout justage and hardware-software calibration.
+    
+    \item \textbf{Data Evaluation Hooks:} Integrated computational data analysis (Python ML) with hardware sensors to optimize measurement throughput and validation.
+    
+\end{itemize}
+
+\vspace{10pt}
+
+
+% --- EDUCATION ---
+\section{EDUCATION}
+
+
+\entry{Medical University of Innsbruck}{Austria}{Ph.D. in Adaptive Optics \& Microscopy}{Jan 2022 -- Present}
+
+\vspace{4pt}
+
+\entry{Friedrich Schiller University Jena}{Germany}{M.Sc. in Photonics}{2019 -- 2021}
+
+\vspace{4pt}
+
+\entry{University of Cauca}{Colombia}{B.Sc. in Physics Engineering}{2012 -- 2018}
+
+\vspace{4pt}
+
+
+% --- SELECTED PUBLICATIONS & AWARDS ---
+\section{PUBLICATIONS \& AWARDS}
+\begin{itemize}[leftmargin=*, topsep=2pt, itemsep=2pt]
+    
+    \item \textbf{Awards:} ASML \& ZEISS Summer Schools participant; COLFUTURO Grant 2026 awardee.
+    
+    \item Muñoz-Bolaños, J. D. et al. Confocal Raman Microscopy with Adaptive Optics. ACS Photonics 12(1), 176--184 (2025).
+    
+    \item Muñoz-Bolaños, J. D., et al. Design of a dispersive 1064 nm fiber probe Raman imaging spectrometer. Applied Sciences, 14(11), 4726 (2024).
+    
+    \item Sohmen, M., Muñoz-Bolaños, J. D., et al. Optofluidic adaptive optics in multi-photon microscopy. Biomedical Optics Express 14(4), 1562--1578 (2023).
+    
+\end{itemize}
+
+\vspace{6pt}
+\section{LANGUAGES} 
+
+English (Professional), 
+
+German (B2 - Working Proficiency), 
+
+Spanish (Native)
+
+
+% --- REFERENCES ---
+\section{REFERENCES}
+
+
+\textbf{Prof. Monika Ritsch-Marte} \hfill Medical University of Innsbruck \\
+\textit{Head of Institute} \\
+\href{mailto:monika.ritsch-marte@i-med.ac.at}{monika.ritsch-marte@i-med.ac.at}
+
+\vspace{10pt}
+
+\textbf{Dr. Christoph Krafft} \hfill Leibniz Institute of Photonic Technology \\
+\textit{Spectroscopy Group Leader} \\
+\href{mailto:christoph.kraft@leibniz-ipht.de}{christoph.kraft@leibniz-ipht.de}
+
+\vspace{10pt}
+
+
+\end{document}

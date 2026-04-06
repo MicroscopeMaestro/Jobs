@@ -26,9 +26,8 @@ ATTACHMENTS = {
         "B2.pdf",
         "Mündliche_test.pdf",
         "Zeiss_Summer_School.pdf",
-        "intecol_english.pdf",
-        "intecol_german.pdf",
-        "intecol_spanish.pdf"
+        "ASML_School.pdf",
+        "intecol_english.pdf"
     ],
     "others": [
         "passport.pdf",
