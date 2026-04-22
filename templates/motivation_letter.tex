@@ -3,21 +3,16 @@
 % --- PDFLATEX COMPATIBLE PREAMBLE ---
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
-\usepackage[ngerman]{babel}
+\usepackage[english]{babel}
 \usepackage{helvet}         
 \renewcommand{\familydefault}{\sfdefault}
 
-% Adjusted margins to fit everything nicely on one page
 \usepackage[left=0.75in,top=0.6in,right=0.75in,bottom=0.6in]{geometry}
 \usepackage{url}
 \usepackage{hyperref}
 \usepackage{enumitem}
 \usepackage{xcolor}
 
-% Custom Colors 
-\definecolor{TECHBLUE}{RGB}{0, 0, 0} 
-
-% Prevent hyphenation 
 \hyphenpenalty=10000
 \exhyphenpenalty=10000
 \sloppy
@@ -30,66 +25,22 @@
 
 \pagestyle{empty}
 \setlength{\parindent}{0pt}
-\setlength{\parskip}{0.5em} % Reduced slightly to fit one page
+\setlength{\parskip}{0.5em}
 
 \begin{document}
-%-----------------------------------------------------------
-% Sender Information
-%-----------------------------------------------------------
-\textbf{\large Juan David Muñoz-Bolaños} \\
-Rechenauerstraße 42, Innsbruck, Österreich (Tirol) \\
-+43 676 9115145 \\
-\href{mailto:juan.munoz@i-med.ac.at}{juan.munoz@i-med.ac.at}
 
-\vspace{8pt}
-\begin{flushright}
-  \vspace{-20pt}
-  \today
-\end{flushright}
-
-%-----------------------------------------------------------
-% Recipient Information
-%-----------------------------------------------------------
-\textbf{TRUMPF Maschinen Austria GmbH + Co. KG} \\
-Frau Mia Basac \\
-Pasching \\
-Österreich \\
-\\
-
-
+\input{sections/ml/sender.tex}
 \vspace{8pt}
 
-%-----------------------------------------------------------
-% Subject Line
-%-----------------------------------------------------------
-\textbf{Bewerbung als Softwareentwickler (w/m/d) Robotik/Vision | Req. R00039130}
+\input{sections/ml/recipient.tex}
+\vspace{8pt}
 
+\input{sections/ml/subject.tex}
 \vspace{4pt}
 
-%-----------------------------------------------------------
-% Body
-%-----------------------------------------------------------
-Sehr geehrte Frau Basac,
-
-die Automatisierung komplexer Biegeprozesse durch intelligente Vision-Systeme ist genau das technologische Feld, in dem ich meine Expertise gewinnbringend für TRUMPF einsetzen werde. Als Physikingenieur an der Schnittstelle zwischen Optik, Lasersystemen und automatisierter Bildverarbeitung verfüge ich über die ideale Kombination aus fundierter theoretischer Tiefe und der notwendigen praktischen Erfahrung, um R\&D-Konzepte erfolgreich in die industrielle Serienfertigung zu überführen. Als gebürtiger Kolumbianer, der seit Jahren im DACH-Raum lebt und arbeitet, kommuniziere ich dabei gut auf Deutsch und Englisch.
-
-In meiner Zeit bei INTECOL S.A.S. habe ich Halcon-basierte Inspektionspipelines für Hochgeschwindigkeitsproduktionslinien nicht nur entwickelt, sondern konsequent bis zur erfolgreichen Kundenabnahme geführt. Durch die Integration von Cognex VisionPro für die robotergestützte Teileerkennung und die präzise Justage optischer Komponenten bin ich mit den hohen Anforderungen an Zuverlässigkeit und Präzision in der Fertigungsautomatisierung bestens vertraut. Ich bin davon überzeugt, dass ich dieses Know-how unmittelbar für die Lokalisierung Ihrer Blechplatinen und die videobasierte Überwachung Ihrer Biegezellen einsetzen kann.
-
-Bereits während meines Masterstudiums in Jena habe ich meine Software-Kompetenz unter Beweis gestellt und das \href{https://pypi.org/project/spectramap/}{SpectraMap} Python-Paket zur KI-basierten Analyse von Raman-Daten entwickelt. Meine aktuelle Promotion an der Medizinischen Universität Innsbruck vertieft dieses Profil im Bereich der Lasersysteme, der Entwicklung von Phase-Retrieval-Algorithmen in Python und der hochpräzisen Wellenfeldmodellierung zur Aberrationskorrektur. Mit meinen fundierten Kenntnissen in Python und C++ (OpenCV) sowie meiner Leidenschaft für innovative Vision-Algorithmen werde ich die technologische Weiterentwicklung bei TRUMPF maßgeblich vorantreiben.
-
-Ich verfüge über einen Aufenthaltstitel für den freien Arbeitsmarkt (gültig ab Mai 2026) und bin somit uneingeschränkt arbeitsberechtigt. Ich stehe Ihnen ab dem 1. Juli 2026 zur Verfügung und freue mich darauf, Sie in einem persönlichen Gespräch von meinem Beitrag zur Automatisierungsstrategie bei TRUMPF zu überzeugen.
-
-
+\input{sections/ml/body.tex}
 \vspace{12pt}
 
-%-----------------------------------------------------------
-% Closing
-%-----------------------------------------------------------
-Mit freundlichen Grüßen,
-
-\vspace{8pt}
-
-\textbf{Juan David Muñoz-Bolaños} \\
-Doktorand, Medizinische Universität Innsbruck
+\input{sections/ml/closing.tex}
 
 \end{document}

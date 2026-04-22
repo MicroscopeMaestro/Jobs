@@ -10,13 +10,33 @@ TEMPLATE_DIR = os.path.join(PROJECT_ROOT, 'templates')
 ASSETS_DIR = os.path.join(PROJECT_ROOT, 'assets')
 OUTPUT_DIR = os.path.join(PROJECT_ROOT, 'generated')
 
+# Static configuration for unique naming
+USER_NAME = "Juan_David_Munoz_Bolanos"
+COMPANY_NAME = "ZEISS_tooz_XR"
+POSITION_NAME = "Pioneer_Extended_Reality_XR"
+
 os.makedirs(OUTPUT_DIR, exist_ok=True)
+
+def setup_latex_path():
+    """ Adds common macOS TeX distribution paths to the environment PATH. """
+    tex_paths = [
+        "/Library/TeX/texbin",
+        "/usr/local/bin",
+        "/usr/local/texlive/2025/bin/universal-darwin",
+        "/usr/local/texlive/2024/bin/universal-darwin"
+    ]
+    current_path = os.environ.get("PATH", "")
+    for path in tex_paths:
+        if os.path.exists(path) and path not in current_path:
+            current_path = f"{path}:{current_path}"
+    os.environ["PATH"] = current_path
+
+setup_latex_path()
 
 # Define categories
 ATTACHMENTS = {
     "professional_experience": [
-        "IPHT0.pdf",
-        "IPHT1.pdf"
+        "intecol_english.pdf"
     ],
     "education": [
         "Bachelor Diploma.pdf",
@@ -24,10 +44,7 @@ ATTACHMENTS = {
     ],
     "certificates": [
         "B2.pdf",
-        "Mündliche_test.pdf",
-        "Zeiss_Summer_School.pdf",
-        "ASML_School.pdf",
-        "intecol_english.pdf"
+        "Mündliche_test.pdf"
     ],
     "others": [
         "passport.pdf",
@@ -70,8 +87,21 @@ def compress_pdf(input_path, output_path, power=3):
             writer.write(f)
         return True
 
+def cleanup_aux_files(tex_filename):
+    """ Deletes temporary LaTeX files like .aux, .out, etc., but KEEPS .log for review. """
+    base = tex_filename.replace('.tex', '')
+    # We explicitly EXCLUDE '.log' from this list to keep it for the user
+    exts = ['.aux', '.out', '.toc', '.nav', '.snm', '.vrb', '.fls', '.fdb_latexmk', '.synctex.gz']
+    for ext in exts:
+        f = os.path.join(OUTPUT_DIR, base + ext)
+        if os.path.exists(f):
+            try:
+                os.remove(f)
+            except:
+                pass
+
 def compile_latex(tex_filename, output_name):
-    """ Compiles a .tex file inside TARGET_DIR to PDF via pdflatex. """
+    """ Compiles a .tex file inside TEMPLATE_DIR to PDF via pdflatex. """
     tex_path = os.path.join(TEMPLATE_DIR, tex_filename)
     if not os.path.exists(tex_path):
         print(f"   ! LaTeX file not found: {tex_path}")
@@ -79,31 +109,50 @@ def compile_latex(tex_filename, output_name):
 
     print(f"   Compiling LaTeX: {tex_filename} -> {output_name}...")
     
-    cmd = ['pdflatex', '-output-directory', OUTPUT_DIR, '-interaction=nonstopmode', tex_path]
-    process = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True, errors='replace')
+    # Delete old output to ensure we don't report a "ghost" success if pdflatex fails
+    expected_pdf = os.path.join(OUTPUT_DIR, tex_filename.replace('.tex', '.pdf'))
+    if os.path.exists(expected_pdf):
+        os.remove(expected_pdf)
+    final_output = os.path.join(OUTPUT_DIR, output_name)
+    if os.path.exists(final_output) and final_output != expected_pdf:
+        os.remove(final_output)
+
+    # Run pdflatex from TEMPLATE_DIR so it can resolve relative \input{sections/...} paths
+    cmd = ['pdflatex', '-output-directory', OUTPUT_DIR, '-interaction=nonstopmode', tex_filename]
+    
+    try:
+        process = subprocess.run(cmd, cwd=TEMPLATE_DIR, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True, errors='replace')
+    except FileNotFoundError:
+        print("   ! CRITICAL ERROR: 'pdflatex' command not found. Please install a TeX distribution (e.g., MikTeX or TeX Live).")
+        return None
     
     expected_pdf = os.path.join(OUTPUT_DIR, tex_filename.replace('.tex', '.pdf'))
     final_output = os.path.join(OUTPUT_DIR, output_name)
     
     if os.path.exists(expected_pdf):
         if expected_pdf != final_output:
+            if os.path.exists(final_output):
+                os.remove(final_output)
             shutil.move(expected_pdf, final_output)
     else:
         print(f"   ! CRITICAL ERROR compiling {tex_filename}")
-        print("--- pdflatex stdout ---")
-        print(process.stdout[:1000] + "\n...")
+        log_path = os.path.join(OUTPUT_DIR, tex_filename.replace('.tex', '.log'))
+        if os.path.exists(log_path):
+            print(f"   Check the log file for details: {log_path}")
+            # Optional: print the last 10 lines of the log for immediate feedback
+            try:
+                with open(log_path, 'r') as log_f:
+                    lines = log_f.readlines()
+                    print("--- Snippet of LaTeX Error Log ---")
+                    for line in lines[-20:]:
+                        if '!' in line or 'Error' in line:
+                            print(line.strip())
+            except:
+                pass
         return None
         
     # Cleanup intermediate files
-    base_name = os.path.splitext(tex_filename)[0]
-    extensions = ['.aux', '.log', '.out', '.synctex.gz', '.fdb_latexmk', '.fls']
-    for ext in extensions:
-        temp_file = os.path.join(OUTPUT_DIR, base_name + ext)
-        if os.path.exists(temp_file):
-            try:
-                os.remove(temp_file)
-            except OSError:
-                pass
+    cleanup_aux_files(tex_filename)
             
     return final_output
 
@@ -133,6 +182,63 @@ def merge_pdfs(pdf_list, output_filename):
         
     merger.close()
     return None
+
+def extract_info_from_latex(tex_filename):
+    """ Extracts Company and Position from motivation_letter modules or main file. """
+    ml_sections_path = os.path.join(TEMPLATE_DIR, 'sections', 'ml')
+    recipient_path = os.path.join(ml_sections_path, 'recipient.tex')
+    subject_path = os.path.join(ml_sections_path, 'subject.tex')
+    
+    company = "Unknown_Company"
+    position = "Unknown_Position"
+    
+    import re
+
+    # Try sub-modules first
+    content = ""
+    if os.path.exists(recipient_path):
+        with open(recipient_path, 'r', encoding='utf-8') as f:
+            content += f.read()
+    if os.path.exists(subject_path):
+        with open(subject_path, 'r', encoding='utf-8') as f:
+            content += f.read()
+
+    # If sub-modules don't exist or are empty, fall back to main file
+    if not content:
+        path = os.path.join(TEMPLATE_DIR, tex_filename)
+        if os.path.exists(path):
+            with open(path, 'r', encoding='utf-8') as f:
+                content = f.read()
+
+    if content:
+        try:
+            # 1. Company Name
+            company_match = re.search(r'%\s*Recipient Information.*?\\textbf\{([^}]*)\}', content, re.DOTALL)
+            if not company_match:
+                # Fallback: look for the first \textbf in recipient if marker missing (less reliable)
+                company_match = re.search(r'\\textbf\{([^}]*)\}', content)
+            
+            if company_match:
+                company = company_match.group(1)
+            
+            # 2. Position
+            subject_match = re.search(r'%\s*Subject Line.*?\\textbf\{([^}]*)\}', content, re.DOTALL)
+            if subject_match:
+                full_subject = subject_match.group(1)
+                if 'Bewerbung als ' in full_subject:
+                    position = full_subject.split('Bewerbung als ')[1].split('|')[0].strip()
+                else:
+                    position = full_subject
+        except Exception as e:
+            print(f"   ! Error parsing LaTeX for naming: {e}")
+
+    # Sanitize for filename
+    def sanitize(s):
+        import re
+        s = s.replace('/', '_').replace('\\', '_').replace(' ', '_')
+        return re.sub(r'[^a-zA-Z0-9_]', '', s).strip('_')
+
+    return sanitize(company), sanitize(position)
 
 def build_all():
     print(f"\\n--- Building Application Documents ---\\n")
@@ -183,15 +289,25 @@ def build_all():
     # 5. Merge full_application.pdf
     full_docs = []
     if ml_pdf: full_docs.append(ml_pdf)
-    if cv_pdf: full_docs.append(cv_pdf)
     if resume_pdf: full_docs.append(resume_pdf)
     full_docs.extend(all_attachments)
     
+    # 5b. Create Resume_with_Attachments.pdf
+    resume_with_attach = []
+    if resume_pdf: resume_with_attach.append(resume_pdf)
+    resume_with_attach.extend(all_attachments)
+    if resume_with_attach:
+        merge_pdfs(resume_with_attach, "Resume_with_Attachments.pdf")
+    
     if full_docs:
-        full_app = merge_pdfs(full_docs, "full_application.pdf")
+        # Extract unique name
+        company, position = extract_info_from_latex("motivation_letter.tex")
+        base_filename = f"Application_{USER_NAME}_{company}_{position}"
+        
+        full_app = merge_pdfs(full_docs, f"{base_filename}.pdf")
         if full_app:
             # Compress final
-            comp_app = os.path.join(OUTPUT_DIR, "Compressed_full_application.pdf")
+            comp_app = os.path.join(OUTPUT_DIR, f"Compressed_{base_filename}.pdf")
             compress_pdf(full_app, comp_app, power=3)
             print(f"\\nSUCCESS! Final application ready at: {comp_app}")
             

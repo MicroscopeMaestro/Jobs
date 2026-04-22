@@ -1,11 +1,12 @@
-\documentclass[a4paper,10pt]{article}
+\documentclass[a4paper,11pt]{article}
 
 % --- PACKAGES ---
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{helvet}
 \renewcommand{\familydefault}{\sfdefault}
-\usepackage[left=0.85in,top=0.7in,right=0.85in,bottom=0.7in]{geometry}
+\usepackage[left=0.75in,top=0.6in,right=0.75in,bottom=0.4in]{geometry}
+\linespread{1.04}
 \usepackage{enumitem}
 \usepackage{titlesec}
 \usepackage{xcolor}
@@ -16,33 +17,33 @@
 \usepackage{parskip}
 \usepackage{changepage}
 
-% Prevent hyphenation 
 \hyphenpenalty=10000
 \exhyphenpenalty=10000
 \sloppy
 
-% --- FORMATTING ---
 \pagestyle{empty}
-% \raggedright -- removed to allow justification
 
-% Section Styling
 \titleformat{\section}{\large\bfseries}{}{0em}{}[\titlerule]
-\titlespacing{\section}{0pt}{10pt}{4pt} 
+\titlespacing{\section}{0pt}{8pt}{4pt} 
 
-% Custom Entry Command
+% --- Layout Macros ---
+\newcommand{\sepsection}{\vspace{6pt}}
+\newcommand{\sepentry}{\vspace{3pt}}
+\newcommand{\sepbullet}{\vspace{1pt}}
+
 \newcommand{\entry}[4]{
   \noindent
   \begin{minipage}[t]{95pt}
-    {\small \textbf{#4}}
+    \raggedleft {\small \textbf{#4}}
   \end{minipage}%
-  \begin{minipage}[t]{\dimexpr\textwidth-95pt\relax}
-    \raggedright \textbf{#1} \hfill #2 \\
+  \hspace{8pt}%
+  \begin{minipage}[t]{\dimexpr\textwidth-103pt\relax}
+    \raggedright \textbf{#1} \hfill \textit{\small #2} \\
     \textit{#3}
   \end{minipage}
-  \par \vspace{6pt}
+  \par \vspace{1pt}
 }
 
-% --- MACRO: ROUND PHOTO ---
 \newcommand{\roundpic}[1]{
   \begin{tikzpicture}
     \clip (0,0) circle (1.5cm); 
@@ -51,144 +52,20 @@
 }
 
 \begin{document}
-% \raggedright -- removed to allow justification
 \setlength{\parindent}{0pt}
 
-% --- HEADER ---
-\noindent
-\begin{minipage}[c]{0.70\textwidth}
-    {\Huge \textbf{Juan David Muñoz-Bolaños} \vspace{2pt}} \\ \vspace{8pt}
-    \textbf{\large Optical System Engineer} \\ \vspace{8pt}
-    Rechenauerstraße 42, Innsbruck, Österreich (Tirol) \\
-    +43 676 9115145 \\
-    \href{mailto:juan.munoz@i-med.ac.at}{juan.munoz@i-med.ac.at} \ \textbf{|} \ \href{https://www.linkedin.com/in/juan-mu\%C3\%B1oz-microscopy/}{LinkedIn Profile}
-\end{minipage}%
-\hfill
-\begin{minipage}[c]{0.25\textwidth}
-    \begin{flushright}
-        % Ensure photo.png is in the same folder
-        \roundpic{photo.png}
-    \end{flushright}
-\end{minipage}
+\input{sections/resume/header.tex}
+\vspace{2pt}
 
-\vspace{10pt}
+\input{sections/resume/summary.tex}
+\input{sections/resume/experience.tex}
+\input{sections/resume/technical_competencies.tex}
+\vspace{-2pt}
 
-% --- PROFESSIONAL SUMMARY ---
-\section{Summary}
-\vspace{8pt}
-\begin{adjustwidth}{0pt}{0pt}
-Physics Engineer with deep expertise in \textbf{Optics, Laser Systems, and Machine Vision}. Experienced in delivering industrial Halcon pipelines for series production and building complex adaptive optics metrology systems. Currently finishing a PhD focused on high-precision hardware-software integration.
-\end{adjustwidth}
-
-
-% --- PROFESSIONAL EXPERIENCE ---
-% --- PROFESSIONAL EXPERIENCE ---
-\section{Professional Experience}
-\vspace{6pt}
-
-% INTECOL S.A.S. -- most relevant, listed first
-\entry{INTECOL S.A.S.}{Medellín, Colombia}{Junior Machine Vision System Engineer}{Mar 2018 to Mar 2019}
-\begin{adjustwidth}{95pt}{0pt}
-\textbf{Machine Vision Pipelines:} Developed and commissioned Halcon-based inspection systems for high-speed glass lines (labels, sealing, liquid level). Handled custom illumination design and hardware integration.\\[4pt]
-\textbf{Robotic Vision:} Implemented Cognex VisionPro for automated part recognition, enabling robotic flame treatment of automotive components (Renault).
-\end{adjustwidth}
-
-\vspace{12pt}
-
-% Medical University of Innsbruck
-\entry{Medical University of Innsbruck}{Innsbruck, Austria}{PhD Researcher, Adaptive Optics \& Data Processing}{Jan 2022 to Present}
-\begin{adjustwidth}{95pt}{0pt}
-\textbf{Optics \& Metrology:} Built a fully automated wavefront sensor stack using C++/Python/LabVIEW; integrated adaptive optics for diffraction-limited imaging (ACS Photonics '25).\\[4pt]
-\textbf{System Integration:} Full-stack development from hardware interfacing to real-time wave-field control and precision data processing in Python.
-\end{adjustwidth}
-
-\vspace{12pt}
-
-% Leibniz Institute of Photonic Technology (IPHT)
-\entry{Leibniz IPHT}{Jena, Germany}{M.Sc. Researcher | Hyperspectral AI \& Photonics}{Jun 2020 to Dec 2021}
-\begin{adjustwidth}{95pt}{0pt}
-\textbf{AI \& Spectroscopy:} Developed the \href{https://pypi.org/project/spectramap/}{SpectraMap} Python package for hyperspectral Raman image analysis. Leveraged clustering and ML algorithms for automated cancer detection in tissue samples (Applied Sciences '24).\\[4pt]
-\textbf{Spectrometer Prototyping:} Led the optical design and build of a 1064\,nm Raman spectrometer.
-\end{adjustwidth}
-
-% --- TECHNICAL COMPETENCIES ---
-
-\section{Technical Competencies}
-\vspace{8pt}
-
-\begin{adjustwidth}{10pt}{0pt}
-\textbf{Image Processing \& Computer Vision:} Halcon (MVTec), Cognex VisionPro, OpenCV; object detection, segmentation, defect detection; illumination design (bright-field, dark-field, structured light).\\[8pt]
-\textbf{AI \& Machine Learning:} Supervised ML on image and spectral data (Python, NumPy, scikit-learn); clustering and classification models for automated defect detection and object recognition.\\[8pt]
-\textbf{Software Development:} Python (advanced) · Halcon (intermediate) · C++ (intermediate / OpenCV) · LabVIEW/FPGA · Git · MATLAB; knowledge of C\#/.NET concepts.\\[8pt]
-\textbf{3D Metrology \& Simulation:} Phase retrieval, Zernike decomposition, wave-field modeling in Python; ZEMAX OpticStudio tolerance analysis.\\[8pt]
-\textbf{Industrial Integration:} Hardware-software integration of camera systems, laser modules, and positioning stages; high-precision alignment of optical measurement systems; commissioning on production lines.\\[8pt]
-\textbf{Laser Systems & Alignment:} Expertise in integration and alignment of high-power laser systems (fs, CW, 1064 nm); maintenance of precision opto-mechatronic setups and EH\&S compliance.
-\end{adjustwidth}
-
-\vspace{6pt}
-
-
-
-\vspace{10pt}
-
-
-% --- EDUCATION ---
-\section{Education}
-\vspace{8pt}
-
-\entry{Medical University of Innsbruck}{Austria}{PhD in Adaptive Optics \& Microscopy}{Jan 2022 to Present}
-\entry{Friedrich Schiller University Jena}{Germany}{M.Sc. in Photonics}{2019 to 2021}
-\entry{University of Cauca}{Colombia}{B.Sc. in Physics Engineering}{2012 to 2018}
-
-
-
-
-
-% --- SELECTED PUBLICATIONS & AWARDS ---
-\section{Publications \& Awards}
-\vspace{8pt}
-
-\begin{adjustwidth}{10pt}{0pt}
-\textbf{Awards:} ASML \& ZEISS Summer Schools (Selected); COLFUTURO Grant 2026 Awardee.\\[6pt]
-Muñoz-Bolaños, J. D. et al. Confocal Raman Microscopy with Adaptive Optics. ACS Photonics 12(1), 176--184 (2025).\\[6pt]
-Muñoz-Bolaños, J. D., et al. Design of a dispersive 1064 nm fiber probe Raman imaging spectrometer. Applied Sciences, 14(11), 4726 (2024).\\[6pt]
-Sohmen, M., Muñoz-Bolaños, J. D., et al. Optofluidic adaptive optics in multi-photon microscopy. Biomedical Optics Express 14(4), 1562--1578 (2023).
-\end{adjustwidth}
-
-\vspace{4pt}
-\section{Languages}
-\begin{adjustwidth}{10pt}{0pt}
-\vspace{4pt}
-English (Professional) \textbf{$\cdot$} German (B2 Certificate | High Intermediate) \textbf{$\cdot$} Spanish (Native)
-\end{adjustwidth}
-
-
-\vspace{4pt}
-\section{Soft Skills \& Hobbies}
-\vspace{4pt}
-
-\begin{adjustwidth}{10pt}{0pt}
-\textbf{Problem Solving:} Resolved complex, cross-disciplinary challenges resulting in 3 peer-reviewed publications.\\[4pt]
-\textbf{Adaptability:} Built a global career path across Colombia, Germany, and Austria with strong networking skills.\\[4pt]
-\textbf{Hobbies:} Mountain biking, Bachata dancing, harmonica, learning German.
-\end{adjustwidth}
-
-\vspace{6pt}
-
-% --- REFERENCES ---
-\section{References}
-\vspace{4pt}
-
-\begin{adjustwidth}{10pt}{0pt}
-\textbf{Prof. Monika Ritsch-Marte} \hfill Medical University of Innsbruck \\
-\textit{Head of the Institute of Biomedical Physics} \\
-\href{mailto:monika.ritsch-marte@i-med.ac.at}{monika.ritsch-marte@i-med.ac.at}
-
-\vspace{6pt}
-
-\textbf{Dr. Christoph Krafft} \hfill Leibniz-IPHT Jena \\
-\textit{Spectroscopy Group Leader} \\
-\href{mailto:christoph.kraft@leibniz-ipht.de}{christoph.kraft@leibniz-ipht.de}
-\end{adjustwidth}
+\input{sections/resume/education.tex}
+\input{sections/resume/publications.tex}
+\input{sections/resume/soft_skills.tex}
+\input{sections/resume/languages.tex}
+\input{sections/resume/references.tex}
 
 \end{document}

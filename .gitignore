@@ -2,6 +2,9 @@
 __pycache__/
 venv/
 
+# Environment secrets
+.env
+
 # LaTeX build artifacts
 *.aux
 *.log
