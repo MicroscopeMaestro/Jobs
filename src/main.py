@@ -2,7 +2,7 @@ import os
 import shutil
 import subprocess
 import sys
-from PyPDF2 import PdfMerger
+from pypdf import PdfWriter as PdfMerger
 
 # --- Configuration ---
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -12,8 +12,8 @@ OUTPUT_DIR = os.path.join(PROJECT_ROOT, 'generated')
 
 # Static configuration for unique naming
 USER_NAME = "Juan_David_Munoz_Bolanos"
-COMPANY_NAME = "ZEISS_tooz_XR"
-POSITION_NAME = "Pioneer_Extended_Reality_XR"
+COMPANY_NAME = "INNIO_Jenbacher"
+POSITION_NAME = "Quality_Engineer_Messtechnik"
 
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
@@ -36,6 +36,8 @@ setup_latex_path()
 # Define categories
 ATTACHMENTS = {
     "professional_experience": [
+        #"IPHT0.pdf",
+        #"IPHT1.pdf",
         "intecol_english.pdf"
     ],
     "education": [
@@ -43,6 +45,8 @@ ATTACHMENTS = {
         "master.pdf"
     ],
     "certificates": [
+        #"ASML_School.pdf",
+        #"Zeiss_Summer_School.pdf",
         "B2.pdf",
         "Mündliche_test.pdf"
     ],
@@ -298,6 +302,15 @@ def build_all():
     resume_with_attach.extend(all_attachments)
     if resume_with_attach:
         merge_pdfs(resume_with_attach, "Resume_with_Attachments.pdf")
+    
+    # 6. Create separate Identification file (Passport + Resident Permit)
+    identification_docs = []
+    passport_path = os.path.join(ASSETS_DIR, "passport.pdf")
+    resident_permit_path = os.path.join(ASSETS_DIR, "resident_permit.pdf")
+    if os.path.exists(passport_path): identification_docs.append(passport_path)
+    if os.path.exists(resident_permit_path): identification_docs.append(resident_permit_path)
+    if identification_docs:
+        merge_pdfs(identification_docs, f"Passport_and_Resident_Permit_{USER_NAME}.pdf")
     
     if full_docs:
         # Extract unique name

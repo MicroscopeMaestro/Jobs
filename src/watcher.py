@@ -36,24 +36,24 @@ def get_tex_mtimes(directory):
     return snapshot
 
 def trigger_build(changed_file):
-    print(f"\n[Watcher] CHANGE DETECTED: {os.path.basename(changed_file)}")
-    print(f"[Watcher] Triggering build...")
+    print(f"\n[Watcher] CHANGE DETECTED: {os.path.basename(changed_file)}", flush=True)
+    print(f"[Watcher] Triggering build...", flush=True)
     try:
         result = subprocess.run([sys.executable, MAIN_SCRIPT], cwd=PROJECT_ROOT)
         if result.returncode == 0:
-            print("[Watcher] BUILD SUCCESSFUL. (Awaiting next change...)\n")
+            print("[Watcher] BUILD SUCCESSFUL. (Awaiting next change...)\n", flush=True)
         else:
-            print(f"[Watcher] BUILD FAILED (Exit Code: {result.returncode}).\n")
+            print(f"[Watcher] BUILD FAILED (Exit Code: {result.returncode}).\n", flush=True)
     except Exception as e:
-        print(f"[Watcher] Error triggering build: {e}\n")
+        print(f"[Watcher] Error triggering build: {e}\n", flush=True)
 
 if __name__ == "__main__":
-    print("="*60)
-    print("TEX WATCHER STARTING...")
-    print(f"Watching: {TEMPLATES_DIR}")
-    print(f"Method:   Custom mtime polling every {POLL_INTERVAL}s")
-    print("="*60)
-    print("Keep this terminal open. Press Ctrl+C to stop.\n")
+    print("="*60, flush=True)
+    print("TEX WATCHER STARTING...", flush=True)
+    print(f"Watching: {TEMPLATES_DIR}", flush=True)
+    print(f"Method:   Custom mtime polling every {POLL_INTERVAL}s", flush=True)
+    print("="*60, flush=True)
+    print("Keep this terminal open. Press Ctrl+C to stop.\n", flush=True)
 
     # Take initial snapshot
     last_snapshot = get_tex_mtimes(TEMPLATES_DIR)
@@ -72,10 +72,13 @@ if __name__ == "__main__":
                     changed = path
                     break
 
-            if changed and (time.time() - last_build) > cooldown:
-                last_build = time.time()
-                last_snapshot = current_snapshot
-                trigger_build(changed)
+            if changed:
+                if (time.time() - last_build) > cooldown:
+                    last_build = time.time()
+                    last_snapshot = current_snapshot
+                    trigger_build(changed)
+                # If in cooldown, we DON'T update last_snapshot, 
+                # so 'changed' will still be True in the next iteration.
             else:
                 last_snapshot = current_snapshot
 
