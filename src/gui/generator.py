@@ -211,6 +211,8 @@ The JSON must have exactly these keys:
                You MUST use a beautiful, modern, tabular grid format to structure and align the categories perfectly.
                Format exactly as follows:
                \\section{{Technical Competencies}}
+               \\vspace{{-4pt}}
+               {{\\footnotesize \\textit{{* Dark tags indicate expertise; light tags indicate knowledge.}}}}\\vspace{{4pt}}
                \\renewcommand{{\\arraystretch}}{{1.5}}
                \\begin{{tabular}}{{@{{}}p{{95pt}}@{{\\hspace{{8pt}}}}p{{\\dimexpr\\textwidth-103pt\\relax}}@{{}}}}
                    \\raggedright\\textbf{{[Category 1]}} & \\cvtagExpertise{{[Skill 1]}} \\cvtagKnowledge{{[Skill 2]}} \\cvtagExpertise{{[Skill 3]}} \\\\

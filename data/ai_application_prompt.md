@@ -118,9 +118,8 @@ surface of the plastic parts to enhance chemically.
 ---
 
 ## MY SKILLS AT A GLANCE
-
-**Software:** Python (JAX, scikit-learn, NumPy) · C++ · LabVIEW/FPGA · Halcon pipelines · Cognex VisionPro · OpenCV · ZEMAX · Git · MATLAB · Code Composer Studio
-**Hardware:** Adaptive optics · Interferometry · Wavefront sensing · Multiphoton/confocal microscopy · Raman spectroscopy · Laser systems (fs, CW, 1064 nm) · Illumination design · Custom illumination · Camera integration · Galvo scanners · Opto-mechanical integration (SolidWorks, FreeCAD) · Spatial Light Modulators (SLMs) · Texas Instruments DMDs · PCB Design (Proteus) · Laser Scanning Systems
+**Software:** Python (scikit-learn, NumPy) · C++ · LabVIEW/FPGA · Halcon pipelines · Cognex VisionPro · OpenCV · ZEMAX · Git · MATLAB · Code Composer Studio
+**Hardware:** Adaptive optics · Interferometry · Wavefront sensing · Multiphoton/confocal microscopy · Raman spectroscopy · Laser systems (fs, CW, 1064 nm) · Illumination design · Custom illumination · Camera integration · Galvo scanners · 3D CAD (SolidWorks, FreeCAD) · Spatial Light Modulators · PCB Design (Proteus) · Laser Scanning Systems
 **Soft Skills:** End-to-end project ownership · Technical documentation · Interdisciplinary teamwork · Supplier coordination · Fast learner on new toolchains · ISO 9001/10110 awareness · V-Model Systems Engineering · FMEA · 8D Problem Solving · MSA / Gage R&R
 
 ---
