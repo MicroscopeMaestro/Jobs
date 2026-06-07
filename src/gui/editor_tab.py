@@ -456,8 +456,10 @@ class EditorTab(QWidget):
         elif selected_text == "Resume Only":
             return os.path.join(self.output_dir, "resume.pdf")
         elif selected_text == "Full Application Bundle":
-            pdf_pattern = os.path.join(self.output_dir, "Application_*.pdf")
-            pdf_files = glob.glob(pdf_pattern)
+            # Search for Compressed files first, fallback to uncompressed Juan_Munoz files
+            pdf_files = glob.glob(os.path.join(self.output_dir, "Compressed_*.pdf"))
+            if not pdf_files:
+                pdf_files = glob.glob(os.path.join(self.output_dir, "Juan_Munoz_*.pdf"))
             if pdf_files:
                 return max(pdf_files, key=os.path.getmtime)
         return ""
