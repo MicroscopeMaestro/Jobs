@@ -101,7 +101,7 @@ class LatexAndGrammarHighlighter(QSyntaxHighlighter):
                 
                 # Fetch existing format to preserve foreground color if it was LaTeX
                 fmt = self.format(local_start)
-                fmt.setUnderlineStyle(QTextCharFormat.UnderlineStyle.SpellCheckUnderline)
+                fmt.setUnderlineStyle(QTextCharFormat.UnderlineStyle.WaveUnderline)
                 
                 if err['type'] == 'misspelling':
                     fmt.setUnderlineColor(QColor("#ef4444")) # Red
