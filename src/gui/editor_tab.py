@@ -133,6 +133,7 @@ class RichTextEditor(QTextEdit):
         
         self.textChanged.connect(self.on_text_changed)
         self.worker = None
+        self._old_workers = set()
 
     def on_text_changed(self):
         self.check_timer.start()
@@ -141,6 +142,10 @@ class RichTextEditor(QTextEdit):
         text = self.toPlainText()
         if not text.strip():
             return
+            
+        if self.worker is not None and self.worker.isRunning():
+            self._old_workers.add(self.worker)
+            self.worker.finished.connect(lambda w=self.worker: self._old_workers.discard(w))
             
         self.worker = GrammarCheckWorker(text, self.grammar_lang)
         self.worker.finished.connect(self.highlighter.update_errors)
