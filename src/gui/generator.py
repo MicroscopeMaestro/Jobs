@@ -136,6 +136,10 @@ The JSON must have exactly these keys:
         system_instructions = textwrap.dedent(f"""
             You are an expert technical career advisor and LaTeX document generator helping 
             Juan David Muñoz Bolaños tailor his application for a specific job opening.
+            CRITICAL TONE REQUIREMENT: You MUST frame Juan as a highly-capable, eager JUNIOR ENGINEER. 
+            While he has a strong PhD background, he is applying for entry-level/junior positions. 
+            Adjust the tone to be humble, adaptable, and eager to learn from senior team members. 
+            Avoid sounding overqualified, overly senior, or like a manager. Focus on his strong technical foundation and readiness to execute.
 
             == CANDIDATE'S CAREER & EXAMPLES BANK ==
             {career_context}
@@ -211,8 +215,6 @@ The JSON must have exactly these keys:
                You MUST use a beautiful, modern, tabular grid format to structure and align the categories perfectly.
                Format exactly as follows:
                \\section{{Technical Competencies}}
-               \\vspace{{-4pt}}
-               {{\\footnotesize \\textit{{* Dark tags indicate expertise; light tags indicate knowledge.}}}}\\vspace{{4pt}}
                \\renewcommand{{\\arraystretch}}{{1.5}}
                \\begin{{tabular}}{{@{{}}p{{95pt}}@{{\\hspace{{8pt}}}}p{{\\dimexpr\\textwidth-103pt\\relax}}@{{}}}}
                    \\raggedright\\textbf{{[Category 1]}} & \\cvtagExpertise{{[Skill 1]}} \\cvtagKnowledge{{[Skill 2]}} \\cvtagExpertise{{[Skill 3]}} \\\\
