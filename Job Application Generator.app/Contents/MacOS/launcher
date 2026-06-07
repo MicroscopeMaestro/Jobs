@@ -1,0 +1,4 @@
+#!/bin/bash
+cd "/Users/juanmunoz/Documents/GitHub/Jobs"
+export PATH="/usr/local/texlive/2025/bin/universal-darwin:$PATH"
+./launch.sh > app_crash.log 2>&1 &

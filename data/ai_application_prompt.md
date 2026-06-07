@@ -97,14 +97,32 @@ surface of the plastic parts to enhance chemically.
 - **Skills demonstrated:** Lab management, safety compliance, equipment maintenance, documentation
 - **Use when:** Lab engineer, materials engineer, or advanced engineer roles requiring lab-management skills
 
+### EX-12 · Laser, SLM & DMD-Based System Build
+- **Where:** Medical University of Innsbruck, PhD (4 years)
+- **What:** Built complex laser- and light-based systems from the bare table up: integrated laser sources, spatial light modulators (SLMs), Texas Instruments DMDs and a TI DLP development kit for image projection, galvo scanners, scientific cameras and piezo stages. Programmed devices both via microcontroller and at the projection level.
+- **Skills demonstrated:** SLMs, DMDs, laser integration, optomechanics, hardware-software integration
+- **Use when:** Additive manufacturing, laser systems, projection technology, hardware implementation roles
+
+### EX-13 · Optomechanical Quality and Testing (ISO 9001 / 10110)
+- **Where:** Medical University of Innsbruck, PhD
+- **What:** Executed structured Design of Experiments (DoE) and optical simulations (Python) to foresee system performance. Applied structured testing and documentation protocols for optomechanical assemblies with an awareness of ISO 9001 and ISO 10110 frameworks.
+- **Skills demonstrated:** ISO 9001, Design of Experiments, optical testing, quality engineering
+- **Use when:** Systems engineering, quality engineering, testing and validation roles
+
+### EX-14 · Systems Engineering Methodologies (V-Model & FMEA/8D)
+- **Where:** Ongoing professional development / Medical University of Innsbruck
+- **What:** Structured my complex instrument development following V-Model systems engineering principles, ensuring clear requirements tracking from concept down to component testing. Gained awareness and practical understanding of quality and failure analysis methodologies including FMEA (Failure Mode and Effects Analysis) and the 8D problem-solving process to systematically prevent and resolve technical defects in prototype iterations.
+- **Skills demonstrated:** V-Model lifecycle, FMEA, 8D problem solving, requirements engineering, risk management
+- **Use when:** Systems engineering, quality assurance, project management, or process engineering roles
+
 ---
 
 ## MY SKILLS AT A GLANCE
 
-**Software:** Python · C++ · LabVIEW/FPGA · Halcon · OpenCV · JAX (GPU) · ZEMAX · Git · MATLAB 
-**Optics/Hardware:** Adaptive optics · Interferometry · Wavefront sensing · Multiphoton/confocal microscopy · Raman spectroscopy · Laser systems (fs, CW, 1064 nm) · Illumination design · Galvo scanners · Opto-mechanical integration  
+**Software:** Python (JAX, scikit-learn, NumPy) · C++ · LabVIEW/FPGA · Halcon · OpenCV · ZEMAX · Git · MATLAB · Code Composer Studio
+**Optics/Hardware:** Adaptive optics · Interferometry · Wavefront sensing · Multiphoton/confocal microscopy · Raman spectroscopy · Laser systems (fs, CW, 1064 nm) · Illumination design · Galvo scanners · Opto-mechanical integration (SolidWorks, FreeCAD) · Spatial Light Modulators (SLMs) · Texas Instruments DMDs · PCB Design (Proteus) · Laser Scanning Systems
 **Machine Vision:** Halcon pipelines · Camera integration · Custom illumination · MSA / Gage R&R · Cognex VisionPro
-**Standards:** ISO(awareness) course taken in SPIE photonics west, San Francisco. 
+**Standards & Quality:** ISO 9001/10110 awareness · V-Model Systems Engineering · FMEA · 8D Problem Solving
 **Soft Skills:** End-to-end project ownership · Technical documentation · Interdisciplinary teamwork · Supplier coordination · Fast learner on new toolchains
 
 ---
@@ -116,6 +134,16 @@ surface of the plastic parts to enhance chemically.
 | 2018–2019 | Junior Machine Vision Engineer — INTECOL S.A.S. (Medellín, Colombia) | Industrial Halcon vision pipelines on production lines |
 | 2020–2021 | R&D Research Assistant — IPHT Jena (Germany) | Raman spectrometer prototype + ML tissue classification |
 | 2022–now  | PhD Researcher — Medical University of Innsbruck (Austria) | Adaptive optics microscope system + 3 peer-reviewed papers |
+
+---
+
+## COVER LETTER HOOKS (ARCHIVED)
+
+When writing the cover letter, feel free to use or adapt these proven hooks from past applications, matching the target language and role:
+
+- **English (R&D / Systems):** "As an engineer in optical metrology and R&D prototyping, my career spans the spectrum from research to hands-on instrumentation. Following my Bachelor degree in Physics Engineering, I gained industrial experience as a Machine Vision Engineer at INTECOL S.A.S., deploying automated inspection systems for high-speed production lines. This practical foundation inspired me to deepen my expertise through a Master of Science in Photonics in Jena and a PhD at the Medical University of Innsbruck..."
+- **German (Machine Vision / Inspection):** "Bildverarbeitungssysteme von der Machbarkeitsstudie bis zur laufenden Serie zu entwickeln habe ich in zwei sich ergänzenden Kontexten getan: als Machine Vision Engineer auf Hochgeschwindigkeits-Produktionslinien (Cognex, Halcon) und als Doktorand beim Aufbau komplexer 2D/3D-optischer Messsysteme. Mit dem Abschluss meiner Promotion im Juni 2026 möchte ich diese kombinierten Kompetenzen in Ihr Team einbringen."
+- **German (Hardware / Laser / Additive):** "Ihre Ausschreibung hat mich sofort angesprochen, denn Ihre Technologie verbindet genau das, womit ich seit Jahren arbeite: Laser, Optik und präzise lichtbasierte Systeme, vom Aufbau bis zur Inbetriebnahme. In meiner Promotion habe ich vier Jahre lang komplexe optomechatronische Systeme von Grund auf selbst gebaut und in Betrieb genommen (Lasersysteme, SLMs, Texas-Instruments-DMDs, Galvoscanner)."
 
 ---
 

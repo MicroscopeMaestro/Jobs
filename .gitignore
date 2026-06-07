@@ -13,4 +13,11 @@ venv/
 *.fdb_latexmk
 *.synctex.gz
 generated/scaled_*.tex
-generated/scaled_*.pdf
+generated/scaled_*.pdfvenv_gui/
+.venv/
+venv_gui/
+.claude/
+
+.venv/
+venv_gui/
+.claude/

@@ -1,0 +1,46 @@
+{
+  "ltex.enabled": ["latex", "tex", "bibtex", "markdown"],
+  "ltex.language": "de-AT",
+  "ltex.additionalRules.enablePickyRules": true,
+  "ltex.latex.commands": {
+    "\\entry{}{}{}{}": "ignore",
+    "\\href{}": "dummy",
+    "\\sepbullet": "ignore",
+    "\\sepentry": "ignore",
+    "\\sepsection": "ignore"
+  },
+  "ltex.dictionary": {
+    "de-AT": [
+      "Rot-Weiß-Rot-Plus-Karte",
+      "DAQ-Karten",
+      "Piezostages",
+      "Galvoscannern",
+      "Galvoscanner",
+      "optomechatronischer",
+      "optomechatronische",
+      "Verifikationsingenieur",
+      "Prüflingen",
+      "Sondermaschinenbau",
+      "Messtechnik",
+      "Doktoratsabsolvent",
+      "FERCHAU",
+      "Sandoz",
+      "LabVIEW"
+    ],
+    "en-US": [
+      "DAQ",
+      "LabVIEW",
+      "Halcon",
+      "Cognex",
+      "VisionPro",
+      "opto-mechanical",
+      "piezo",
+      "galvo",
+      "Basler",
+      "Hamamatsu",
+      "Andor",
+      "INTECOL",
+      "optomechatronic"
+    ]
+  }
+}

@@ -11,7 +11,7 @@ ASSETS_DIR = os.path.join(PROJECT_ROOT, 'assets')
 OUTPUT_DIR = os.path.join(PROJECT_ROOT, 'generated')
 
 # Static configuration for unique naming
-USER_NAME = "Juan_David_Munoz_Bolanos"
+USER_NAME = "Juan_Munoz"
 COMPANY_NAME = "INNIO_Jenbacher"
 POSITION_NAME = "Quality_Engineer_Messtechnik"
 
@@ -199,42 +199,32 @@ def extract_info_from_latex(tex_filename):
     import re
 
     # Try sub-modules first
-    content = ""
     if os.path.exists(recipient_path):
-        with open(recipient_path, 'r', encoding='utf-8') as f:
-            content += f.read()
-    if os.path.exists(subject_path):
-        with open(subject_path, 'r', encoding='utf-8') as f:
-            content += f.read()
-
-    # If sub-modules don't exist or are empty, fall back to main file
-    if not content:
-        path = os.path.join(TEMPLATE_DIR, tex_filename)
-        if os.path.exists(path):
-            with open(path, 'r', encoding='utf-8') as f:
-                content = f.read()
-
-    if content:
         try:
-            # 1. Company Name
-            company_match = re.search(r'%\s*Recipient Information.*?\\textbf\{([^}]*)\}', content, re.DOTALL)
-            if not company_match:
-                # Fallback: look for the first \textbf in recipient if marker missing (less reliable)
-                company_match = re.search(r'\\textbf\{([^}]*)\}', content)
-            
+            with open(recipient_path, 'r', encoding='utf-8') as f:
+                rec_content = f.read()
+            company_match = re.search(r'\\textbf\{([^}]*)\}', rec_content)
             if company_match:
                 company = company_match.group(1)
-            
-            # 2. Position
-            subject_match = re.search(r'%\s*Subject Line.*?\\textbf\{([^}]*)\}', content, re.DOTALL)
+        except Exception:
+            pass
+
+    if os.path.exists(subject_path):
+        try:
+            with open(subject_path, 'r', encoding='utf-8') as f:
+                sub_content = f.read()
+            subject_match = re.search(r'\\textbf\{([^}]*)\}', sub_content)
             if subject_match:
                 full_subject = subject_match.group(1)
+                # Try to clean out common prefixes
                 if 'Bewerbung als ' in full_subject:
                     position = full_subject.split('Bewerbung als ')[1].split('|')[0].strip()
+                elif 'Application for ' in full_subject:
+                    position = full_subject.split('Application for ')[1].split('|')[0].strip()
                 else:
-                    position = full_subject
-        except Exception as e:
-            print(f"   ! Error parsing LaTeX for naming: {e}")
+                    position = full_subject.split('|')[0].strip()
+        except Exception:
+            pass
 
     # Sanitize for filename
     def sanitize(s):
@@ -315,7 +305,7 @@ def build_all():
     if full_docs:
         # Extract unique name
         company, position = extract_info_from_latex("motivation_letter.tex")
-        base_filename = f"Application_{USER_NAME}_{company}_{position}"
+        base_filename = f"{USER_NAME}_{company}_{position}"
         
         full_app = merge_pdfs(full_docs, f"{base_filename}.pdf")
         if full_app:
@@ -323,6 +313,8 @@ def build_all():
             comp_app = os.path.join(OUTPUT_DIR, f"Compressed_{base_filename}.pdf")
             compress_pdf(full_app, comp_app, power=3)
             print(f"\\nSUCCESS! Final application ready at: {comp_app}")
+            return comp_app
+    return None
             
 if __name__ == "__main__":
     build_all()

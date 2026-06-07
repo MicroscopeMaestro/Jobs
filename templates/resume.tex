@@ -29,19 +29,24 @@
 % --- Layout Macros ---
 \newcommand{\sepsection}{\vspace{4pt}}
 \newcommand{\sepentry}{\vspace{2pt}}
-\newcommand{\sepbullet}{\vspace{0pt}}
+\newcommand{\sepbullet}{\par \vspace{3pt}\noindent}
 
 \newcommand{\entry}[4]{
   \noindent
   \begin{minipage}[t]{95pt}
-    \raggedleft {\small \textbf{#4}}
+    \raggedright {\small \textbf{#4}}
   \end{minipage}%
   \hspace{8pt}%
   \begin{minipage}[t]{\dimexpr\textwidth-103pt\relax}
     \raggedright \textbf{#1} \hfill \textit{\small #2} \\
-    \textit{#3}
+    \vspace{2pt}
+    \textbf{\textit{#3}}
   \end{minipage}
-  \par \vspace{1pt}
+  \par \vspace{5pt}
+}
+
+\newcommand{\cvtag}[1]{%
+  \tikz[baseline]\node[anchor=base,draw=black!20,rounded corners,inner xsep=1ex,inner ysep=0.6ex,text height=1.2ex,text depth=.25ex,fill=gray!10,font=\small]{#1};%
 }
 
 \newcommand{\roundpic}[1]{
