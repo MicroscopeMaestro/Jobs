@@ -90,7 +90,10 @@ The JSON must have exactly these keys:
         if params.get("skills"):
             skills_str = "Selected Skills to highlight:\n"
             for sk in params["skills"]:
-                skills_str += f"- {sk}\n"
+                if isinstance(sk, dict):
+                    skills_str += f"- {sk['name']} (Level: {sk['level']})\n"
+                else:
+                    skills_str += f"- {sk} (Level: Knowledge)\n"
 
         # Format selected experience roles
         experience_str = "Selected Career Roles and Titles to include:\n"
@@ -114,7 +117,8 @@ The JSON must have exactly these keys:
         is_humanize_enabled = params.get("humanize", True)
         if params.get("skills"):
             for sk in params["skills"]:
-                if "humanize" in sk.lower() or "writing voice" in sk.lower():
+                sk_name = sk["name"] if isinstance(sk, dict) else sk
+                if "humanize" in sk_name.lower() or "writing voice" in sk_name.lower():
                     is_humanize_enabled = True
                     break
 
@@ -203,14 +207,15 @@ The JSON must have exactly these keys:
 
             6. <RESUME_COMPETENCIES>: Technical competencies section.
                List skills grouped by category, highlighting the selected skills that match this job posting.
+               Use `\\cvtagExpertise{{}}` for skills marked as 'Expertise' in the selected skills list, and `\\cvtagKnowledge{{}}` for skills marked as 'Knowledge'.
                You MUST use a beautiful, modern, tabular grid format to structure and align the categories perfectly.
                Format exactly as follows:
                \\section{{Technical Competencies}}
                \\renewcommand{{\\arraystretch}}{{1.5}}
                \\begin{{tabular}}{{@{{}}p{{95pt}}@{{\\hspace{{8pt}}}}p{{\\dimexpr\\textwidth-103pt\\relax}}@{{}}}}
-                   \\raggedright\\textbf{{[Category 1]}} & \\cvtag{{[Skill 1]}} \\cvtag{{[Skill 2]}} \\cvtag{{[Skill 3]}} \\\\
-                   \\raggedright\\textbf{{[Category 2]}} & \\cvtag{{[Skill 4]}} \\cvtag{{[Skill 5]}} \\cvtag{{[Skill 6]}} \\\\
-                   \\raggedright\\textbf{{[Category 3]}} & \\cvtag{{[Skill 7]}} \\cvtag{{[Skill 8]}} \\cvtag{{[Skill 9]}} \\\\
+                   \\raggedright\\textbf{{[Category 1]}} & \\cvtagExpertise{{[Skill 1]}} \\cvtagKnowledge{{[Skill 2]}} \\cvtagExpertise{{[Skill 3]}} \\\\
+                   \\raggedright\\textbf{{[Category 2]}} & \\cvtagKnowledge{{[Skill 4]}} \\cvtagKnowledge{{[Skill 5]}} \\cvtagExpertise{{[Skill 6]}} \\\\
+                   \\raggedright\\textbf{{[Category 3]}} & \\cvtagExpertise{{[Skill 7]}} \\cvtagKnowledge{{[Skill 8]}} \\cvtagKnowledge{{[Skill 9]}} \\\\
                \\end{{tabular}}
                
             Let's begin. Generate the 6 sections enclosed in their tags.

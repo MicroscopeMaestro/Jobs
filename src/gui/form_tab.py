@@ -683,10 +683,21 @@ class FormTab(QWidget):
                 cat_group = QGroupBox(category)
                 cat_layout = QGridLayout(cat_group)
                 for idx, s in enumerate(unique_skills):
+                    widget = QWidget()
+                    h_layout = QHBoxLayout(widget)
+                    h_layout.setContentsMargins(0, 0, 0, 0)
+                    
                     cb = QCheckBox(s)
-                    cb.setChecked(True) # Checked by default
-                    cat_layout.addWidget(cb, idx // 3, idx % 3)
-                    self.skills_list.append((cb, category))
+                    cb.setChecked(True)
+                    
+                    combo = QComboBox()
+                    combo.addItems(["Knowledge", "Expertise"])
+                    
+                    h_layout.addWidget(cb)
+                    h_layout.addWidget(combo)
+                    
+                    cat_layout.addWidget(widget, idx // 2, idx % 2)
+                    self.skills_list.append((cb, category, combo))
                     
                 self.skills_container_layout.addWidget(cat_group)
                         
@@ -1125,9 +1136,12 @@ class FormTab(QWidget):
                 
         # 4. Gather selected Skills
         selected_skills = []
-        for cb, cat in self.skills_list:
+        for cb, cat, combo in self.skills_list:
             if cb.isChecked():
-                selected_skills.append(cb.text())
+                selected_skills.append({
+                    "name": cb.text(),
+                    "level": combo.currentText()
+                })
                 
         # 5. Gather Experience Entries
         exp_entries = []
