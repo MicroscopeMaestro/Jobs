@@ -4,7 +4,7 @@ from datetime import datetime
 from PySide6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QPushButton, 
                              QTableWidget, QTableWidgetItem, QHeaderView, 
                              QMessageBox, QInputDialog, QComboBox, QDialog,
-                             QFormLayout, QLineEdit, QLabel)
+                             QFormLayout, QLineEdit)
 from PySide6.QtCore import Qt
 
 class AddEntryDialog(QDialog):

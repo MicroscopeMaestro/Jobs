@@ -30,7 +30,7 @@ def apply_premium_stylesheet(app):
     /* Global widget defaults */
     QWidget {
         color: #e2e8f0;
-        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        font-family: 'Helvetica Neue', Helvetica, Arial;
         font-size: 13px;
         background-color: transparent;
     }

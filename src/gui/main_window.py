@@ -1,9 +1,9 @@
 import os
 import sys
-import glob
-from PySide6.QtWidgets import (QMainWindow, QTabWidget, QMenuBar, QMenu, 
-                             QMessageBox, QProgressDialog, QInputDialog, 
-                             QStatusBar, QFileDialog)
+from PySide6.QtWidgets import (QMainWindow, QTabWidget, QMenu,
+                             QMessageBox, QProgressDialog, QInputDialog,
+                             QStatusBar, QDialog,
+                             QVBoxLayout, QLabel, QTextEdit, QPushButton)
 from PySide6.QtCore import Qt, QThread, Signal as Signal
 
 from .form_tab import FormTab
@@ -15,9 +15,12 @@ from .generator import Generator
 from .ai_chat_tab import AIChatTab
 from .tracker_tab import TrackerTab
 
-# --- Asynchronous Worker for Gemini Application Generation ---
+# --- Asynchronous Worker for Claude Application Generation ---
 class GenerateWorker(QThread):
-    finished = Signal(dict)
+    # NOTE: never name a custom signal "finished" — it shadows QThread.finished
+    # (which fires only after run() returns). The registry in MainWindow relies
+    # on the real QThread.finished to release workers safely.
+    done = Signal(dict)
     error = Signal(str)
 
     def __init__(self, generator, api_key, params, style_profile, career_context, papers_dict, tuning_params):
@@ -41,14 +44,14 @@ class GenerateWorker(QThread):
                 model=self.tuning_params["model"],
                 temperature=self.tuning_params["temperature"]
             )
-            self.finished.emit(sections)
+            self.done.emit(sections)
         except Exception as e:
             self.error.emit(str(e))
 
 # --- Asynchronous Worker for AI Chat Section Editing ---
 class AIChatWorker(QThread):
     # Emits (success: bool, section_key: str, content_or_error: str)
-    finished = Signal(bool, str, str)
+    done = Signal(bool, str, str)
 
     def __init__(self, generator, api_key, section_key, current_text, user_prompt, tuning_params):
         super().__init__()
@@ -68,14 +71,14 @@ class AIChatWorker(QThread):
                 model=self.tuning_params["model"],
                 temperature=self.tuning_params["temperature"]
             )
-            self.finished.emit(True, self.section_key, updated_text)
+            self.done.emit(True, self.section_key, updated_text)
         except Exception as e:
-            self.finished.emit(False, self.section_key, str(e))
+            self.done.emit(False, self.section_key, str(e))
 
 # --- Asynchronous Worker for Auto-Extracting Job Details ---
 class ExtractionWorker(QThread):
     # Emits (success: bool, parsed_json: dict, error_msg: str)
-    finished = Signal(bool, dict, str)
+    done = Signal(bool, dict, str)
 
     def __init__(self, generator, api_key, job_description, tuning_params, context_dict):
         super().__init__()
@@ -94,13 +97,13 @@ class ExtractionWorker(QThread):
                 model=self.tuning_params["model"],
                 temperature=0.1 # Enforce low temp for extraction
             )
-            self.finished.emit(True, parsed_json, "")
+            self.done.emit(True, parsed_json, "")
         except Exception as e:
-            self.finished.emit(False, {}, str(e))
+            self.done.emit(False, {}, str(e))
 
 # --- Asynchronous Worker for AI Sanity Check ---
 class SanityCheckWorker(QThread):
-    finished = Signal(bool, str)
+    done = Signal(bool, str)
 
     def __init__(self, generator, api_key, document_text, tuning_params):
         super().__init__()
@@ -116,39 +119,37 @@ class SanityCheckWorker(QThread):
                 document_text=self.document_text,
                 model=self.tuning_params["model"]
             )
-            self.finished.emit(True, result)
+            self.done.emit(True, result)
         except Exception as e:
-            self.finished.emit(False, str(e))
+            self.done.emit(False, str(e))
 
 # --- Asynchronous Worker for LaTeX Compilation (wraps src/main.py) ---
 class CompileWorker(QThread):
-    finished = Signal(str)
+    done = Signal(str)
     error = Signal(str)
 
-    def __init__(self, project_root, attachments_map):
+    def __init__(self, project_root, attachments_map, target="full_bundle"):
         super().__init__()
         self.project_root = project_root
         self.attachments_map = attachments_map
+        self.target = target
 
     def run(self):
         try:
             # Add project root to sys.path to allow imports
             if self.project_root not in sys.path:
                 sys.path.append(self.project_root)
-                
+
             # Import main pipeline dynamically
             from src import main as main_pipeline
-            
+
             # Setup latex path in environment
             main_pipeline.setup_latex_path()
-            
-            # Override attachments dynamically
-            main_pipeline.ATTACHMENTS = self.attachments_map
-            
-            # Run the build process
-            final_path = main_pipeline.build_all()
-            
-            self.finished.emit(final_path if final_path else "")
+
+            # Build only the requested target (full_bundle == whole pipeline)
+            final_path = main_pipeline.compile_target(self.target, self.attachments_map)
+
+            self.done.emit(final_path if final_path else "")
         except Exception as e:
             self.error.emit(str(e))
 
@@ -158,7 +159,14 @@ class MainWindow(QMainWindow):
         self.project_root = project_root
         self.setWindowTitle("Job Application LaTeX GUI Generator")
         self.resize(1100, 750)
-        
+
+        # Strong references to every background worker, held until its OS thread
+        # has actually finished. Reassigning self.gen_worker/compile_worker/etc.
+        # while the previous one is still running would otherwise drop its last
+        # reference and let Python GC destroy a live QThread (Qt then aborts the
+        # whole process with "QThread: Destroyed while thread is still running").
+        self._workers = set()
+
         # Instantiate logical components
         self.generator = Generator(project_root)
         self.preset_manager = PresetManager(project_root)
@@ -168,6 +176,18 @@ class MainWindow(QMainWindow):
         self.init_ui()
         self.setup_menu()
         self.update_style_status()
+
+    def _track(self, worker):
+        """Hold a strong ref to a worker until its thread truly finishes.
+
+        Uses the real QThread.finished (fires after run() returns), so the
+        reference is only released once the OS thread has stopped — never while
+        run() is still executing.
+        """
+        self._workers.add(worker)
+        worker.finished.connect(lambda w=worker: self._workers.discard(w))
+        worker.finished.connect(worker.deleteLater)
+        return worker
 
     def init_ui(self):
         # Tabs container
@@ -183,6 +203,7 @@ class MainWindow(QMainWindow):
         # Tab 2: Manual Revisions & Preview
         self.editor_tab = EditorTab(self.project_root)
         self.editor_tab.recompile_requested.connect(self.on_recompile_requested)
+        self.editor_tab.ai_check_requested.connect(self.on_ai_check_requested)
         self.tabs.addTab(self.editor_tab, "2. Revise LaTeX & Preview")
         
         # Tab 3: AI Chat Assistant
@@ -255,9 +276,9 @@ class MainWindow(QMainWindow):
     # --- ACTION HANDLERS ---
     
     def on_relearn_triggered(self):
-        api_key = os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY", "")
+        api_key = os.environ.get("ANTHROPIC_API_KEY", "")
         if not api_key:
-            QMessageBox.warning(self, "API Key Missing", "Re-learning voice requires a Gemini API Key. Please set it in Settings.")
+            QMessageBox.warning(self, "API Key Missing", "Re-learning voice requires an Anthropic API Key. Please set it in Settings.")
             return
             
         tuning = SettingsDialog.get_tuning_params(self.project_root)
@@ -304,13 +325,12 @@ class MainWindow(QMainWindow):
         selected_focus = [cb.text() for cb in self.form_tab.focus_checkboxes if cb.isChecked()]
         
         selected_examples = []
-        for i in range(self.form_tab.examples_layout.count()):
-            cb = self.form_tab.examples_layout.itemAt(i).widget()
-            if isinstance(cb, QCheckBox) and cb.isChecked():
+        for cb in self.form_tab.example_checkboxes:
+            if cb.isChecked():
                 selected_examples.append(cb.property("ex_id"))
                 
         selected_skills = []
-        for cb, cat in self.form_tab.skills_list:
+        for cb, cat, combo in self.form_tab.skills_list:
             if cb.isChecked():
                 selected_skills.append((cb.text(), cat))
                 
@@ -376,10 +396,8 @@ class MainWindow(QMainWindow):
             
         # 3. Examples
         examples_list = preset.get("examples", [])
-        for i in range(self.form_tab.examples_layout.count()):
-            cb = self.form_tab.examples_layout.itemAt(i).widget()
-            if isinstance(cb, QCheckBox):
-                cb.setChecked(cb.property("ex_id") in examples_list)
+        for cb in self.form_tab.example_checkboxes:
+            cb.setChecked(cb.property("ex_id") in examples_list)
                 
         # 4. Skills (including custom adding)
         skills_list = preset.get("skills", [])
@@ -387,19 +405,8 @@ class MainWindow(QMainWindow):
         plain_skills = [sk[0] if isinstance(sk, list) else sk for sk in skills_list]
         
         # Reset standard skills checkbox state
-        for cb, cat in self.form_tab.skills_list:
+        for cb, cat, combo in self.form_tab.skills_list:
             cb.setChecked(cb.text() in plain_skills)
-            
-        # Handle custom skills in preset that don't exist in standard checklist
-        existing_skills = [cb.text() for cb, cat in self.form_tab.skills_list]
-        for sk in skills_list:
-            # Check if skill list contains tuples/lists [name, category]
-            sk_name = sk[0] if isinstance(sk, list) else sk
-            sk_cat = sk[1] if isinstance(sk, list) else "Custom"
-            
-            if sk_name not in existing_skills:
-                self.form_tab.custom_skill_input.setText(sk_name)
-                self.form_tab.on_add_custom_skill()
                 
         # 5. Experience
         exp_list = preset.get("experience", [])
@@ -448,10 +455,10 @@ class MainWindow(QMainWindow):
     # --- GENERATION FLOW ---
     
     def on_generation_requested(self, params):
-        api_key = os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY", "")
+        api_key = os.environ.get("ANTHROPIC_API_KEY", "")
         if not api_key:
             QMessageBox.critical(self, "API Key Missing", 
-                                 "No Gemini API Key found.\n"
+                                 "No Anthropic API Key found.\n"
                                  "Please enter your key in Tools -> API & Tuning Settings.")
             return
 
@@ -481,14 +488,14 @@ class MainWindow(QMainWindow):
                         pass
 
         # Progress indicator
-        self.progress_dlg = QProgressDialog("🤖 Generating tailored LaTeX sections via Gemini API (this takes ~15 seconds)...", "", 0, 0, self)
+        self.progress_dlg = QProgressDialog("🤖 Generating tailored LaTeX sections via Claude (Opus 4.8)...", "", 0, 0, self)
         self.progress_dlg.setWindowTitle("AI Generation running")
         self.progress_dlg.setWindowModality(Qt.WindowModality.WindowModal)
         self.progress_dlg.show()
 
         # Start background worker
-        self.gen_worker = GenerateWorker(self.generator, api_key, params, style_profile, career_context, papers_dict, tuning)
-        self.gen_worker.finished.connect(lambda s: self.on_generation_finished(s, params))
+        self.gen_worker = self._track(GenerateWorker(self.generator, api_key, params, style_profile, career_context, papers_dict, tuning))
+        self.gen_worker.done.connect(lambda s: self.on_generation_finished(s, params))
         self.gen_worker.error.connect(self.on_generation_error)
         self.gen_worker.start()
 
@@ -506,26 +513,26 @@ class MainWindow(QMainWindow):
 
     def on_generation_error(self, err_msg):
         self.progress_dlg.close()
-        QMessageBox.critical(self, "Generation Error", f"Gemini API Call Failed:\n{err_msg}")
+        QMessageBox.critical(self, "Generation Error", f"Claude API Call Failed:\n{err_msg}")
 
     # --- AI CHAT FLOW ---
     def on_chat_requested(self, data):
-        api_key = os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY", "")
+        api_key = os.environ.get("ANTHROPIC_API_KEY", "")
         if not api_key:
             self.ai_chat_tab.on_chat_finished(False, data['section_key'], "API Key Missing. Enter in Tools -> API Settings.")
             return
 
         tuning = SettingsDialog.get_tuning_params(self.project_root)
         
-        self.chat_worker = AIChatWorker(
+        self.chat_worker = self._track(AIChatWorker(
             generator=self.generator,
             api_key=api_key,
             section_key=data['section_key'],
             current_text=data['current_text'],
             user_prompt=data['user_prompt'],
             tuning_params=tuning
-        )
-        self.chat_worker.finished.connect(self.on_chat_finished)
+        ))
+        self.chat_worker.done.connect(self.on_chat_finished)
         self.chat_worker.start()
 
     def on_chat_finished(self, success, section_key, result):
@@ -561,7 +568,7 @@ class MainWindow(QMainWindow):
         self.form_tab.extract_btn.setEnabled(False)
         self.form_tab.extract_btn.setText("Extracting & Tuning...")
 
-        api_key = os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY", "")
+        api_key = os.environ.get("ANTHROPIC_API_KEY", "")
         if not api_key:
             QMessageBox.warning(self, "API Key Missing", "Enter your API Key in Tools -> API Settings.")
             self.form_tab.extract_btn.setEnabled(True)
@@ -572,13 +579,13 @@ class MainWindow(QMainWindow):
         context_dict = {
             "foci": [cb.text() for cb in self.form_tab.focus_checkboxes],
             "examples": [cb.property("ex_id") for cb in self.form_tab.example_checkboxes],
-            "skills": [cb.text() for cb, _ in self.form_tab.skills_list],
+            "skills": [cb.text() for cb, _, _ in self.form_tab.skills_list],
             "experience_entries": [cb.text() for cb, _, _ in self.form_tab.exp_widgets]
         }
             
         tuning = SettingsDialog.get_tuning_params(self.project_root)
-        self.extraction_worker = ExtractionWorker(self.generator, api_key, job_description, tuning, context_dict)
-        self.extraction_worker.finished.connect(self.on_extraction_finished)
+        self.extraction_worker = self._track(ExtractionWorker(self.generator, api_key, job_description, tuning, context_dict))
+        self.extraction_worker.done.connect(self.on_extraction_finished)
         self.extraction_worker.start()
         
     def on_extraction_finished(self, success, parsed_json, error_msg):
@@ -606,7 +613,7 @@ class MainWindow(QMainWindow):
                 
             # Toggle Skills Checkboxes
             skills = parsed_json.get("skills", [])
-            for cb, _ in self.form_tab.skills_list:
+            for cb, _, _ in self.form_tab.skills_list:
                 cb.setChecked(cb.text() in skills)
                 
             # Toggle Experience Widgets
@@ -636,18 +643,18 @@ class MainWindow(QMainWindow):
                 cat = cb.property("category")
                 filename = cb.property("filename")
                 attachments_map[cat].append(filename)
-                
-        # 3. Trigger Compile
-        self.compile_latex_bundle(attachments_map)
 
-    def compile_latex_bundle(self, attachments_map):
+        # 3. Compile only the document selected in the editor's dropdown
+        self.compile_latex_bundle(attachments_map, self.editor_tab.selected_target())
+
+    def compile_latex_bundle(self, attachments_map, target="full_bundle"):
         self.compile_dlg = QProgressDialog("Compiling PDFs via pdflatex & merging attachments...", "", 0, 0, self)
         self.compile_dlg.setWindowTitle("Document Compilation running")
         self.compile_dlg.setWindowModality(Qt.WindowModality.WindowModal)
         self.compile_dlg.show()
-        
-        self.compile_worker = CompileWorker(self.project_root, attachments_map)
-        self.compile_worker.finished.connect(self.on_compile_finished)
+
+        self.compile_worker = self._track(CompileWorker(self.project_root, attachments_map, target))
+        self.compile_worker.done.connect(self.on_compile_finished)
         self.compile_worker.error.connect(self.on_compile_error)
         self.compile_worker.start()
 
@@ -674,22 +681,34 @@ class MainWindow(QMainWindow):
                 print(f"Failed to auto-log application: {e}")
         
         self.status_bar.showMessage(msg, 10000)
-        
-        # Start Post-Compilation AI Sanity Check
-        api_key = os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY", "")
-        if api_key:
-            # Gather raw document text from the editors
-            doc_text = ""
-            for key, editor in self.editor_tab.editors.items():
-                doc_text += f"\n--- {key} ---\n{editor.toPlainText()}\n"
-                
-            tuning = SettingsDialog.get_tuning_params(self.project_root)
-            self.sanity_worker = SanityCheckWorker(self.generator, api_key, doc_text, tuning)
-            self.sanity_worker.finished.connect(self.on_sanity_check_finished)
-            self.sanity_worker.start()
-            self.status_bar.showMessage(f"{msg} | Running AI Sanity Check...", 10000)
+        # AI proofreading no longer runs automatically — use the "🤖 AI Check"
+        # button in the editor tab to run it on demand.
+
+    def on_ai_check_requested(self):
+        api_key = os.environ.get("ANTHROPIC_API_KEY", "")
+        if not api_key:
+            QMessageBox.warning(self, "API Key Missing",
+                                "An Anthropic API Key is required for the AI check. Set it in Tools -> Settings.")
+            return
+
+        doc_text = ""
+        for key, editor in self.editor_tab.editors.items():
+            doc_text += f"\n--- {key} ---\n{editor.toPlainText()}\n"
+        if not doc_text.strip():
+            QMessageBox.information(self, "Nothing to Check", "Generate or write some content first.")
+            return
+
+        self.editor_tab.ai_check_btn.setEnabled(False)
+        self.editor_tab.ai_check_btn.setText("🤖 Checking...")
+        tuning = SettingsDialog.get_tuning_params(self.project_root)
+        self.sanity_worker = self._track(SanityCheckWorker(self.generator, api_key, doc_text, tuning))
+        self.sanity_worker.done.connect(self.on_sanity_check_finished)
+        self.sanity_worker.start()
+        self.status_bar.showMessage("Running AI check on the current document...", 10000)
 
     def on_sanity_check_finished(self, success, result):
+        self.editor_tab.ai_check_btn.setEnabled(True)
+        self.editor_tab.ai_check_btn.setText("🤖 AI Check")
         if success:
             if "all good" not in result.lower():
                 # Create a non-modal dialog so the user can read it while editing
@@ -723,6 +742,38 @@ class MainWindow(QMainWindow):
 
     def on_compile_error(self, err_msg):
         self.compile_dlg.close()
-        QMessageBox.critical(self, "Compilation Error", 
-                             f"Latex/Python pipeline failed to run successfully:\n{err_msg}\n\n"
-                             "Please check LaTeX installation and make sure 'pdflatex' is callable.")
+        if "LaTeX failed to compile" in err_msg:
+            # Content error from a manual edit — show the actual LaTeX error.
+            QMessageBox.critical(self, "LaTeX Error",
+                                 "Your LaTeX has an error, so the PDF was not updated. "
+                                 "Fix the highlighted issue and recompile:\n\n"
+                                 f"{err_msg}")
+        else:
+            QMessageBox.critical(self, "Compilation Error",
+                                 f"Latex/Python pipeline failed to run successfully:\n{err_msg}\n\n"
+                                 "Please check LaTeX installation and make sure 'pdflatex' is callable.")
+
+    # --- LIFECYCLE ---
+    def closeEvent(self, event):
+        # Stop every background QThread before teardown, otherwise Qt aborts the
+        # process with "QThread: Destroyed while thread is still running". Grammar
+        # workers can sit in a blocking network request, so a short wait isn't
+        # enough — wait generously, then terminate as a last resort (safe here:
+        # the process is exiting anyway).
+        workers = list(self._workers)
+        for editor in getattr(self.editor_tab, "editors", {}).values():
+            current = getattr(editor, "worker", None)
+            if current is not None:
+                workers.append(current)
+            workers.extend(getattr(editor, "_old_workers", set()))
+
+        workers = [w for w in workers if w is not None]
+        for w in workers:
+            if w.isRunning():
+                w.requestInterruption()
+        for w in workers:
+            if w.isRunning() and not w.wait(6000):
+                w.terminate()
+                w.wait(1000)
+
+        super().closeEvent(event)

@@ -1,9 +1,24 @@
 # Python
 __pycache__/
 venv/
+.venv/
+venv_gui/
+venv_plugins/
+
+# Claude / tooling
+.claude/
+
+# macOS
+.DS_Store
+**/.DS_Store
 
 # Environment secrets
 .env
+
+# Personal / identity documents — NEVER commit
+**/passport.pdf
+**/resident_permit.pdf
+generated/Passport_and_Resident_Permit_*.pdf
 
 # LaTeX build artifacts
 *.aux
@@ -13,11 +28,4 @@ venv/
 *.fdb_latexmk
 *.synctex.gz
 generated/scaled_*.tex
-generated/scaled_*.pdfvenv_gui/
-.venv/
-venv_gui/
-.claude/
-
-.venv/
-venv_gui/
-.claude/
+generated/scaled_*.pdf

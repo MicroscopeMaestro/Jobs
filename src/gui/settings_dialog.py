@@ -12,7 +12,7 @@ class SettingsDialog(QDialog):
         self.settings_path = os.path.join(project_root, "data", "gui_settings.json")
         self.env_path = os.path.join(project_root, ".env")
         
-        self.setWindowTitle("Gemini Settings & Tuning")
+        self.setWindowTitle("Claude Settings & Tuning")
         self.setMinimumWidth(450)
         
         self.init_ui()
@@ -22,12 +22,12 @@ class SettingsDialog(QDialog):
         layout = QVBoxLayout(self)
         
         # 1. API Configuration Group
-        api_group = QGroupBox("Google Gemini API Credentials")
+        api_group = QGroupBox("Anthropic Claude API Credentials")
         api_layout = QFormLayout(api_group)
-        
+
         self.api_key_input = QLineEdit()
         self.api_key_input.setEchoMode(QLineEdit.EchoMode.Password)
-        self.api_key_input.setPlaceholderText("Paste GEMINI_API_KEY here...")
+        self.api_key_input.setPlaceholderText("Paste ANTHROPIC_API_KEY (sk-ant-...) here...")
         
         self.key_status_label = QLabel("Loading status...")
         self.key_status_label.setStyleSheet("font-style: italic;")
@@ -37,17 +37,15 @@ class SettingsDialog(QDialog):
         layout.addWidget(api_group)
         
         # 2. Generation Tuning Group
-        tuning_group = QGroupBox("Gemini Generation Parameters")
+        tuning_group = QGroupBox("Claude Generation Parameters")
         tuning_layout = QFormLayout(tuning_group)
-        
+
         self.model_combo = QComboBox()
         self.model_combo.setEditable(True)
         self.model_combo.addItems([
-            "gemini-3.5-flash",
-            "antigravity-preview-05-2026",
-            "gemini-2.5-pro",
-            "gemini-2.5-flash",
-            "gemini-2.0-flash"
+            "claude-opus-4-8",
+            "claude-sonnet-4-6",
+            "claude-haiku-4-5"
         ])
         
         # Temperature Slider
@@ -66,7 +64,7 @@ class SettingsDialog(QDialog):
         self.tokens_spin.setSingleStep(500)
         self.tokens_spin.setValue(4000)
         
-        tuning_layout.addRow("Gemini Model:", self.model_combo)
+        tuning_layout.addRow("Claude Model:", self.model_combo)
         tuning_layout.addRow("Temperature:", temp_layout)
         tuning_layout.addRow("Max Tokens:", self.tokens_spin)
         layout.addWidget(tuning_group)
@@ -87,32 +85,29 @@ class SettingsDialog(QDialog):
 
     def load_settings(self):
         # 1. Load API Key from environment or .env
-        api_key = os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY", "")
-        
+        api_key = os.environ.get("ANTHROPIC_API_KEY", "")
+
         if not api_key and os.path.exists(self.env_path):
             try:
                 with open(self.env_path, "r", encoding="utf-8") as f:
                     for line in f:
                         clean_line = line.strip()
-                        if clean_line.startswith("GEMINI_API_KEY="):
-                            api_key = clean_line.split("=", 1)[1].strip().strip('"').strip("'")
-                            break
-                        elif clean_line.startswith("GOOGLE_API_KEY="):
+                        if clean_line.startswith("ANTHROPIC_API_KEY="):
                             api_key = clean_line.split("=", 1)[1].strip().strip('"').strip("'")
                             break
             except Exception as e:
                 print(f"Error reading .env: {e}")
-                
+
         if api_key:
             self.api_key_input.setText(api_key)
-            self.key_status_label.setText("✓ Integrated key loaded (using Antigravity default)")
+            self.key_status_label.setText("✓ Anthropic API key loaded. Billing is metered per token.")
             self.key_status_label.setStyleSheet("color: #4caf50; font-style: normal; font-weight: bold;")
         else:
-            self.key_status_label.setText("⚠ No API key found. Please supply key to generate.")
+            self.key_status_label.setText("⚠ No API key found. Add your ANTHROPIC_API_KEY to generate.")
             self.key_status_label.setStyleSheet("color: #f44336; font-style: normal; font-weight: bold;")
 
         # 2. Load model params from JSON
-        model = "gemini-3.5-flash"
+        model = "claude-opus-4-8"
         temp = 0.2
         tokens = 4000
         
@@ -149,26 +144,22 @@ class SettingsDialog(QDialog):
                 with open(self.env_path, "r", encoding="utf-8") as f:
                     for line in f:
                         clean_line = line.strip()
-                        if clean_line.startswith("GEMINI_API_KEY="):
-                            env_lines.append(f"GEMINI_API_KEY={api_key}\n")
-                            key_replaced = True
-                        elif clean_line.startswith("GOOGLE_API_KEY="):
-                            env_lines.append(f"GOOGLE_API_KEY={api_key}\n")
+                        if clean_line.startswith("ANTHROPIC_API_KEY="):
+                            env_lines.append(f"ANTHROPIC_API_KEY={api_key}\n")
                             key_replaced = True
                         else:
                             env_lines.append(line)
             except Exception as e:
                 print(f"Error scanning .env before save: {e}")
-                
+
         if not key_replaced and api_key:
-            env_lines.append(f"GEMINI_API_KEY={api_key}\n")
-            
+            env_lines.append(f"ANTHROPIC_API_KEY={api_key}\n")
+
         try:
             with open(self.env_path, "w", encoding="utf-8") as f:
                 f.writelines(env_lines)
             # Set to current environment
-            os.environ["GEMINI_API_KEY"] = api_key
-            os.environ["GOOGLE_API_KEY"] = api_key
+            os.environ["ANTHROPIC_API_KEY"] = api_key
         except Exception as e:
             QMessageBox.critical(self, "Error", f"Could not write .env file:\n{e}")
             return
@@ -196,7 +187,7 @@ class SettingsDialog(QDialog):
         """Helper to load tuning settings statically."""
         settings_path = os.path.join(project_root, "data", "gui_settings.json")
         params = {
-            "model": "gemini-3.5-flash",
+            "model": "claude-opus-4-8",
             "temperature": 0.2,
             "max_tokens": 4000
         }

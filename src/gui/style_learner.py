@@ -2,8 +2,8 @@ import os
 import json
 import glob
 import pypdf
-from google import genai
-from google.genai import types as genai_types
+import anthropic
+from .generator import DEFAULT_MODEL, _normalize_model
 
 class StyleLearner:
     def __init__(self, project_root):
@@ -34,8 +34,10 @@ class StyleLearner:
 
     def scan_past_applications(self):
         """Scans the generated directory for past applications and extracts text."""
-        pdf_pattern = os.path.join(self.generated_dir, "Application_*.pdf")
-        pdf_files = glob.glob(pdf_pattern)
+        # Past full-application bundles are named Juan_Munoz_<company>_<position>.pdf
+        # (page 1 = motivation letter). The old "Application_*.pdf" pattern no
+        # longer matches anything after the output filenames were renamed.
+        pdf_files = glob.glob(os.path.join(self.generated_dir, "Juan_Munoz_*.pdf"))
         
         ingested_count = 0
         updated = False
@@ -99,10 +101,10 @@ class StyleLearner:
             "- Resume structure: Focused bullet points with strong active verbs starting each item, clear category headers, and consistent technical competencies."
         )
 
-    def relearn_style(self, api_key, model="gemini-2.0-flash", temperature=0.2):
-        """Uses Gemini to analyze cover letters in the cache and synthesize a voice profile."""
+    def relearn_style(self, api_key, model=DEFAULT_MODEL, temperature=0.2):
+        """Uses Claude to analyze cover letters in the cache and synthesize a voice profile."""
         if not api_key:
-            raise ValueError("Gemini API key is required to relearn style.")
+            raise ValueError("Anthropic API key is required to relearn style.")
             
         self.scan_past_applications()
         
@@ -125,7 +127,7 @@ class StyleLearner:
         system_prompt = (
             "You are an expert copywriter, linguist, and technical CV advisor. Your task is to analyze "
             "a selection of past job application cover letters written by Juan David Muñoz Bolaños and extract "
-            "a highly precise style, voice, and formatting profile. This profile will be used to guide Gemini "
+            "a highly precise style, voice, and formatting profile. This profile will be used to guide the model "
             "in generating brand new cover letters that sound identical to Juan's natural voice."
         )
         
@@ -144,23 +146,23 @@ Provide a highly concise, bulleted description of his writing style. Focus on pa
 """
 
         try:
-            client = genai.Client(api_key=api_key)
-            response = client.models.generate_content(
-                model=model,
-                contents=analysis_prompt,
-                config=genai_types.GenerateContentConfig(
-                    system_instruction=system_prompt,
-                    temperature=temperature,
-                )
+            client = anthropic.Anthropic(api_key=api_key)
+            response = client.messages.create(
+                model=_normalize_model(model),
+                max_tokens=4000,
+                system=system_prompt,
+                messages=[{"role": "user", "content": analysis_prompt}],
             )
-            profile_text = response.text.strip()
-            
+            profile_text = "".join(
+                b.text for b in response.content if b.type == "text"
+            ).strip()
+
             with open(self.profile_path, "w", encoding="utf-8") as f:
                 f.write(profile_text)
-                
+
             return len(cover_letters)
         except Exception as e:
-            print(f"Error during Gemini style synthesis: {e}")
+            print(f"Error during Claude style synthesis: {e}")
             # Ensure we write a default profile if the synthesis fails
             if not os.path.exists(self.profile_path):
                 with open(self.profile_path, "w", encoding="utf-8") as f:

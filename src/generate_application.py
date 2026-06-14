@@ -123,7 +123,7 @@ def build_prompt(papers: dict[str, str], job_text: str, career_context: str, lan
         - VERTICAL SPINE: Resume content must be aligned at exactly 103pt from the left using `\\begin{{adjustwidth}}{{103pt}}{{0pt}}`.
         - BE CONCRETE: Base every skill on specific projects, papers, or the examples bank. NO HALLUCINATION. DO NOT use random filler words.
         - HARD WRAP: Content in the source must be manually wrapped at ~80 characters.
-        - LATEX SAFE: Escape special LaTeX characters appropriately (e.g., \&, \%, \\_).
+        - LATEX SAFE: Escape special LaTeX characters appropriately (e.g., \\&, \\%, \\_).
 
         == TASK ==
         Generate tailored LaTeX code for 5 distinct files. 

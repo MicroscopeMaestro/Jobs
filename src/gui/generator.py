@@ -2,9 +2,27 @@ import os
 import re
 import json
 import textwrap
-from google import genai
-from google.genai import types as genai_types
-from pypdf import PdfReader
+import anthropic
+
+# Default Claude model. Opus 4.8 is the most capable; billing is metered
+# automatically per token by the Anthropic account tied to the API key.
+DEFAULT_MODEL = "claude-opus-4-8"
+
+
+def _normalize_model(model):
+    """Guard against stale Gemini model ids lingering in saved settings."""
+    if not model or not str(model).startswith("claude"):
+        return DEFAULT_MODEL
+    return model
+
+
+def _strip_code_fences(text):
+    text = (text or "").strip()
+    if text.startswith("```"):
+        text = re.sub(r"^```(?:json|latex)?\n?", "", text)
+        text = re.sub(r"\n?```$", "", text)
+    return text.strip()
+
 
 class Generator:
     def __init__(self, project_root):
@@ -12,10 +30,24 @@ class Generator:
         self.templates_dir = os.path.join(project_root, "templates")
         self.sections_dir = os.path.join(self.templates_dir, "sections")
 
-    def extract_recipient_details(self, api_key, job_text, model="gemini-3.5-flash"):
-        """Calls Gemini to extract recipient information from a job posting."""
+    def _complete(self, api_key, system, user_content, max_tokens=16000, model=DEFAULT_MODEL):
+        """Single Claude completion. Returns the concatenated text output."""
         if not api_key:
-            raise ValueError("Gemini API key is missing.")
+            raise ValueError("Anthropic API key is missing.")
+        client = anthropic.Anthropic(api_key=api_key)
+        # Note: Opus 4.8 rejects temperature/top_p/top_k, so they are not passed.
+        response = client.messages.create(
+            model=_normalize_model(model),
+            max_tokens=max_tokens,
+            system=system,
+            messages=[{"role": "user", "content": user_content}],
+        )
+        return "".join(b.text for b in response.content if b.type == "text").strip()
+
+    def extract_recipient_details(self, api_key, job_text, model=DEFAULT_MODEL):
+        """Calls Claude to extract recipient information from a job posting."""
+        if not api_key:
+            raise ValueError("Anthropic API key is missing.")
 
         prompt = f"""
 You are an expert career assistant. Analyze the following job description and extract the recipient details.
@@ -39,24 +71,14 @@ The JSON must have exactly these keys:
 """
 
         try:
-            client = genai.Client(api_key=api_key)
-            
-            # Use 0.0 temperature for high precision
-            config = genai_types.GenerateContentConfig(
-                system_instruction="You are a precise data extraction assistant. You only output valid raw JSON.",
-                temperature=0.0
+            response_text = self._complete(
+                api_key,
+                system="You are a precise data extraction assistant. You only output valid raw JSON.",
+                user_content=prompt,
+                max_tokens=1024,
+                model=model,
             )
-            
-            response = client.models.generate_content(model=model, contents=prompt, config=config)
-            response_text = response.text.strip()
-            
-            # Clean markdown code blocks if the model returned them
-            if response_text.startswith("```"):
-                response_text = re.sub(r"^```(?:json)?\n", "", response_text)
-                response_text = re.sub(r"\n```$", "", response_text)
-                response_text = response_text.strip()
-                
-            return json.loads(response_text)
+            return json.loads(_strip_code_fences(response_text))
         except Exception as e:
             print(f"Error extracting recipient details: {e}")
             # Return empty/default dict
@@ -67,11 +89,11 @@ The JSON must have exactly these keys:
                 "job_title": ""
             }
 
-    def generate_application(self, api_key, params, style_profile, career_context, papers_dict, 
-                             model="gemini-3.5-flash", temperature=0.2):
-        """Assembles context and prompts Gemini to generate tailored LaTeX sections."""
+    def generate_application(self, api_key, params, style_profile, career_context, papers_dict,
+                             model=DEFAULT_MODEL, temperature=0.2):
+        """Assembles context and prompts Claude to generate tailored LaTeX sections."""
         if not api_key:
-            raise ValueError("Gemini API key is missing.")
+            raise ValueError("Anthropic API key is missing.")
 
         # Build papers section
         paper_sections = ""
@@ -126,7 +148,7 @@ The JSON must have exactly these keys:
         if is_humanize_enabled:
             humanize_guideline = textwrap.dedent("""
                 - HUMANIZE WRITING STYLE (CRITICAL):
-                  * Write in a highly natural, authentic, human voice. 
+                  * Write in a highly natural, authentic, human voice.
                   * Avoid typical AI buzzwords and clichés (e.g., "delve", "testament", "passionate", "pioneered", "cutting-edge", "revolutionary", "meticulously", "harnessing", "moreover", "furthermore", "beacon", "in conclusion").
                   * Use varied sentence lengths (e.g., mix short, punchy sentences with occasional longer, descriptive ones).
                   * Use active voice and natural transitions.
@@ -134,11 +156,11 @@ The JSON must have exactly these keys:
             """).strip()
 
         system_instructions = textwrap.dedent(f"""
-            You are an expert technical career advisor and LaTeX document generator helping 
+            You are an expert technical career advisor and LaTeX document generator helping
             Juan David Muñoz Bolaños tailor his application for a specific job opening.
-            CRITICAL TONE REQUIREMENT: You MUST frame Juan as a highly-capable, eager JUNIOR ENGINEER. 
-            While he has a strong PhD background, he is applying for entry-level/junior positions. 
-            Adjust the tone to be humble, adaptable, and eager to learn from senior team members. 
+            CRITICAL TONE REQUIREMENT: You MUST frame Juan as a highly-capable, eager JUNIOR ENGINEER.
+            While he has a strong PhD background, he is applying for entry-level/junior positions.
+            Adjust the tone to be humble, adaptable, and eager to learn from senior team members.
             Avoid sounding overqualified, overly senior, or like a manager. Focus on his strong technical foundation and readiness to execute.
 
             == CANDIDATE'S CAREER & EXAMPLES BANK ==
@@ -187,7 +209,7 @@ The JSON must have exactly these keys:
 
             1. <ML_SUBJECT>: Subject line of the motivation letter.
                Format: \\textbf{{Bewerbung als [Position] | Ref. [Ref_Number]}} (Translate "Bewerbung als" to English if ML is in English). Do NOT use en-dashes or hyphens for dates, but a vertical bar | is fine.
-               
+
             2. <ML_RECIPIENT>: Recipient address block.
                Format:
                \\textbf{{[Company Name]}}\\\\
@@ -221,23 +243,21 @@ The JSON must have exactly these keys:
                    \\raggedright\\textbf{{[Category 2]}} & \\cvtagKnowledge{{[Skill 4]}} \\cvtagKnowledge{{[Skill 5]}} \\cvtagExpertise{{[Skill 6]}} \\\\
                    \\raggedright\\textbf{{[Category 3]}} & \\cvtagExpertise{{[Skill 7]}} \\cvtagKnowledge{{[Skill 8]}} \\cvtagKnowledge{{[Skill 9]}} \\\\
                \\end{{tabular}}
-               
+
             Let's begin. Generate the 6 sections enclosed in their tags.
         """)
 
         try:
-            client = genai.Client(api_key=api_key)
-            
-            config = genai_types.GenerateContentConfig(
-                system_instruction=system_instructions,
-                temperature=temperature
+            result = self._complete(
+                api_key,
+                system=system_instructions,
+                user_content=user_prompt,
+                max_tokens=16000,
+                model=model,
             )
-            
-            response = client.models.generate_content(model=model, contents=user_prompt, config=config)
-            result = response.text.strip()
         except Exception as e:
-            raise RuntimeError(f"Gemini API generation error: {e}")
-        
+            raise RuntimeError(f"Claude API generation error: {e}")
+
         # Parse XML tags
         def extract_tag(text, tag):
             pattern = re.compile(rf"<{tag}>(.*?)</{tag}>", re.DOTALL)
@@ -282,8 +302,8 @@ The JSON must have exactly these keys:
                     f.write(content + "\n")
                 print(f"Written section to: {abs_path}")
 
-    def edit_section(self, api_key, current_text, user_prompt, model="gemini-2.5-flash", temperature=0.4):
-        """Uses Gemini to edit a single section based on user instructions."""
+    def edit_section(self, api_key, current_text, user_prompt, model=DEFAULT_MODEL, temperature=0.4):
+        """Uses Claude to edit a single section based on user instructions."""
         system_instruction = (
             "You are an expert LaTeX editor. You will be provided with the current LaTeX content "
             "of a specific section of a job application (resume or motivation letter), along with "
@@ -298,27 +318,19 @@ The JSON must have exactly these keys:
         prompt = f"== CURRENT CONTENT ==\n{current_text}\n\n== INSTRUCTION ==\n{user_prompt}\n\nPlease provide the updated content."
 
         try:
-            client = genai.Client(api_key=api_key)
-            config = genai_types.GenerateContentConfig(
-                system_instruction=system_instruction,
-                temperature=temperature
+            result = self._complete(
+                api_key,
+                system=system_instruction,
+                user_content=prompt,
+                max_tokens=8000,
+                model=model,
             )
-            response = client.models.generate_content(model=model, contents=prompt, config=config)
-            
-            # Clean up potential markdown blocks if the model ignores instructions
-            result = response.text.strip()
-            if result.startswith("```latex"):
-                result = result[8:]
-            if result.startswith("```"):
-                result = result[3:]
-            if result.endswith("```"):
-                result = result[:-3]
-            return result.strip()
+            return _strip_code_fences(result)
         except Exception as e:
-            raise RuntimeError(f"Gemini API chat error: {e}")
+            raise RuntimeError(f"Claude API chat error: {e}")
 
-    def extract_job_details(self, api_key, job_description, context_dict, model="gemini-2.5-flash", temperature=0.1):
-        """Uses Gemini to extract details and auto-select checkboxes based on the job description."""
+    def extract_job_details(self, api_key, job_description, context_dict, model=DEFAULT_MODEL, temperature=0.1):
+        """Uses Claude to extract details and auto-select checkboxes based on the job description."""
         system_instruction = (
             "You are an intelligent Auto-Tuning bot for a job application generator. "
             "Your task is to analyze the provided Job Description and output a strict JSON payload. "
@@ -333,23 +345,22 @@ The JSON must have exactly these keys:
             "Ensure ALL selected strings exactly match the provided available options.\n\n"
             "AVAILABLE OPTIONS:\n"
             f"{json.dumps(context_dict, indent=2)}\n\n"
-            "Return ONLY valid JSON."
+            "Return ONLY valid JSON. Do not wrap it in markdown code blocks."
         )
-        
+
         try:
-            client = genai.Client(api_key=api_key)
-            config = genai_types.GenerateContentConfig(
-                system_instruction=system_instruction,
-                temperature=temperature,
-                response_mime_type="application/json"
+            result = self._complete(
+                api_key,
+                system=system_instruction,
+                user_content=job_description,
+                max_tokens=2000,
+                model=model,
             )
-            response = client.models.generate_content(model=model, contents=job_description, config=config)
-            
-            return json.loads(response.text.strip())
+            return json.loads(_strip_code_fences(result))
         except Exception as e:
             raise RuntimeError(f"Extraction error: {e}")
 
-    def run_sanity_check(self, api_key, document_text, model="gemini-2.5-flash"):
+    def run_sanity_check(self, api_key, document_text, model=DEFAULT_MODEL):
         """Runs a post-compilation sanity check on the provided document text."""
         system_instruction = (
             "You are a strict Quality Assurance reviewer for a job application. "
@@ -361,15 +372,14 @@ The JSON must have exactly these keys:
             "If everything is perfect, output exactly: 'All Good'.\n"
             "If you find issues, output a concise bulleted list of the discrepancies found."
         )
-        
+
         try:
-            client = genai.Client(api_key=api_key)
-            config = genai_types.GenerateContentConfig(
-                system_instruction=system_instruction,
-                temperature=0.2
+            return self._complete(
+                api_key,
+                system=system_instruction,
+                user_content=document_text,
+                max_tokens=2000,
+                model=model,
             )
-            response = client.models.generate_content(model=model, contents=document_text, config=config)
-            return response.text.strip()
         except Exception as e:
             raise RuntimeError(f"Sanity Check API error: {e}")
-

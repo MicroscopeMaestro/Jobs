@@ -2,16 +2,20 @@ import os
 import requests
 import re
 import glob
-from PySide6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLabel, 
-                             QPushButton, QTabWidget, QTextEdit, QMenu,
-                             QSplitter, QComboBox, QMessageBox, QProgressDialog, QScrollArea)
-from PySide6.QtGui import (QPixmap, QImage, QSyntaxHighlighter, QTextCharFormat, QColor, QFont)
+from PySide6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLabel,
+                             QPushButton, QTabWidget, QTextEdit,
+                             QSplitter, QComboBox, QMessageBox, QScrollArea)
+from PySide6.QtGui import (QPixmap, QImage, QSyntaxHighlighter, QTextCharFormat, QColor)
 from PySide6.QtCore import Qt, Signal as Signal, QThread, QTimer
 import fitz  # PyMuPDF
 
 class GrammarCheckWorker(QThread):
-    finished = Signal(list)
-    
+    # NOTE: do NOT name this "finished" — that shadows QThread.finished, which
+    # fires only after run() returns. A custom "finished" emits from inside run()
+    # (thread still running); dropping the worker's last ref on it lets Python GC
+    # destroy a live QThread -> Qt qFatal("QThread: Destroyed while running").
+    results_ready = Signal(list)
+
     def __init__(self, text, language="auto"):
         super().__init__()
         self.text = text
@@ -32,7 +36,7 @@ class GrammarCheckWorker(QThread):
                     "text": masked_text,
                     "language": self.language
                 },
-                timeout=5
+                timeout=4
             )
             if response.status_code == 200:
                 data = response.json()
@@ -46,12 +50,12 @@ class GrammarCheckWorker(QThread):
                         "message": match["message"],
                         "replacements": match.get("replacements", [])
                     })
-                self.finished.emit(errors)
+                self.results_ready.emit(errors)
             else:
-                self.finished.emit([])
+                self.results_ready.emit([])
         except Exception:
             # Silently fail if offline or API is down
-            self.finished.emit([])
+            self.results_ready.emit([])
 
 class LatexAndGrammarHighlighter(QSyntaxHighlighter):
     def __init__(self, parent=None):
@@ -142,13 +146,17 @@ class RichTextEditor(QTextEdit):
         text = self.toPlainText()
         if not text.strip():
             return
-            
-        if self.worker is not None and self.worker.isRunning():
+
+        # Keep a strong reference to every worker until the OS thread has fully
+        # stopped. Pruning only non-running workers (on the main thread) means a
+        # reference is never dropped while run() is mid-flight, so Python GC can
+        # never destroy a live QThread.
+        if self.worker is not None:
             self._old_workers.add(self.worker)
-            self.worker.finished.connect(lambda w=self.worker: self._old_workers.discard(w))
-            
+        self._old_workers = {w for w in self._old_workers if w.isRunning()}
+
         self.worker = GrammarCheckWorker(text, self.grammar_lang)
-        self.worker.finished.connect(self.highlighter.update_errors)
+        self.worker.results_ready.connect(self.highlighter.update_errors)
         self.worker.start()
 
     def set_font_size(self, size):
@@ -220,6 +228,7 @@ class RichTextEditor(QTextEdit):
 
 class EditorTab(QWidget):
     recompile_requested = Signal(dict)
+    ai_check_requested = Signal()
 
     def __init__(self, project_root, parent=None):
         super().__init__(parent)
@@ -329,22 +338,38 @@ class EditorTab(QWidget):
         bottom_layout.addStretch()
         
         recompile_layout = QHBoxLayout()
-        recompile_layout.addWidget(QLabel("Preview:"))
+        recompile_layout.addWidget(QLabel("Document:"))
         self.pdf_selector = QComboBox()
-        self.pdf_selector.addItems([
-            "Motivation Letter & Resume",
-            "Full Application Bundle",
-            "Resume Only",
-            "Motivation Letter Only"
-        ])
+        # label -> (compile target key, output filename | None for the bundle glob)
+        self.PDF_TARGETS = [
+            ("Resume", "resume", "resume.pdf"),
+            ("Motivation Letter", "motivation_letter", "motivation_letter.pdf"),
+            ("Motivation Letter & Resume", "motivation_letter_and_resume", "motivation_letter_and_resume.pdf"),
+            ("Experience", "professional_experience", "professional_experience.pdf"),
+            ("Education", "education", "education.pdf"),
+            ("Certificates", "certificates", "certificates.pdf"),
+            ("Other Documents", "others", "others.pdf"),
+            ("All Attachments", "all_attachments", "all_attachments.pdf"),
+            ("Personal Documents", "personal_documents", "Passport_and_Resident_Permit_Juan_Munoz.pdf"),
+            ("Full Application Bundle", "full_bundle", None),
+        ]
+        self.pdf_selector.addItems([label for label, _, _ in self.PDF_TARGETS])
         self.pdf_selector.currentIndexChanged.connect(self.load_selected_pdf)
         recompile_layout.addWidget(self.pdf_selector)
-        
-        self.recompile_btn = QPushButton("Save & Recompile PDF")
+
+        self.recompile_btn = QPushButton("Save & Compile")
+        self.recompile_btn.setToolTip("Compile the document selected in the dropdown")
         self.recompile_btn.setStyleSheet("font-weight: bold; background-color: #0060df; color: white; padding: 6px 12px; border-radius: 4px;")
         self.recompile_btn.clicked.connect(self.on_recompile_clicked)
         recompile_layout.addWidget(self.recompile_btn)
-        
+
+        # On-demand AI proofreading (no longer runs automatically after compile)
+        self.ai_check_btn = QPushButton("🤖 AI Check")
+        self.ai_check_btn.setToolTip("Run an AI proofreading pass over the current document")
+        self.ai_check_btn.setStyleSheet("font-weight: bold; background-color: #6d28d9; color: white; padding: 6px 12px; border-radius: 4px;")
+        self.ai_check_btn.clicked.connect(self.on_ai_check_clicked)
+        recompile_layout.addWidget(self.ai_check_btn)
+
         left_layout.addLayout(bottom_layout)
         left_layout.addLayout(recompile_layout)
         
@@ -441,27 +466,36 @@ class EditorTab(QWidget):
         else:
             QMessageBox.warning(self, "Not Found", "No original AI generation cached for this session yet.")
 
+    def _selected_entry(self):
+        label = self.pdf_selector.currentText()
+        for entry in self.PDF_TARGETS:
+            if entry[0] == label:
+                return entry
+        return self.PDF_TARGETS[0]
+
+    def selected_target(self):
+        """The compile-target key for the document selected in the dropdown."""
+        return self._selected_entry()[1]
+
     def on_recompile_clicked(self):
         self.save_all_files()
         contents = self.get_current_editor_contents()
         self.recompile_requested.emit(contents)
 
+    def on_ai_check_clicked(self):
+        self.ai_check_requested.emit()
+
     # --- PDF MANAGEMENT ---
     def resolve_pdf_path(self):
-        selected_text = self.pdf_selector.currentText()
-        if selected_text == "Motivation Letter & Resume":
-            return os.path.join(self.output_dir, "motivation_letter_and_resume.pdf")
-        elif selected_text == "Motivation Letter Only":
-            return os.path.join(self.output_dir, "motivation_letter.pdf")
-        elif selected_text == "Resume Only":
-            return os.path.join(self.output_dir, "resume.pdf")
-        elif selected_text == "Full Application Bundle":
-            # Search for Compressed files first, fallback to uncompressed Juan_Munoz files
-            pdf_files = glob.glob(os.path.join(self.output_dir, "Compressed_*.pdf"))
-            if not pdf_files:
-                pdf_files = glob.glob(os.path.join(self.output_dir, "Juan_Munoz_*.pdf"))
-            if pdf_files:
-                return max(pdf_files, key=os.path.getmtime)
+        _, target, filename = self._selected_entry()
+        if filename is not None:
+            return os.path.join(self.output_dir, filename)
+        # Full Application Bundle: newest compressed (fallback to uncompressed) bundle
+        pdf_files = glob.glob(os.path.join(self.output_dir, "Compressed_*.pdf"))
+        if not pdf_files:
+            pdf_files = glob.glob(os.path.join(self.output_dir, "Juan_Munoz_*.pdf"))
+        if pdf_files:
+            return max(pdf_files, key=os.path.getmtime)
         return ""
 
     def load_selected_pdf(self):

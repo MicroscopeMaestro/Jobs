@@ -7,7 +7,7 @@ from PySide6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLabel,
                              QLineEdit, QTextEdit, QComboBox, QCheckBox, 
                              QPushButton, QScrollArea, QGroupBox, QGridLayout,
                              QRadioButton, QButtonGroup, QSpinBox, QMessageBox,
-                             QListWidget, QProgressBar, QFormLayout, QFrame, QDialog, QFileDialog)
+                             QProgressBar, QFormLayout, QFrame, QDialog, QFileDialog)
 from PySide6.QtCore import Qt, QThread, Signal as Signal
 
 # --- Worker for fetching URL and extracting recipient block asynchronously ---
@@ -44,7 +44,7 @@ class FetchWorker(QThread):
             self.error.emit("Job description text is empty.")
             return
             
-        # 2. Extract recipient details using Gemini if API key is provided
+        # 2. Extract recipient details using Claude if API key is provided
         result = {
             "job_text": job_text,
             "company": "",
@@ -1068,10 +1068,10 @@ class FormTab(QWidget):
             QMessageBox.warning(self, "Input Required", "Please enter a Job URL or paste a Job Description first.")
             return
             
-        # Try to read GEMINI_API_KEY from environment to auto-extract recipient block
+        # Try to read ANTHROPIC_API_KEY from environment to auto-extract recipient block
         from .settings_dialog import SettingsDialog
         tuning = SettingsDialog.get_tuning_params(self.project_root)
-        api_key = os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY", "")
+        api_key = os.environ.get("ANTHROPIC_API_KEY", "")
         
         # Start async worker
         self.fetch_btn.setEnabled(False)
@@ -1119,7 +1119,7 @@ class FormTab(QWidget):
         # 1. Validate Job Description
         job_desc = self.job_desc_input.toPlainText().strip()
         if not job_desc:
-            QMessageBox.warning(self, "Missing Job Description", "The job description field is required to guide Gemini's generation.")
+            QMessageBox.warning(self, "Missing Job Description", "The job description field is required to guide Claude's generation.")
             return
             
         # 2. Gather Focus Themes

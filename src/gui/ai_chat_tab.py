@@ -1,7 +1,6 @@
-import os
-from PySide6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QComboBox, 
-                             QTextBrowser, QTextEdit, QPushButton, QLabel, QMessageBox, QFrame)
-from PySide6.QtCore import Qt, Signal as Signal
+from PySide6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QComboBox,
+                             QTextBrowser, QTextEdit, QPushButton, QLabel, QMessageBox)
+from PySide6.QtCore import Signal as Signal
 
 class AIChatTab(QWidget):
     # Emits dict with keys: 'section_key', 'user_prompt', 'current_text'
@@ -42,7 +41,7 @@ class AIChatTab(QWidget):
                 border: 1px solid #333333;
                 border-radius: 4px;
                 padding: 10px;
-                font-family: 'Inter', sans-serif;
+                font-family: 'Inter', 'Helvetica Neue', Helvetica, Arial;
                 font-size: 14px;
             }
         """)
