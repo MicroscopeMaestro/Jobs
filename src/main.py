@@ -2,7 +2,7 @@ import os
 import shutil
 import subprocess
 import sys
-from pypdf import PdfWriter as PdfMerger
+import fitz  # PyMuPDF — robust PDF merge engine (pypdf blanked vector resume pages)
 
 # --- Configuration ---
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -247,29 +247,14 @@ def compile_latex(tex_filename, output_name):
     cleanup_aux_files(tex_filename)
     raise RuntimeError(f"LaTeX failed to compile {tex_filename}.\n\n{last_snippet}")
 
-def _gs_merge(pdf_list, output_path):
-    """Merge PDFs with Ghostscript. Robust against malformed PDFs that make
-    pypdf raise (e.g. 'invalid literal for int() with base 16'). Returns True
-    on success."""
-    existing = [p for p in pdf_list if os.path.exists(p)]
-    if not existing:
-        return False
-    gs_cmd = 'gs' if sys.platform != 'win32' else 'gswin64c'
-    if shutil.which(gs_cmd) is None:
-        return False
-    cmd = [
-        gs_cmd, '-sDEVICE=pdfwrite', '-dCompatibilityLevel=1.4',
-        '-dNOPAUSE', '-dQUIET', '-dBATCH', f'-sOutputFile={output_path}',
-    ] + existing
-    try:
-        subprocess.run(cmd, check=True)
-        return os.path.exists(output_path)
-    except Exception as e:
-        print(f"    ! Ghostscript merge failed: {e}")
-        return False
-
-
 def merge_pdfs(pdf_list, output_filename):
+    """Merge PDFs with PyMuPDF (fitz).
+
+    pypdf's PdfWriter.append silently blanked vector pages from the LaTeX resume
+    (transparency-group / inherited-resource handling), so the resume showed up
+    as a blank page in the bundle. MuPDF is a full PDF engine and reproduces
+    every input page faithfully (scanned attachments included).
+    """
     if not pdf_list:
         return None
 
@@ -281,53 +266,27 @@ def merge_pdfs(pdf_list, output_filename):
     if not existing:
         return None
 
-    merger = PdfMerger()
-    appended = []
-    failed = False
-    for pdf in existing:
-        try:
-            merger.append(pdf)
-            appended.append(pdf)
-        except Exception as e:
-            print(f"    ! Failed to append {pdf}: {e}")
-            failed = True
-
-    # If any input could not be appended, do NOT silently ship a partial merge
-    # (that is how the resume went missing from the bundle). Rebuild the WHOLE
-    # set with Ghostscript, which repairs the offending file.
-    if failed:
-        merger.close()
-        print(f"    ! Partial pypdf merge for {output_filename}; rebuilding all {len(existing)} files via Ghostscript...")
-        if _gs_merge(existing, output_path):
-            print(f"   -> Merged {len(existing)} files into {output_filename} (via Ghostscript)")
-            return output_path
-        # gs unavailable — fall through and at least keep what pypdf could append
-        merger = PdfMerger()
-        for pdf in appended:
-            try:
-                merger.append(pdf)
-            except Exception:
-                pass
-
-    if not appended:
-        merger.close()
-        return None
-
-    # pypdf write can also raise on a malformed object (it parses lazily) — same
-    # Ghostscript fallback over the full set.
+    out = fitz.open()
+    merged = 0
     try:
-        merger.write(output_path)
-        merger.close()
-        print(f"   -> Merged {len(appended)} files into {output_filename}")
+        for pdf in existing:
+            try:
+                src = fitz.open(pdf)
+                out.insert_pdf(src)
+                src.close()
+                merged += 1
+            except Exception as e:
+                print(f"    ! Failed to merge {pdf}: {e}")
+        if merged == 0:
+            return None
+        out.save(output_path, garbage=4, deflate=True)
+        print(f"   -> Merged {merged} files into {output_filename}")
         return output_path
     except Exception as e:
-        merger.close()
-        print(f"    ! pypdf write failed for {output_filename} ({e}); retrying via Ghostscript...")
-        if _gs_merge(existing, output_path):
-            print(f"   -> Merged {len(existing)} files into {output_filename} (via Ghostscript)")
-            return output_path
-        print(f"    ! Could not produce {output_filename}; skipping it (pipeline continues).")
+        print(f"    ! Could not produce {output_filename}: {e}")
         return None
+    finally:
+        out.close()
 
 def extract_info_from_latex(tex_filename):
     """ Extracts Company and Position from motivation_letter modules or main file. """
@@ -500,6 +459,17 @@ def build_all():
         all_attach_pdf = merge_pdfs(all_attachments, "all_attachments.pdf")
     
     # 5. Merge full_application.pdf
+    # Defensive: the core documents (motivation letter, resume) MUST be in the
+    # bundle. If either file went missing since it was compiled (a transient
+    # filesystem/merge race), recompile it now so the bundle is never missing
+    # the resume or the cover letter.
+    if ml_pdf and not _pdf_is_valid(ml_pdf):
+        print("   ! motivation_letter.pdf missing before bundle; recompiling...")
+        ml_pdf = compile_latex("motivation_letter.tex", "motivation_letter.pdf")
+    if resume_pdf and not _pdf_is_valid(resume_pdf):
+        print("   ! resume.pdf missing before bundle; recompiling...")
+        resume_pdf = compile_latex("resume.tex", "resume.pdf")
+
     full_docs = []
     if ml_pdf: full_docs.append(ml_pdf)
     if resume_pdf: full_docs.append(resume_pdf)

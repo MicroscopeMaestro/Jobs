@@ -660,7 +660,13 @@ class MainWindow(QMainWindow):
 
     def on_compile_finished(self, final_path):
         self.compile_dlg.close()
-        
+
+        # Remember the exact full-bundle file just built, so its preview shows
+        # this one rather than the newest (possibly stale/broken) bundle on disk.
+        worker = getattr(self, "compile_worker", None)
+        if worker is not None and getattr(worker, "target", None) == "full_bundle" and final_path:
+            self.editor_tab.last_bundle_path = final_path
+
         # Reload current PDF inside editor tab
         self.editor_tab.load_selected_pdf()
         

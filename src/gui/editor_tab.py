@@ -234,7 +234,11 @@ class EditorTab(QWidget):
         super().__init__(parent)
         self.project_root = project_root
         self.output_dir = os.path.join(project_root, "generated")
-        
+        # Exact path of the last full bundle compiled this session, so the
+        # preview shows what was just built rather than the newest file on disk
+        # (old/broken bundles from earlier runs would otherwise win by mtime).
+        self.last_bundle_path = None
+
         self.pdf_doc = None
         self.current_page_index = 0
         self.zoom_factor = 1.0
@@ -490,7 +494,10 @@ class EditorTab(QWidget):
         _, target, filename = self._selected_entry()
         if filename is not None:
             return os.path.join(self.output_dir, filename)
-        # Full Application Bundle: newest compressed (fallback to uncompressed) bundle
+        # Full Application Bundle: prefer the exact file just compiled this
+        # session; otherwise fall back to the newest bundle on disk.
+        if self.last_bundle_path and os.path.exists(self.last_bundle_path):
+            return self.last_bundle_path
         pdf_files = glob.glob(os.path.join(self.output_dir, "Compressed_*.pdf"))
         if not pdf_files:
             pdf_files = glob.glob(os.path.join(self.output_dir, "Juan_Munoz_*.pdf"))
