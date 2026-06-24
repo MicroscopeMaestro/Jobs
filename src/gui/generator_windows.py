@@ -6,6 +6,7 @@ from .generator import Generator, DEFAULT_MODEL, _strip_code_fences
 PROVIDER_GEMINI = "gemini"
 PROVIDER_KIMI = "kimi"
 PROVIDER_CLAUDE = "claude"
+PROVIDER_OLLAMA = "ollama"
 
 import time
 
@@ -14,6 +15,8 @@ GEMINI_MODEL = "gemini-2.0-flash"
 
 KIMI_URL = "https://api.moonshot.cn/v1/chat/completions"
 KIMI_MODEL = "moonshot-v1-128k"  # largest context — handles big generation prompts
+
+OLLAMA_URL = "http://localhost:11434/v1/chat/completions"
 
 
 def _openai_compat_complete(base_url, api_key, model, system, user_content, max_tokens, provider_name):
@@ -61,13 +64,16 @@ def _openai_compat_complete(base_url, api_key, model, system, user_content, max_
 class GeneratorWindows(Generator):
     """Windows variant — all AI calls routed to the provider chosen in Settings."""
 
-    def _get_provider(self):
+    def _get_settings(self):
         settings_path = os.path.join(self.project_root, "data", "gui_settings.json")
         try:
             with open(settings_path, "r", encoding="utf-8") as f:
-                return json.load(f).get("ai_provider", PROVIDER_GEMINI)
+                return json.load(f)
         except Exception:
-            return PROVIDER_GEMINI
+            return {}
+
+    def _get_provider(self):
+        return self._get_settings().get("ai_provider", PROVIDER_GEMINI)
 
     def _complete(self, api_key, system, user_content, max_tokens=16000, model=DEFAULT_MODEL):
         """Override: routes every AI call to the user-selected provider."""
@@ -96,6 +102,19 @@ class GeneratorWindows(Generator):
                 user_content=user_content,
                 max_tokens=max_tokens,
                 provider_name="Kimi",
+            )
+
+        if provider == PROVIDER_OLLAMA:
+            settings = self._get_settings()
+            ollama_model = settings.get("ollama_model", "qwen2.5:7b")
+            return _openai_compat_complete(
+                base_url=OLLAMA_URL,
+                api_key="ollama", # placeholder key for local server
+                model=ollama_model,
+                system=system,
+                user_content=user_content,
+                max_tokens=max_tokens,
+                provider_name="Ollama",
             )
 
         raise ValueError(f"Unknown AI provider: {provider}")

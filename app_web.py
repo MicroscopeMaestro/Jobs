@@ -33,7 +33,7 @@ load_dotenv(os.path.join(PROJECT_ROOT, ".env"))
 import streamlit as st
 import fitz  # PyMuPDF
 
-from src.gui.generator_windows import GeneratorWindows, PROVIDER_GEMINI, PROVIDER_KIMI, PROVIDER_CLAUDE
+from src.gui.generator_windows import GeneratorWindows, PROVIDER_GEMINI, PROVIDER_KIMI, PROVIDER_CLAUDE, PROVIDER_OLLAMA
 from src import main as pipeline
 
 # ── Constants ────────────────────────────────────────────────────────────────
@@ -92,7 +92,7 @@ TITLE_OPTIONS = [
 @st.cache_data
 def load_settings():
     defaults = {"model": "claude-opus-4-8", "temperature": 0.2, "max_tokens": 4000,
-                "ai_provider": PROVIDER_GEMINI}
+                "ai_provider": PROVIDER_GEMINI, "ollama_model": "qwen2.5:7b"}
     if os.path.exists(SETTINGS_PATH):
         try:
             with open(SETTINGS_PATH) as f:
@@ -141,6 +141,8 @@ def _get_api_key():
         return os.environ.get("GEMINI_API_KEY", "")
     elif provider == PROVIDER_KIMI:
         return os.environ.get("KIMI_API_KEY", "")
+    elif provider == PROVIDER_OLLAMA:
+        return "ollama"
     return os.environ.get("ANTHROPIC_API_KEY", "")
 
 
@@ -270,17 +272,17 @@ def render_sidebar():
 
     provider = st.sidebar.selectbox(
         "AI Provider",
-        [PROVIDER_GEMINI, PROVIDER_KIMI, PROVIDER_CLAUDE],
-        index=[PROVIDER_GEMINI, PROVIDER_KIMI, PROVIDER_CLAUDE].index(s.get("ai_provider", PROVIDER_GEMINI)),
+        [PROVIDER_GEMINI, PROVIDER_KIMI, PROVIDER_CLAUDE, PROVIDER_OLLAMA],
+        index=[PROVIDER_GEMINI, PROVIDER_KIMI, PROVIDER_CLAUDE, PROVIDER_OLLAMA].index(s.get("ai_provider", PROVIDER_GEMINI)),
         format_func=lambda p: {"gemini": "Gemini 2.0 Flash (free)",
                                "kimi": "Kimi / Moonshot (free tier)",
-                               "claude": "Claude (paid)"}[p],
+                               "claude": "Claude (paid)",
+                               "ollama": "Ollama (local AI model)"}[p],
     )
     if provider != s.get("ai_provider"):
         save_settings({"ai_provider": provider})
         st.session_state.settings = load_settings()
         st.rerun()
-
 
     if provider == PROVIDER_GEMINI:
         key = st.sidebar.text_input("Gemini API Key", value=os.environ.get("GEMINI_API_KEY",""), type="password",
@@ -293,6 +295,13 @@ def render_sidebar():
                                     help="Get key at platform.moonshot.cn")
         if key != os.environ.get("KIMI_API_KEY",""):
             update_env_key("KIMI_API_KEY", key)
+
+    elif provider == PROVIDER_OLLAMA:
+        model_val = st.sidebar.text_input("Ollama Model Tag", value=s.get("ollama_model", "qwen2.5:7b"),
+                                          help="Local Ollama model name (e.g. qwen2.5:7b, gemma4:e4b)")
+        if model_val != s.get("ollama_model"):
+            save_settings({"ollama_model": model_val})
+            st.session_state.settings = load_settings()
 
     else:  # Claude
         key = st.sidebar.text_input("Anthropic API Key", value=os.environ.get("ANTHROPIC_API_KEY",""), type="password")
