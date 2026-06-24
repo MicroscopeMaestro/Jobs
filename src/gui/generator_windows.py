@@ -92,3 +92,13 @@ class GeneratorWindows(Generator):
 
     def extract_recipient_details(self, api_key, job_text, model=DEFAULT_MODEL):
         return super().extract_recipient_details(self._bypass_key(api_key), job_text, model)
+
+    def extract_job_details(self, api_key, job_description, context_dict, model=DEFAULT_MODEL, temperature=0.1):
+        return super().extract_job_details(self._bypass_key(api_key), job_description, context_dict, model, temperature)
+
+    def edit_section(self, api_key, current_text, user_prompt, model=DEFAULT_MODEL, temperature=0.4):
+        return super().edit_section(self._bypass_key(api_key), current_text, user_prompt, model, temperature)
+
+    def run_sanity_check(self, api_key, document_text, model=DEFAULT_MODEL):
+        return super().run_sanity_check(self._bypass_key(api_key), document_text, model)
+

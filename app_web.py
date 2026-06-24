@@ -134,6 +134,16 @@ def update_env_key(var, value):
     os.environ[var] = value
 
 
+def _get_api_key():
+    s = st.session_state.get("settings", {})
+    provider = s.get("ai_provider", PROVIDER_GEMINI)
+    if provider == PROVIDER_GEMINI:
+        return os.environ.get("GEMINI_API_KEY", "")
+    elif provider == PROVIDER_KIMI:
+        return os.environ.get("KIMI_API_KEY", "")
+    return os.environ.get("ANTHROPIC_API_KEY", "")
+
+
 @st.cache_data
 def parse_prompt():
     """Returns (examples_list, skills_by_category) from ai_application_prompt.md."""
@@ -166,6 +176,9 @@ def render_pdf_page_img(pdf_path, page_idx=0, zoom=1.5):
     try:
         doc = fitz.open(pdf_path)
         n = len(doc)
+        if n == 0:
+            doc.close()
+            return None, 0, 0
         page_idx = max(0, min(page_idx, n - 1))
         pix = doc[page_idx].get_pixmap(matrix=fitz.Matrix(zoom, zoom))
         doc.close()
@@ -222,6 +235,14 @@ def scan_assets():
     return categories, actual, defaults
 
 
+def get_default_attachments_map():
+    categories, actual, defaults = scan_assets()
+    default_map = {}
+    for cat, fnames in categories.items():
+        default_map[cat] = [f for f in fnames if f in actual and f in defaults]
+    return default_map
+
+
 # ── State init ───────────────────────────────────────────────────────────────
 
 def init_state():
@@ -237,6 +258,8 @@ def init_state():
         st.session_state.tracker = load_tracker()
     if "settings" not in st.session_state:
         st.session_state.settings = load_settings()
+    if "attachments_map" not in st.session_state:
+        st.session_state.attachments_map = get_default_attachments_map()
 
 
 # ── Sidebar settings ─────────────────────────────────────────────────────────
@@ -322,7 +345,7 @@ def tab_configure():
             with st.spinner("Extracting details…"):
                 try:
                     g = get_generator()
-                    api_key = os.environ.get("ANTHROPIC_API_KEY","")
+                    api_key = _get_api_key()
                     result = g.extract_job_details(
                         api_key=api_key,
                         job_description=st.session_state["job_desc"],
@@ -392,12 +415,14 @@ def tab_configure():
                 cols = st.columns(3)
                 for i, fname in enumerate(fnames):
                     if fname in actual_assets:
-                        checked = cols[i%3].checkbox(fname, value=(fname in default_assets),
+                        is_checked = (fname in st.session_state.attachments_map.get(cat, []))
+                        checked = cols[i%3].checkbox(fname, value=is_checked,
                                                      key=f"att_{fname}")
                         if checked:
-                            attachments_map.get(cat, attachments_map.setdefault(cat,[])).append(fname)
+                            attachments_map.setdefault(cat, []).append(fname)
         else:
             st.info("No PDFs found in assets/")
+        st.session_state.attachments_map = attachments_map
 
     # Options
     with st.expander("Application Options"):
@@ -448,7 +473,7 @@ def tab_configure():
                 career_context = f.read()
 
         settings = st.session_state.settings
-        api_key = os.environ.get("ANTHROPIC_API_KEY","")  # only used when provider=Claude
+        api_key = _get_api_key()
 
         with st.spinner("Generating application sections…"):
             try:
@@ -472,7 +497,7 @@ def tab_configure():
         with st.spinner("Compiling PDFs…"):
             try:
                 pipeline.setup_latex_path()
-                pipeline.compile_target("full_bundle", attachments_map)
+                pipeline.compile_target("full_bundle", st.session_state.attachments_map)
                 st.success("Compiled successfully!")
             except Exception as e:
                 st.warning(f"Compilation note: {e}")
@@ -492,13 +517,6 @@ def tab_editor():
         if os.path.exists(section_path):
             with open(section_path, encoding="utf-8") as f:
                 current_content = f.read()
-        # Override with in-session generated content
-        section_key = section_name.lower().replace(" ","_").replace("&","").replace("__","_")
-        # Also check st.session_state.sections by title mapping
-        for k, v in st.session_state.get("sections",{}).items():
-            if k in section_name.lower() or section_name.lower() in k:
-                current_content = v
-                break
 
         edited = st.text_area("LaTeX Source", value=current_content, height=500,
                               key=f"editor_{section_name}",
@@ -523,7 +541,7 @@ def tab_editor():
                 with st.spinner("Compiling…"):
                     try:
                         pipeline.setup_latex_path()
-                        result = pipeline.compile_target(target_key)
+                        result = pipeline.compile_target(target_key, st.session_state.get("attachments_map"))
                         if result:
                             st.session_state["preview_label"] = target_label
                             st.session_state.pdf_page = 0
@@ -593,7 +611,7 @@ def tab_chat():
         with st.spinner("Editing with AI…"):
             try:
                 g = get_generator()
-                api_key = os.environ.get("ANTHROPIC_API_KEY","")
+                api_key = _get_api_key()
                 updated = g.edit_section(api_key=api_key, current_text=current_content,
                                          user_prompt=user_prompt)
                 # Write back
