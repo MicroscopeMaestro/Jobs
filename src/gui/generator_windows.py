@@ -46,8 +46,15 @@ def _openai_compat_complete(base_url, api_key, model, system, user_content, max_
                 print(f"Rate limited (429) for {provider_name}. Retrying in {sleep_time}s...")
                 time.sleep(sleep_time)
                 continue
+            else:
+                raise RuntimeError(
+                    f"{provider_name} API rate limit exceeded (429).\n\n"
+                    "If you are using a shared API key, please generate a free personal key "
+                    "at https://aistudio.google.com/apikey and update it in the sidebar settings."
+                )
         resp.raise_for_status()
         return resp.json()["choices"][0]["message"]["content"].strip()
+
 
 
 
