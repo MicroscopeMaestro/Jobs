@@ -276,6 +276,11 @@ def render_sidebar():
                                "kimi": "Kimi / Moonshot (free tier)",
                                "claude": "Claude (paid)"}[p],
     )
+    if provider != s.get("ai_provider"):
+        save_settings({"ai_provider": provider})
+        st.session_state.settings = load_settings()
+        st.rerun()
+
 
     if provider == PROVIDER_GEMINI:
         key = st.sidebar.text_input("Gemini API Key", value=os.environ.get("GEMINI_API_KEY",""), type="password",
