@@ -294,13 +294,11 @@ def render_sidebar():
         if key != os.environ.get("ANTHROPIC_API_KEY",""):
             update_env_key("ANTHROPIC_API_KEY", key)
 
-    model = st.sidebar.text_input("Claude Model (generation)", value=s.get("model","claude-opus-4-8"),
-                                   help="Only used when provider=Claude")
-
     if st.sidebar.button("Save Settings"):
-        save_settings({"ai_provider": provider, "model": model})
+        save_settings({"ai_provider": provider})
         st.session_state.settings = load_settings()
         st.sidebar.success("Saved!")
+
 
 
 # ── Tab 1: Configure & Generate ──────────────────────────────────────────────
