@@ -1,0 +1,94 @@
+import os
+import json
+import requests
+from .generator import Generator, DEFAULT_MODEL, _strip_code_fences
+
+PROVIDER_GEMINI = "gemini"
+PROVIDER_KIMI = "kimi"
+PROVIDER_CLAUDE = "claude"
+
+GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"
+GEMINI_MODEL = "gemini-2.0-flash"
+
+KIMI_URL = "https://api.moonshot.cn/v1/chat/completions"
+KIMI_MODEL = "moonshot-v1-128k"  # largest context — handles big generation prompts
+
+
+def _openai_compat_complete(base_url, api_key, model, system, user_content, max_tokens, provider_name):
+    if not api_key:
+        raise ValueError(
+            f"{provider_name} API key not set.\n"
+            "Add it in Tools → Settings."
+        )
+    resp = requests.post(
+        base_url,
+        headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
+        json={
+            "model": model,
+            "messages": [
+                {"role": "system", "content": system},
+                {"role": "user", "content": user_content},
+            ],
+            "max_tokens": max_tokens,
+            "temperature": 0.3,
+        },
+        timeout=60,
+    )
+    resp.raise_for_status()
+    return resp.json()["choices"][0]["message"]["content"].strip()
+
+
+class GeneratorWindows(Generator):
+    """Windows variant — all AI calls routed to the provider chosen in Settings."""
+
+    def _get_provider(self):
+        settings_path = os.path.join(self.project_root, "data", "gui_settings.json")
+        try:
+            with open(settings_path, "r", encoding="utf-8") as f:
+                return json.load(f).get("ai_provider", PROVIDER_GEMINI)
+        except Exception:
+            return PROVIDER_GEMINI
+
+    def _complete(self, api_key, system, user_content, max_tokens=16000, model=DEFAULT_MODEL):
+        """Override: routes every AI call to the user-selected provider."""
+        provider = self._get_provider()
+
+        if provider == PROVIDER_CLAUDE:
+            return super()._complete(api_key, system, user_content, max_tokens, model)
+
+        if provider == PROVIDER_GEMINI:
+            return _openai_compat_complete(
+                base_url=GEMINI_URL,
+                api_key=os.environ.get("GEMINI_API_KEY", ""),
+                model=GEMINI_MODEL,
+                system=system,
+                user_content=user_content,
+                max_tokens=min(max_tokens, 8192),  # Gemini flash free-tier output cap
+                provider_name="Gemini",
+            )
+
+        if provider == PROVIDER_KIMI:
+            return _openai_compat_complete(
+                base_url=KIMI_URL,
+                api_key=os.environ.get("KIMI_API_KEY", ""),
+                model=KIMI_MODEL,
+                system=system,
+                user_content=user_content,
+                max_tokens=max_tokens,
+                provider_name="Kimi",
+            )
+
+        raise ValueError(f"Unknown AI provider: {provider}")
+
+    def _bypass_key(self, api_key):
+        """Return api_key for Claude; a sentinel for other providers (bypasses base-class guard)."""
+        return api_key if self._get_provider() == PROVIDER_CLAUDE else (api_key or "__provider__")
+
+    def generate_application(self, api_key, params, style_profile, career_context,
+                             papers_dict, model=DEFAULT_MODEL, temperature=0.2):
+        return super().generate_application(
+            self._bypass_key(api_key), params, style_profile, career_context,
+            papers_dict, model, temperature)
+
+    def extract_recipient_details(self, api_key, job_text, model=DEFAULT_MODEL):
+        return super().extract_recipient_details(self._bypass_key(api_key), job_text, model)
