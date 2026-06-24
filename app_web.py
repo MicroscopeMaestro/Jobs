@@ -320,23 +320,24 @@ def tab_configure():
             st.write("")
             fetch_clicked = st.button("Fetch & Parse", use_container_width=True)
 
-        job_desc = st.text_area("Job Description", height=180, key="job_desc",
-                                placeholder="Paste the job description here…")
-
-        if fetch_clicked and (job_url or job_desc):
+        if fetch_clicked and job_url:
             with st.spinner("Fetching…"):
                 try:
                     import requests, html2text
-                    if job_url:
-                        r = requests.get(job_url, headers={"User-Agent":"Mozilla/5.0"}, timeout=15)
-                        converter = html2text.HTML2Text()
-                        converter.ignore_links = True
-                        converter.ignore_images = True
-                        fetched = converter.handle(r.text)
-                        st.session_state["job_desc"] = fetched
-                        st.rerun()
+                    r = requests.get(job_url, headers={"User-Agent":"Mozilla/5.0"}, timeout=15)
+                    r.raise_for_status()
+                    converter = html2text.HTML2Text()
+                    converter.ignore_links = True
+                    converter.ignore_images = True
+                    fetched = converter.handle(r.text)
+                    st.session_state["job_desc"] = fetched
+                    st.rerun()
                 except Exception as e:
                     st.error(f"Fetch failed: {e}")
+
+        job_desc = st.text_area("Job Description", height=180, key="job_desc",
+                                placeholder="Paste the job description here…")
+
 
         col_extract, _ = st.columns([1, 3])
         with col_extract:

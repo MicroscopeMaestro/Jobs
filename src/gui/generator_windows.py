@@ -7,6 +7,8 @@ PROVIDER_GEMINI = "gemini"
 PROVIDER_KIMI = "kimi"
 PROVIDER_CLAUDE = "claude"
 
+import time
+
 GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"
 GEMINI_MODEL = "gemini-2.0-flash"
 
@@ -20,22 +22,33 @@ def _openai_compat_complete(base_url, api_key, model, system, user_content, max_
             f"{provider_name} API key not set.\n"
             "Add it in Tools → Settings."
         )
-    resp = requests.post(
-        base_url,
-        headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
-        json={
-            "model": model,
-            "messages": [
-                {"role": "system", "content": system},
-                {"role": "user", "content": user_content},
-            ],
-            "max_tokens": max_tokens,
-            "temperature": 0.3,
-        },
-        timeout=60,
-    )
-    resp.raise_for_status()
-    return resp.json()["choices"][0]["message"]["content"].strip()
+    
+    MAX_RETRIES = 5
+    BACKOFF_FACTOR = 2
+    for attempt in range(MAX_RETRIES):
+        resp = requests.post(
+            base_url,
+            headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
+            json={
+                "model": model,
+                "messages": [
+                    {"role": "system", "content": system},
+                    {"role": "user", "content": user_content},
+                ],
+                "max_tokens": max_tokens,
+                "temperature": 0.3,
+            },
+            timeout=60,
+        )
+        if resp.status_code == 429:
+            if attempt < MAX_RETRIES - 1:
+                sleep_time = BACKOFF_FACTOR ** attempt
+                print(f"Rate limited (429) for {provider_name}. Retrying in {sleep_time}s...")
+                time.sleep(sleep_time)
+                continue
+        resp.raise_for_status()
+        return resp.json()["choices"][0]["message"]["content"].strip()
+
 
 
 class GeneratorWindows(Generator):
