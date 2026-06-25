@@ -30,17 +30,30 @@ POSITION_NAME = "Quality_Engineer_Messtechnik"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 def setup_latex_path():
-    """ Adds common macOS TeX distribution paths to the environment PATH. """
-    tex_paths = [
-        "/Library/TeX/texbin",
-        "/usr/local/bin",
-        "/usr/local/texlive/2025/bin/universal-darwin",
-        "/usr/local/texlive/2024/bin/universal-darwin"
-    ]
+    """ Adds common macOS/Windows/Linux TeX distribution paths to the environment PATH. """
     current_path = os.environ.get("PATH", "")
+    if sys.platform == 'win32':
+        tex_paths = [
+            r"C:\Program Files\MiKTeX\miktex\bin\x64",
+            r"C:\Program Files\MiKTeX 2.9\miktex\bin\x64",
+            os.path.expandvars(r"%LOCALAPPDATA%\Programs\MiKTeX\miktex\bin\x64"),
+            r"C:\texlive\2026\bin\windows",
+            r"C:\texlive\2025\bin\windows",
+            r"C:\texlive\2024\bin\windows",
+        ]
+        separator = ";"
+    else:
+        tex_paths = [
+            "/Library/TeX/texbin",
+            "/usr/local/bin",
+            "/usr/local/texlive/2025/bin/universal-darwin",
+            "/usr/local/texlive/2024/bin/universal-darwin"
+        ]
+        separator = ":"
+        
     for path in tex_paths:
         if os.path.exists(path) and path not in current_path:
-            current_path = f"{path}:{current_path}"
+            current_path = f"{path}{separator}{current_path}"
     os.environ["PATH"] = current_path
 
 setup_latex_path()

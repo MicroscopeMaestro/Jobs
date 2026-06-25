@@ -225,10 +225,10 @@ def main():
     
     app = QApplication(sys.argv)
     
-    # Configure beautiful typography (use system fonts available on macOS)
-    font = QFont(".AppleSystemUIFont", 10)
-    if not font.exactMatch():
-        font = QFont("Helvetica Neue", 10)
+    # Configure beautiful typography dynamically for all platforms (Segoe UI for Windows, AppleSystemUIFont for macOS, Arial as fallback)
+    font = QFont()
+    font.setFamilies(["Segoe UI", ".AppleSystemUIFont", "Helvetica Neue", "Arial"])
+    font.setPointSize(10)
     app.setFont(font)
     
     # Apply modern design QSS stylesheet

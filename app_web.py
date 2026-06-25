@@ -33,7 +33,7 @@ load_dotenv(os.path.join(PROJECT_ROOT, ".env"))
 import streamlit as st
 import fitz  # PyMuPDF
 
-from src.gui.generator_windows import GeneratorWindows, PROVIDER_GEMINI, PROVIDER_KIMI, PROVIDER_CLAUDE, PROVIDER_OLLAMA
+from src.gui.generator import GeneratorWindows, PROVIDER_GEMINI, PROVIDER_KIMI, PROVIDER_CLAUDE, PROVIDER_OLLAMA
 from src import main as pipeline
 
 # ── Constants ────────────────────────────────────────────────────────────────
