@@ -20,6 +20,13 @@ venv_plugins/
 **/resident_permit.pdf
 generated/Passport_and_Resident_Permit_*.pdf
 
+# Personal data directory
+/personal/
+/generated/
+data/style_cache.json
+/*.app/
+/*.zip
+
 # LaTeX build artifacts
 *.aux
 *.log

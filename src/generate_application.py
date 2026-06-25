@@ -27,21 +27,11 @@ from dotenv import load_dotenv
 # Load API key from .env file
 load_dotenv()
 
-try:
-    import google.generativeai as genai
-except ImportError:
-    sys.exit("google-generativeai not found. Run: pip3 install google-generativeai")
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, PROJECT_ROOT)
 
-API_KEY = os.environ.get("GOOGLE_API_KEY") or os.environ.get("GEMINI_API_KEY")
-if not API_KEY:
-    sys.exit(
-        "No Gemini API key found.\n"
-        "Set it with:  export GOOGLE_API_KEY='your-key-here'\n"
-        "Or:           export GEMINI_API_KEY='your-key-here'"
-    )
-
-genai.configure(api_key=API_KEY)
-MODEL = genai.GenerativeModel("gemini-2.0-flash")
+from src.gui.generator_windows import GeneratorWindows
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -87,6 +77,9 @@ def fetch_job_description(url: str = None, file_path: str = None) -> str:
 def load_career_context() -> str:
     """Load the candidate's career context from the prompt file."""
     prompt_path = os.path.join(PROJECT_ROOT, "data", "ai_application_prompt.md")
+    personal_prompt_path = os.path.join(PROJECT_ROOT, "personal", "data", "ai_application_prompt.md")
+    if os.path.exists(personal_prompt_path):
+        prompt_path = personal_prompt_path
     try:
         with open(prompt_path, "r", encoding="utf-8") as f:
             return f.read()
@@ -212,13 +205,19 @@ def extract_tag(text: str, tag: str) -> str:
         return match.group(1).strip()
     return ""
 
+def get_write_path(rel_path: str) -> str:
+    personal_dir = os.path.join(PROJECT_ROOT, "personal")
+    if os.path.exists(personal_dir):
+        return os.path.join(personal_dir, rel_path)
+    return os.path.join(PROJECT_ROOT, rel_path)
+
 def update_file(rel_path: str, content: str):
     """Write content to a file if content is not empty."""
     if not content:
         print(f"  ⚠ Warning: No content generated for {rel_path}")
         return
         
-    abs_path = os.path.join(PROJECT_ROOT, rel_path)
+    abs_path = get_write_path(rel_path)
     os.makedirs(os.path.dirname(abs_path), exist_ok=True)
     
     with open(abs_path, "w", encoding="utf-8") as f:
@@ -248,6 +247,12 @@ def main():
     paper_dir = os.path.join(PROJECT_ROOT, args.papers if not os.path.isabs(args.papers) else "")
     if os.path.isabs(args.papers):
         paper_dir = args.papers
+
+    # If personal papers directory exists and default papers path is selected, use it
+    if args.papers == "assets/papers":
+        personal_papers_dir = os.path.join(PROJECT_ROOT, "personal", "assets", "papers")
+        if os.path.exists(personal_papers_dir):
+            paper_dir = personal_papers_dir
 
     pdf_paths = []
     if os.path.isfile(paper_dir):
@@ -279,15 +284,20 @@ def main():
     if not job_text:
         sys.exit("Error: Could not retrieve job description content.")
 
-    # 4. Call Gemini
-    print("\n🤖 Generating tailored application via Gemini AI (this may take ~20 seconds)...")
+    # 4. Call Generator
+    print("\n🤖 Generating tailored application via chosen AI provider (this may take ~20 seconds)...")
     prompt = build_prompt(papers, job_text, career_context, args.lang)
     
     try:
-        response = MODEL.generate_content(prompt)
-        result = response.text
+        generator = GeneratorWindows(PROJECT_ROOT)
+        result = generator._complete(
+            api_key="",
+            system="You are an expert technical career advisor and LaTeX document generator.",
+            user_content=prompt,
+            max_tokens=16000
+        )
     except Exception as e:
-        sys.exit(f"Gemini API error: {e}")
+        sys.exit(f"Generation error: {e}")
 
     # 5. Extract and Update Files
     print("\n💾 Updating LaTeX templates...")

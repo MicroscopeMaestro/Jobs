@@ -9,6 +9,12 @@ from PySide6.QtGui import (QPixmap, QImage, QSyntaxHighlighter, QTextCharFormat,
 from PySide6.QtCore import Qt, Signal as Signal, QThread, QTimer
 import fitz  # PyMuPDF
 
+def get_user_name(project_root):
+    personal_dir = os.path.join(project_root, "personal")
+    if os.path.exists(personal_dir):
+        return "Juan_Munoz"
+    return "John_Doe"
+
 class GrammarCheckWorker(QThread):
     # NOTE: do NOT name this "finished" — that shadows QThread.finished, which
     # fires only after run() returns. A custom "finished" emits from inside run()
@@ -320,8 +326,14 @@ class EditorTab(QWidget):
         """)
         self.tabs.setUsesScrollButtons(True)
         
+        personal_dir = os.path.join(self.project_root, "personal")
+        use_personal = os.path.exists(personal_dir)
+        
         for i, sec in enumerate(self.sections):
-            abs_path = os.path.join(self.project_root, sec["path"])
+            if use_personal:
+                abs_path = os.path.join(personal_dir, sec["path"])
+            else:
+                abs_path = os.path.join(self.project_root, sec["path"])
             editor = RichTextEditor(abs_path)
             self.editors[sec["key"]] = editor
             self.tabs.addTab(editor, sec["title"])
@@ -345,6 +357,7 @@ class EditorTab(QWidget):
         recompile_layout.addWidget(QLabel("Document:"))
         self.pdf_selector = QComboBox()
         # label -> (compile target key, output filename | None for the bundle glob)
+        user_name = get_user_name(self.project_root)
         self.PDF_TARGETS = [
             ("Resume", "resume", "resume.pdf"),
             ("Motivation Letter", "motivation_letter", "motivation_letter.pdf"),
@@ -354,7 +367,7 @@ class EditorTab(QWidget):
             ("Certificates", "certificates", "certificates.pdf"),
             ("Other Documents", "others", "others.pdf"),
             ("All Attachments", "all_attachments", "all_attachments.pdf"),
-            ("Personal Documents", "personal_documents", "Passport_and_Resident_Permit_Juan_Munoz.pdf"),
+            ("Personal Documents", "personal_documents", f"Passport_and_Resident_Permit_{user_name}.pdf"),
             ("Full Application Bundle", "full_bundle", None),
         ]
         self.pdf_selector.addItems([label for label, _, _ in self.PDF_TARGETS])
@@ -498,9 +511,10 @@ class EditorTab(QWidget):
         # session; otherwise fall back to the newest bundle on disk.
         if self.last_bundle_path and os.path.exists(self.last_bundle_path):
             return self.last_bundle_path
+        user_name = get_user_name(self.project_root)
         pdf_files = glob.glob(os.path.join(self.output_dir, "Compressed_*.pdf"))
         if not pdf_files:
-            pdf_files = glob.glob(os.path.join(self.output_dir, "Juan_Munoz_*.pdf"))
+            pdf_files = glob.glob(os.path.join(self.output_dir, f"{user_name}_*.pdf"))
         if pdf_files:
             return max(pdf_files, key=os.path.getmtime)
         return ""

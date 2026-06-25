@@ -10,8 +10,20 @@ TEMPLATE_DIR = os.path.join(PROJECT_ROOT, 'templates')
 ASSETS_DIR = os.path.join(PROJECT_ROOT, 'assets')
 OUTPUT_DIR = os.path.join(PROJECT_ROOT, 'generated')
 
+def get_user_name():
+    personal_dir = os.path.join(PROJECT_ROOT, "personal")
+    if os.path.exists(personal_dir):
+        return "Juan_Munoz"
+    return "John_Doe"
+
+def get_asset_path(filename):
+    personal_path = os.path.join(PROJECT_ROOT, "personal", "assets", filename)
+    if os.path.exists(personal_path):
+        return personal_path
+    return os.path.join(PROJECT_ROOT, "assets", filename)
+
 # Static configuration for unique naming
-USER_NAME = "Juan_Munoz"
+USER_NAME = get_user_name()
 COMPANY_NAME = "INNIO_Jenbacher"
 POSITION_NAME = "Quality_Engineer_Messtechnik"
 
@@ -160,8 +172,26 @@ def _pdf_is_valid(path):
 
 
 def compile_latex(tex_filename, output_name):
-    """ Compiles a .tex file inside TEMPLATE_DIR to PDF via pdflatex. """
-    tex_path = os.path.join(TEMPLATE_DIR, tex_filename)
+    """ Compiles a .tex file inside TEMPLATE_DIR (or build_templates) to PDF via pdflatex. """
+    # Setup build directory
+    build_templates_dir = os.path.join(OUTPUT_DIR, "build_templates")
+    if os.path.exists(build_templates_dir):
+        try:
+            shutil.rmtree(build_templates_dir)
+        except Exception:
+            pass
+    os.makedirs(build_templates_dir, exist_ok=True)
+
+    # 1. Copy public templates
+    if os.path.exists(TEMPLATE_DIR):
+        shutil.copytree(TEMPLATE_DIR, build_templates_dir, dirs_exist_ok=True)
+
+    # 2. Overlay personal templates if present
+    personal_templates_dir = os.path.join(PROJECT_ROOT, "personal", "templates")
+    if os.path.exists(personal_templates_dir):
+        shutil.copytree(personal_templates_dir, build_templates_dir, dirs_exist_ok=True)
+
+    tex_path = os.path.join(build_templates_dir, tex_filename)
     if not os.path.exists(tex_path):
         print(f"   ! LaTeX file not found: {tex_path}")
         return None
@@ -207,7 +237,7 @@ def compile_latex(tex_filename, output_name):
             # Two passes: write the .aux, then read it back (the letter class
             # inputs \jobname.aux at \enddocument; also resolves references).
             for _ in range(2):
-                process = subprocess.run(cmd, cwd=TEMPLATE_DIR, env=run_env, stdout=subprocess.PIPE,
+                process = subprocess.run(cmd, cwd=build_templates_dir, env=run_env, stdout=subprocess.PIPE,
                                          stderr=subprocess.PIPE, universal_newlines=True, errors='replace')
                 if process.returncode != 0:
                     break
@@ -290,7 +320,10 @@ def merge_pdfs(pdf_list, output_filename):
 
 def extract_info_from_latex(tex_filename):
     """ Extracts Company and Position from motivation_letter modules or main file. """
-    ml_sections_path = os.path.join(TEMPLATE_DIR, 'sections', 'ml')
+    build_templates_dir = os.path.join(OUTPUT_DIR, "build_templates")
+    ml_sections_path = os.path.join(build_templates_dir, 'sections', 'ml')
+    if not os.path.exists(ml_sections_path):
+        ml_sections_path = os.path.join(TEMPLATE_DIR, 'sections', 'ml')
     recipient_path = os.path.join(ml_sections_path, 'recipient.tex')
     subject_path = os.path.join(ml_sections_path, 'subject.tex')
     
@@ -339,7 +372,7 @@ def _category_source_files(category):
     """Existing source PDFs for an attachment category (from ATTACHMENTS)."""
     files = []
     for f in ATTACHMENTS.get(category, []):
-        p = os.path.join(ASSETS_DIR, f)
+        p = get_asset_path(f)
         if os.path.exists(p):
             files.append(p)
         else:
@@ -371,7 +404,7 @@ def build_personal_documents():
     """Merge passport + residence permit into the identification PDF."""
     docs = []
     for name in ("passport.pdf", "resident_permit.pdf"):
-        p = os.path.join(ASSETS_DIR, name)
+        p = get_asset_path(name)
         if os.path.exists(p):
             docs.append(p)
     if not docs:
@@ -447,7 +480,7 @@ def build_all():
     for category, filenames in ATTACHMENTS.items():
         cat_files = []
         for f in filenames:
-            path = os.path.join(ASSETS_DIR, f)
+            path = get_asset_path(f)
             if os.path.exists(path):
                 cat_files.append(path)
                 all_attachments.append(path)
@@ -484,8 +517,8 @@ def build_all():
     
     # 6. Create separate Identification file (Passport + Resident Permit)
     identification_docs = []
-    passport_path = os.path.join(ASSETS_DIR, "passport.pdf")
-    resident_permit_path = os.path.join(ASSETS_DIR, "resident_permit.pdf")
+    passport_path = get_asset_path("passport.pdf")
+    resident_permit_path = get_asset_path("resident_permit.pdf")
     if os.path.exists(passport_path): identification_docs.append(passport_path)
     if os.path.exists(resident_permit_path): identification_docs.append(resident_permit_path)
     if identification_docs:

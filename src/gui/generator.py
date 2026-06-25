@@ -100,6 +100,19 @@ The JSON must have exactly these keys:
         for name, text in papers_dict.items():
             paper_sections += f"\n### Research Paper: {name}\n{text[:3000]}\n"
 
+        import re
+        candidate_name = "John Doe"
+        if career_context:
+            name_match = re.search(r"\*\*Name:\*\*\s*(.+)", career_context)
+            if name_match:
+                candidate_name = name_match.group(1).strip()
+            else:
+                helping_match = re.search(r"helping\s+\*\*([^*]+)\*\*", career_context)
+                if helping_match:
+                    candidate_name = helping_match.group(1).strip()
+
+        first_name = candidate_name.split()[0] if candidate_name else "John"
+
         # Format selected examples
         examples_str = ""
         if params.get("examples"):
@@ -157,11 +170,11 @@ The JSON must have exactly these keys:
 
         system_instructions = textwrap.dedent(f"""
             You are an expert technical career advisor and LaTeX document generator helping
-            Juan David Muñoz Bolaños tailor his application for a specific job opening.
-            CRITICAL TONE REQUIREMENT: You MUST frame Juan as a highly-capable, eager JUNIOR ENGINEER.
-            While he has a strong PhD background, he is applying for entry-level/junior positions.
+            {candidate_name} tailor their application for a specific job opening.
+            CRITICAL TONE REQUIREMENT: You MUST frame the candidate as a highly-capable, eager JUNIOR ENGINEER.
+            While they may have a strong educational or research background, they are applying for entry-level/junior positions.
             Adjust the tone to be humble, adaptable, and eager to learn from senior team members.
-            Avoid sounding overqualified, overly senior, or like a manager. Focus on his strong technical foundation and readiness to execute.
+            Avoid sounding overqualified, overly senior, or like a manager. Focus on their strong technical foundation and readiness to execute.
 
             == CANDIDATE'S CAREER & EXAMPLES BANK ==
             {career_context}
@@ -217,9 +230,9 @@ The JSON must have exactly these keys:
                [Address / City]
 
             3. <ML_BODY>: The body paragraphs of the motivation letter.
-               Include standard greeting (e.g. "Sehr geehrte Frau [Name]" or "Sehr geehrtes Recruiting-Team"), 3-4 body paragraphs tailoring Juan's career story to the JD requirements and selected examples.
-               Make sure the closing mentions Juan finishing his PhD in June 2026, and that his Austrian Residence Permit converts seamlessly to a working permit.
-               Do NOT include any closing salutation (e.g., "Mit freundlichen Grüßen" or Juan's name) at the end, as this is already dynamically appended by the template.
+               Include standard greeting (e.g. "Sehr geehrte Frau [Name]" or "Sehr geehrtes Recruiting-Team"), 3-4 body paragraphs tailoring the candidate's career story to the JD requirements and selected examples.
+               Make sure the closing mentions any graduation/availability details and work permit details if they are relevant and specified in the candidate's career context (e.g. PhD timeline or residency status).
+               Do NOT include any closing salutation (e.g., "Mit freundlichen Grüßen" or the candidate's name) at the end, as this is already dynamically appended by the template.
 
             4. <RESUME_SUMMARY>: The summary paragraph at the top of the resume.
                You MUST start this section exactly with: `\\section{{Summary}}`.
@@ -281,10 +294,7 @@ The JSON must have exactly these keys:
         }
 
     def write_sections(self, sections):
-        """Writes the generated sections directly into the templates directory."""
-        os.makedirs(os.path.join(self.sections_dir, "ml"), exist_ok=True)
-        os.makedirs(os.path.join(self.sections_dir, "resume"), exist_ok=True)
-
+        """Writes the generated sections directly into the templates directory (or personal/ templates)."""
         mapping = {
             "ml_subject": "ml/subject.tex",
             "ml_recipient": "ml/recipient.tex",
@@ -294,10 +304,18 @@ The JSON must have exactly these keys:
             "resume_competencies": "resume/technical_competencies.tex"
         }
 
+        personal_dir = os.path.join(self.project_root, "personal")
+        use_personal = os.path.exists(personal_dir)
+
         for key, rel_path in mapping.items():
             content = sections.get(key, "").strip()
             if content:
-                abs_path = os.path.join(self.sections_dir, rel_path)
+                if use_personal:
+                    abs_path = os.path.join(personal_dir, "templates", "sections", rel_path)
+                else:
+                    abs_path = os.path.join(self.sections_dir, rel_path)
+                
+                os.makedirs(os.path.dirname(abs_path), exist_ok=True)
                 with open(abs_path, "w", encoding="utf-8") as f:
                     f.write(content + "\n")
                 print(f"Written section to: {abs_path}")

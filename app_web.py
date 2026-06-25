@@ -38,10 +38,24 @@ from src import main as pipeline
 
 # ── Constants ────────────────────────────────────────────────────────────────
 
-SETTINGS_PATH = os.path.join(PROJECT_ROOT, "data", "gui_settings.json")
-TRACKER_PATH  = os.path.join(PROJECT_ROOT, "data", "tracker.json")
-PROMPT_PATH   = os.path.join(PROJECT_ROOT, "data", "ai_application_prompt.md")
-ASSETS_DIR    = os.path.join(PROJECT_ROOT, "assets")
+def resolve_data_path(filename):
+    personal_path = os.path.join(PROJECT_ROOT, "personal", "data", filename)
+    if os.path.exists(personal_path) or os.path.exists(os.path.join(PROJECT_ROOT, "personal")):
+        os.makedirs(os.path.dirname(personal_path), exist_ok=True)
+        return personal_path
+    return os.path.join(PROJECT_ROOT, "data", filename)
+
+SETTINGS_PATH = resolve_data_path("gui_settings.json")
+TRACKER_PATH  = resolve_data_path("tracker.json")
+PROMPT_PATH   = resolve_data_path("ai_application_prompt.md")
+
+def get_assets_dir():
+    personal_assets = os.path.join(PROJECT_ROOT, "personal", "assets")
+    if os.path.exists(personal_assets):
+        return personal_assets
+    return os.path.join(PROJECT_ROOT, "assets")
+
+ASSETS_DIR    = get_assets_dir()
 OUTPUT_DIR    = os.path.join(PROJECT_ROOT, "generated")
 TEMPLATES_DIR = os.path.join(PROJECT_ROOT, "templates")
 
@@ -59,6 +73,14 @@ SECTION_MAP = {
     "Resume Languages":       "templates/sections/resume/languages.tex",
 }
 
+def get_user_name():
+    personal_dir = os.path.join(PROJECT_ROOT, "personal")
+    if os.path.exists(personal_dir):
+        return "Juan_Munoz"
+    return "John_Doe"
+
+USER_NAME = get_user_name()
+
 PDF_TARGETS = [
     ("Resume",                      "resume",                    "resume.pdf"),
     ("Motivation Letter",           "motivation_letter",         "motivation_letter.pdf"),
@@ -68,24 +90,32 @@ PDF_TARGETS = [
     ("Certificates",                "certificates",              "certificates.pdf"),
     ("Other Documents",             "others",                    "others.pdf"),
     ("All Attachments",             "all_attachments",           "all_attachments.pdf"),
-    ("Personal Documents",          "personal_documents",        "Passport_and_Resident_Permit_Juan_Munoz.pdf"),
+    ("Personal Documents",          "personal_documents",        f"Passport_and_Resident_Permit_{USER_NAME}.pdf"),
     ("Full Application Bundle",     "full_bundle",               None),
 ]
 
-EXP_ENTRIES = [
-    {"id": "MUI",     "name": "Medical University of Innsbruck (PhD)", "default_title": "Optical Systems Engineer | PhD Researcher"},
-    {"id": "IPHT",    "name": "Leibniz Institute of Photonic Technology (IPHT Jena)", "default_title": "R&D Research Assistant"},
-    {"id": "INTECOL", "name": "INTECOL S.A.S. (Medellín, Colombia)", "default_title": "Junior Machine Vision Engineer (Field Service)"},
-]
+def load_app_config():
+    personal_config = os.path.join(PROJECT_ROOT, "personal", "data", "config.json")
+    default_config = os.path.join(PROJECT_ROOT, "data", "config.json")
+    config_path = personal_config if os.path.exists(personal_config) else default_config
+    try:
+        with open(config_path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+            return (
+                data.get("exp_entries", []),
+                data.get("focus_themes", []),
+                data.get("title_options", [])
+            )
+    except Exception:
+        return (
+            [
+                {"id": "COMP1", "name": "Tech Corp (Software Development)", "default_title": "Software Engineer"}
+            ],
+            ["Software Engineering"],
+            ["Software Engineer"]
+        )
 
-FOCUS_THEMES = ["Semiconductor", "Machine Vision", "System Engineering",
-                "Metrology", "Photonics/Laser", "Maintenance/Service", "R&D"]
-
-TITLE_OPTIONS = [
-    "Optical Systems Engineer", "System Engineer", "Junior System Engineer",
-    "Implementation Engineer", "Verification Engineer",
-    "Machine Vision Engineer", "Quality Engineer Messtechnik",
-]
+EXP_ENTRIES, FOCUS_THEMES, TITLE_OPTIONS = load_app_config()
 
 # ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -197,7 +227,7 @@ def resolve_pdf_path(label):
             # Full bundle — newest Compressed_ file
             files = glob.glob(os.path.join(OUTPUT_DIR, "Compressed_*.pdf"))
             if not files:
-                files = glob.glob(os.path.join(OUTPUT_DIR, "Juan_Munoz_*.pdf"))
+                files = glob.glob(os.path.join(OUTPUT_DIR, f"{USER_NAME}_*.pdf"))
             return max(files, key=os.path.getmtime) if files else ""
     return ""
 
@@ -393,8 +423,13 @@ def tab_configure():
             title = st.selectbox("Professional Title", title_options,
                                  index=title_options.index(title_input), key="title_sel")
         with col2:
-            focus = st.multiselect("Motivation Letter Focus", FOCUS_THEMES,
-                                   default=st.session_state.get("focus",[]), key="focus")
+            focus_options = FOCUS_THEMES.copy()
+            saved_focus = st.session_state.get("focus", [])
+            for f in saved_focus:
+                if f not in focus_options:
+                    focus_options.append(f)
+            focus = st.multiselect("Motivation Letter Focus", focus_options,
+                                   default=saved_focus, key="focus")
 
     # Examples
     with st.expander(f"Professional Examples ({len(examples)} available)"):
@@ -406,8 +441,12 @@ def tab_configure():
     # Skills
     with st.expander("Skills"):
         all_skills = [sk for items in skills.values() for sk in items]
+        saved_skills = st.session_state.get("skills_sel", [])
+        for s in saved_skills:
+            if s not in all_skills:
+                all_skills.append(s)
         sel_skills = st.multiselect("Select skills to highlight", all_skills,
-                                    default=st.session_state.get("skills_sel",[]), key="skills_sel")
+                                    default=saved_skills, key="skills_sel")
 
     # Experience
     with st.expander("Resume Experience Entries"):

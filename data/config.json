@@ -1,0 +1,21 @@
+{
+    "exp_entries": [
+        {"id": "COMP1", "name": "Tech Corp (Software Development)", "default_title": "Software Engineer"},
+        {"id": "COMP2", "name": "Innovate Ltd (Research & Development)", "default_title": "R&D Systems Engineer"},
+        {"id": "COMP3", "name": "Global Solutions (Support & Integration)", "default_title": "Field Application Engineer"}
+    ],
+    "focus_themes": [
+        "Software Engineering",
+        "Systems Engineering",
+        "Data Science",
+        "Machine Learning",
+        "Product Management"
+    ],
+    "title_options": [
+        "Software Engineer",
+        "Systems Engineer",
+        "Data Scientist",
+        "Machine Learning Engineer",
+        "Product Manager"
+    ]
+}

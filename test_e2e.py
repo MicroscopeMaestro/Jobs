@@ -3,7 +3,7 @@ import sys
 from PyQt6.QtWidgets import QApplication
 from PyQt6.QtCore import QTimer
 
-PROJECT_ROOT = "/Users/juanmunoz/Documents/GitHub/Jobs"
+PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 if PROJECT_ROOT not in sys.path:
     sys.path.append(PROJECT_ROOT)
 

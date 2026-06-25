@@ -25,22 +25,11 @@ from dotenv import load_dotenv
 # Load API key from .env file
 load_dotenv()
 
-# ── Gemini setup ────────────────────────────────────────────────────────────
-try:
-    import google.generativeai as genai
-except ImportError:
-    sys.exit("google-generativeai not found. Run: pip3 install google-generativeai")
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, PROJECT_ROOT)
 
-API_KEY = os.environ.get("GOOGLE_API_KEY") or os.environ.get("GEMINI_API_KEY")
-if not API_KEY:
-    sys.exit(
-        "No Gemini API key found.\n"
-        "Set it with:  export GOOGLE_API_KEY='your-key-here'\n"
-        "Or:           export GEMINI_API_KEY='your-key-here'"
-    )
-
-genai.configure(api_key=API_KEY)
-MODEL = genai.GenerativeModel("gemini-3.1-pro-preview")
+from src.gui.generator_windows import GeneratorWindows
 
 # ── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -213,14 +202,19 @@ def main():
     
     print(f"   ✓ Retrieved {len(job_text)} characters")
 
-    # ── Call Gemini ──────────────────────────────────────────────────────────
-    print("\n🤖 Analysing with Gemini AI (this may take ~15 seconds)...")
+    # ── Call Generator ───────────────────────────────────────────────────────
+    print("\n🤖 Analysing with chosen AI provider (this may take ~15 seconds)...")
     prompt = build_prompt(papers, job_text)
     try:
-        response = MODEL.generate_content(prompt)
-        result = response.text
+        generator = GeneratorWindows(PROJECT_ROOT)
+        result = generator._complete(
+            api_key="",
+            system="You are an expert career advisor.",
+            user_content=prompt,
+            max_tokens=8000
+        )
     except Exception as e:
-        sys.exit(f"Gemini API error: {e}")
+        sys.exit(f"Generation error: {e}")
 
     # ── Output ───────────────────────────────────────────────────────────────
     print_section("SKILL MATCH ANALYSIS", result)

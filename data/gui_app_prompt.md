@@ -7,7 +7,7 @@ Paste this into a coding agent (Claude Code / Cursor) to build the app.
 Build a desktop GUI application that generates tailored job applications (motivation letter + resume) as compiled PDFs. It wraps an existing LaTeX + Python pipeline and uses the Claude API for content generation. I provide parameters and final manual edits through the GUI.
 
 ## Context: existing project
-The pipeline already exists at `/Users/juanmunoz/Documents/GitHub/Jobs`:
+The pipeline already exists at the project root directory:
 - `templates/motivation_letter.tex` and `templates/resume.tex` are master LaTeX files that `\input` modular sections from `templates/sections/ml/` (sender, recipient, subject, body, closing) and `templates/sections/resume/` (header, summary, experience, technical_competencies, education, publications, soft_skills, languages, references).
 - `src/main.py` compiles both via pdflatex, merges attachments with pypdf, and produces a final `generated/Application_<name>_<company>_<position>.pdf` plus a compressed version.
 - `data/ai_application_prompt.md` holds my career story + a bank of professional examples (EX-1..EX-11) + skills.

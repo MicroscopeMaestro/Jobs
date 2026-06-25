@@ -19,7 +19,7 @@ KIMI_MODEL = "moonshot-v1-128k"  # largest context — handles big generation pr
 OLLAMA_URL = "http://localhost:11434/v1/chat/completions"
 
 
-def _openai_compat_complete(base_url, api_key, model, system, user_content, max_tokens, provider_name):
+def _openai_compat_complete(base_url, api_key, model, system, user_content, max_tokens, provider_name, timeout=60):
     if not api_key:
         raise ValueError(
             f"{provider_name} API key not set.\n"
@@ -29,19 +29,23 @@ def _openai_compat_complete(base_url, api_key, model, system, user_content, max_
     MAX_RETRIES = 5
     BACKOFF_FACTOR = 2
     for attempt in range(MAX_RETRIES):
+        json_data = {
+            "model": model,
+            "messages": [
+                {"role": "system", "content": system},
+                {"role": "user", "content": user_content},
+            ],
+            "max_tokens": max_tokens,
+            "temperature": 0.3,
+        }
+        if provider_name == "Ollama":
+            json_data["options"] = {"num_ctx": 16384}
+
         resp = requests.post(
             base_url,
             headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
-            json={
-                "model": model,
-                "messages": [
-                    {"role": "system", "content": system},
-                    {"role": "user", "content": user_content},
-                ],
-                "max_tokens": max_tokens,
-                "temperature": 0.3,
-            },
-            timeout=60,
+            json=json_data,
+            timeout=timeout,
         )
         if resp.status_code == 429:
             if attempt < MAX_RETRIES - 1:
@@ -65,7 +69,8 @@ class GeneratorWindows(Generator):
     """Windows variant — all AI calls routed to the provider chosen in Settings."""
 
     def _get_settings(self):
-        settings_path = os.path.join(self.project_root, "data", "gui_settings.json")
+        personal_settings = os.path.join(self.project_root, "personal", "data", "gui_settings.json")
+        settings_path = personal_settings if os.path.exists(personal_settings) else os.path.join(self.project_root, "data", "gui_settings.json")
         try:
             with open(settings_path, "r", encoding="utf-8") as f:
                 return json.load(f)
@@ -91,6 +96,7 @@ class GeneratorWindows(Generator):
                 user_content=user_content,
                 max_tokens=min(max_tokens, 8192),  # Gemini flash free-tier output cap
                 provider_name="Gemini",
+                timeout=120,
             )
 
         if provider == PROVIDER_KIMI:
@@ -102,6 +108,7 @@ class GeneratorWindows(Generator):
                 user_content=user_content,
                 max_tokens=max_tokens,
                 provider_name="Kimi",
+                timeout=120,
             )
 
         if provider == PROVIDER_OLLAMA:
@@ -115,6 +122,7 @@ class GeneratorWindows(Generator):
                 user_content=user_content,
                 max_tokens=max_tokens,
                 provider_name="Ollama",
+                timeout=300,
             )
 
         raise ValueError(f"Unknown AI provider: {provider}")

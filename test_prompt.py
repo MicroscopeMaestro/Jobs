@@ -13,7 +13,7 @@ params = {}
 
 system_instructions = textwrap.dedent(f"""
     You are an expert technical career advisor and LaTeX document generator helping 
-    Juan David Muñoz Bolaños tailor his application for a specific job opening.
+    John Doe tailor his application for a specific job opening.
 
     == CANDIDATE'S CAREER & EXAMPLES BANK ==
     {career_context}
@@ -67,9 +67,9 @@ user_prompt = textwrap.dedent(f"""
 
     3. <ML_BODY>: The body of the motivation letter.
        Write entirely in {lang_instruction}.
-       Include standard greeting (e.g. "Sehr geehrte Frau [Name]" or "Sehr geehrtes Recruiting-Team"), 3-4 body paragraphs tailoring Juan's career story to the JD requirements and selected examples.
-       Make sure the closing mentions Juan finishing his PhD in June 2026, and that his Austrian Residence Permit converts seamlessly to a working permit.
-       Do NOT include any closing salutation (e.g., "Mit freundlichen Grüßen" or Juan's name) at the end, as this is already dynamically appended by the template.
+       Include standard greeting (e.g. "Sehr geehrte Frau [Name]" or "Sehr geehrtes Recruiting-Team"), 3-4 body paragraphs tailoring John's career story to the JD requirements and selected examples.
+       Make sure the closing mentions any graduation/availability details and work permit details if they are relevant and specified in the candidate's career context.
+       Do NOT include any closing salutation (e.g., "Mit freundlichen Grüßen" or the candidate's name) at the end, as this is already dynamically appended by the template.
 
     4. <RESUME_EXPERIENCE>: The professional/research experience section for the resume.
        You MUST start this section exactly with: `\\section{{Research/Professional Experience}}`

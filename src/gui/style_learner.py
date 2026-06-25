@@ -9,7 +9,13 @@ class StyleLearner:
     def __init__(self, project_root):
         self.project_root = project_root
         self.generated_dir = os.path.join(project_root, "generated")
-        self.data_dir = os.path.join(project_root, "data")
+        
+        personal_data_dir = os.path.join(project_root, "personal", "data")
+        if os.path.exists(personal_data_dir) or os.path.exists(os.path.join(project_root, "personal")):
+            self.data_dir = personal_data_dir
+        else:
+            self.data_dir = os.path.join(project_root, "data")
+            
         self.cache_path = os.path.join(self.data_dir, "style_cache.json")
         self.profile_path = os.path.join(self.data_dir, "style_profile.txt")
         
@@ -32,12 +38,18 @@ class StyleLearner:
         except Exception as e:
             print(f"Error saving style cache: {e}")
 
+    def get_user_name(self):
+        personal_dir = os.path.join(self.project_root, "personal")
+        if os.path.exists(personal_dir):
+            return "Juan_Munoz"
+        return "John_Doe"
+
     def scan_past_applications(self):
         """Scans the generated directory for past applications and extracts text."""
-        # Past full-application bundles are named Juan_Munoz_<company>_<position>.pdf
-        # (page 1 = motivation letter). The old "Application_*.pdf" pattern no
-        # longer matches anything after the output filenames were renamed.
-        pdf_files = glob.glob(os.path.join(self.generated_dir, "Juan_Munoz_*.pdf"))
+        # Past full-application bundles are named <user_name>_<company>_<position>.pdf
+        # (page 1 = motivation letter).
+        user_name = self.get_user_name()
+        pdf_files = glob.glob(os.path.join(self.generated_dir, f"{user_name}_*.pdf"))
         
         ingested_count = 0
         updated = False
@@ -93,11 +105,13 @@ class StyleLearner:
                 print(f"Error reading style profile: {e}")
                 
         # Default fallback profile
+        user_name = self.get_user_name()
+        display_name = user_name.replace("_", " ")
         return (
-            "Juan's Voice Profile (Default / Humanized):\n"
-            "- Tone & Register: Professional, clear, confident, yet highly natural German (B2 level, authentic register for Austrian/German jobs).\n"
+            f"{display_name}'s Voice Profile (Default / Humanized):\n"
+            "- Tone & Register: Professional, clear, confident, yet highly natural.\n"
             "- Formatting & Phrasing: Active voice, varied sentence lengths, direct statements, no inflated corporate buzzwords or cliché academic filler.\n"
-            "- Structural style: Clean opening capturing a solid hook matching the job description; experience-driven paragraphs utilizing concrete metrics; closes with a smooth explanation that the PhD completes in June 2026 and the Austrian residence permit seamlessly transitions to a work permit.\n"
+            "- Structural style: Clean opening capturing a solid hook matching the job description; experience-driven paragraphs utilizing concrete metrics.\n"
             "- Resume structure: Focused bullet points with strong active verbs starting each item, clear category headers, and consistent technical competencies."
         )
 
@@ -124,15 +138,17 @@ class StyleLearner:
         sample_letters = cover_letters[:5]
         letters_input = "\n\n".join(sample_letters)
         
+        user_name = self.get_user_name()
+        display_name = user_name.replace("_", " ")
         system_prompt = (
             "You are an expert copywriter, linguist, and technical CV advisor. Your task is to analyze "
-            "a selection of past job application cover letters written by Juan David Muñoz Bolaños and extract "
+            f"a selection of past job application cover letters written by {display_name} and extract "
             "a highly precise style, voice, and formatting profile. This profile will be used to guide the model "
-            "in generating brand new cover letters that sound identical to Juan's natural voice."
+            f"in generating brand new cover letters that sound identical to {display_name}'s voice."
         )
         
         analysis_prompt = f"""
-Here is a collection of Cover Letters previously sent or edited by Juan (written in German/ngerman):
+Here is a collection of Cover Letters previously sent or edited by {display_name}:
 
 {letters_input}
 
