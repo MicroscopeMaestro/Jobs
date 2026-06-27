@@ -12,7 +12,15 @@ class PresetManager:
         if os.path.exists(self.presets_path):
             try:
                 with open(self.presets_path, "r", encoding="utf-8") as f:
-                    return json.load(f)
+                    data = json.load(f)
+                    if isinstance(data, dict):
+                        return data
+                    elif isinstance(data, list):
+                        res = {}
+                        for item in data:
+                            if isinstance(item, dict) and "name" in item:
+                                res[item["name"]] = item
+                        return res
             except Exception as e:
                 print(f"Error loading presets: {e}")
         return {}

@@ -320,7 +320,9 @@ The JSON must have exactly these keys:
             3. <ML_BODY>: The body paragraphs of the motivation letter.
                Include standard greeting (e.g. "Sehr geehrte Frau [Name]" or "Sehr geehrtes Recruiting-Team"), 3-4 body paragraphs tailoring the candidate's career story to the JD requirements and selected examples.
                Make sure the closing mentions any graduation/availability details and work permit details if they are relevant and specified in the candidate's career context (e.g. PhD timeline or residency status).
-               Do NOT include any closing salutation (e.g., "Mit freundlichen Grüßen" or the candidate's name) at the end, as this is already dynamically appended by the template.
+               CRITICAL RULES FOR ML_BODY:
+               - Do NOT include any closing salutation (e.g., "Mit freundlichen Grüßen", "Sincerely", or the candidate's name) at the end, as this is already dynamically appended by the template.
+               - NEVER use \entry, \cvtag, or any custom resume LaTeX macros in the motivation letter (<ML_BODY>). Use plain text to reference experience or roles.
 
             4. <RESUME_SUMMARY>: The summary paragraph at the top of the resume.
                You MUST start this section exactly with: `\\section{{Summary}}`.
@@ -331,6 +333,7 @@ The JSON must have exactly these keys:
                Generate `\\entry{{Institution}}{{Location}}{{Title}}{{Date}}` blocks for the selected experience entries, each followed by `\\begin{{adjustwidth}}{{103pt}}{{0pt}}` and bullet points with `\\sepbullet` or `\\sepentry` separators, aligned to 103pt. Use the custom job titles specified by the user!
                Make sure all dates use the short version of the month and the year, separated by "to" (e.g., "Jan 2022 to Jun 2026").
                Ensure bullet points are concrete, highly relevant to the JD, and structured with bold prefixes.
+               IMPORTANT: Always escape ampersands in job titles or descriptions as `\\&` (e.g., `R\\&D`). Never write unescaped `&`.
 
             6. <RESUME_COMPETENCIES>: Technical competencies section.
                List skills grouped by category, highlighting the selected skills that match this job posting.
@@ -361,9 +364,17 @@ The JSON must have exactly these keys:
 
         # Parse XML tags
         def extract_tag(text, tag):
-            pattern = re.compile(rf"<{tag}>(.*?)</{tag}>", re.DOTALL)
+            pattern = re.compile(rf"<{tag}>(.*?)</{tag}>", re.DOTALL | re.IGNORECASE)
             match = pattern.search(text)
-            return match.group(1).strip() if match else ""
+            val = match.group(1).strip() if match else ""
+            if val.startswith("```"):
+                lines = val.split("\n")
+                if lines[0].startswith("```"):
+                    lines = lines[1:]
+                if lines and lines[-1].strip().startswith("```"):
+                    lines = lines[:-1]
+                val = "\n".join(lines).strip()
+            return val
 
         ml_subject = extract_tag(result, "ML_SUBJECT")
         ml_recipient = extract_tag(result, "ML_RECIPIENT")
@@ -398,6 +409,32 @@ The JSON must have exactly these keys:
         for key, rel_path in mapping.items():
             content = sections.get(key, "").strip()
             if content:
+                content = re.sub(r'(?<!\\)%', r'\%', content)
+                content = re.sub(r'(?<!\\)#', r'\#', content)
+                content = re.sub(r'(?<!\\)_', r'\_', content)
+                
+                if key != "resume_competencies":
+                    content = re.sub(r'(?<!\\)&', r'\&', content)
+                else:
+                    def clean_macro(m):
+                        macro = m.group(1)
+                        inner_text = m.group(2).replace('&', r'\&').replace('%', r'\%').replace('#', r'\#').replace('_', r'\_')
+                        return f"{macro}{{{inner_text}}}"
+                    content = re.sub(r'(\\cvtag[A-Za-z]*|\\textbf)\{([^}]+)\}', clean_macro, content)
+
+                content = content.replace("{1103pt}", "{103pt}")
+                
+                if key == "resume_experience":
+                    opens = content.count(r'\begin{adjustwidth}')
+                    closes = content.count(r'\end{adjustwidth}')
+                    if opens > closes:
+                        content += "\n\\end{adjustwidth}" * (opens - closes)
+                        
+                if key.startswith("ml_"):
+                    content = re.sub(r'\\entry\{[^}]*\}\{[^}]*\}\{[^}]*\}\{[^}]*\}', '', content)
+                    content = re.sub(r'\\cvtag[A-Za-z]*\{[^}]*\}', '', content)
+                    content = content.replace(r'\sepbullet', '').replace(r'\sepentry', '')
+
                 if use_personal:
                     abs_path = os.path.join(personal_dir, "templates", "sections", rel_path)
                 else:

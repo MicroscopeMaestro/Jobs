@@ -360,7 +360,7 @@ def tab_configure():
                                     placeholder="https://example.com/careers/...")
         with col2:
             st.write("")
-            fetch_clicked = st.button("Fetch & Parse", use_container_width=True)
+            fetch_clicked = st.button("Fetch & Parse", width="stretch")
 
         if fetch_clicked and job_url:
             with st.spinner("Fetching…"):
@@ -402,7 +402,7 @@ def tab_configure():
                     if result.get("company"):
                         st.session_state["rec_company"] = result["company"]
                     if result.get("position") and result["position"] != "Unknown Position":
-                        st.session_state["title_input"] = result["position"]
+                        st.session_state["title_sel"] = result["position"]
                     if result.get("foci"):
                         st.session_state["focus"] = result["foci"]
                     if result.get("skills"):
@@ -417,19 +417,30 @@ def tab_configure():
         col1, col2 = st.columns(2)
         with col1:
             title_options = TITLE_OPTIONS.copy()
-            title_input = st.session_state.get("title_input", TITLE_OPTIONS[0])
-            if title_input not in title_options:
-                title_options.insert(0, title_input)
-            title = st.selectbox("Professional Title", title_options,
-                                 index=title_options.index(title_input), key="title_sel")
+            if "title_sel" not in st.session_state:
+                title_input = st.session_state.get("title_input", TITLE_OPTIONS[0])
+                if title_input not in title_options:
+                    title_options.insert(0, title_input)
+                st.session_state["title_sel"] = title_input
+            else:
+                if st.session_state["title_sel"] not in title_options:
+                    title_options.insert(0, st.session_state["title_sel"])
+            title = st.selectbox("Professional Title", title_options, key="title_sel")
         with col2:
             focus_options = FOCUS_THEMES.copy()
-            saved_focus = st.session_state.get("focus", [])
-            for f in saved_focus:
-                if f not in focus_options:
-                    focus_options.append(f)
-            focus = st.multiselect("Motivation Letter Focus", focus_options,
-                                   default=saved_focus, key="focus")
+            if "focus" in st.session_state:
+                val = st.session_state["focus"]
+                if isinstance(val, str):
+                    val = [s.strip() for s in val.split(",") if s.strip()]
+                elif not isinstance(val, list):
+                    val = list(val)
+                st.session_state["focus"] = val
+                for f in val:
+                    if f not in focus_options:
+                        focus_options.append(f)
+                focus = st.multiselect("Motivation Letter Focus", focus_options, key="focus")
+            else:
+                focus = st.multiselect("Motivation Letter Focus", focus_options, default=[], key="focus")
 
     # Examples
     with st.expander(f"Professional Examples ({len(examples)} available)"):
@@ -441,12 +452,19 @@ def tab_configure():
     # Skills
     with st.expander("Skills"):
         all_skills = [sk for items in skills.values() for sk in items]
-        saved_skills = st.session_state.get("skills_sel", [])
-        for s in saved_skills:
-            if s not in all_skills:
-                all_skills.append(s)
-        sel_skills = st.multiselect("Select skills to highlight", all_skills,
-                                    default=saved_skills, key="skills_sel")
+        if "skills_sel" in st.session_state:
+            val = st.session_state["skills_sel"]
+            if isinstance(val, str):
+                val = [s.strip() for s in val.split(",") if s.strip()]
+            elif not isinstance(val, list):
+                val = list(val)
+            st.session_state["skills_sel"] = val
+            for s in val:
+                if s not in all_skills:
+                    all_skills.append(s)
+            sel_skills = st.multiselect("Select skills to highlight", all_skills, key="skills_sel")
+        else:
+            sel_skills = st.multiselect("Select skills to highlight", all_skills, default=[], key="skills_sel")
 
     # Experience
     with st.expander("Resume Experience Entries"):
@@ -492,7 +510,7 @@ def tab_configure():
 
     # Generate
     st.divider()
-    if st.button("Generate Tailored Application", type="primary", use_container_width=True):
+    if st.button("Generate Tailored Application", type="primary", width="stretch"):
         job_description = st.session_state.get("job_desc","").strip()
         if not job_description:
             st.error("Job description is required.")
@@ -576,7 +594,7 @@ def tab_editor():
 
         col1, col2 = st.columns(2)
         with col1:
-            if st.button("Save to disk", use_container_width=True):
+            if st.button("Save to disk", width="stretch"):
                 os.makedirs(os.path.dirname(section_path), exist_ok=True)
                 with open(section_path, "w", encoding="utf-8") as f:
                     f.write(edited)
@@ -586,7 +604,7 @@ def tab_editor():
         target_key = next(t[1] for t in PDF_TARGETS if t[0] == target_label)
 
         with col2:
-            if st.button("Save & Compile", type="primary", use_container_width=True):
+            if st.button("Save & Compile", type="primary", width="stretch"):
                 os.makedirs(os.path.dirname(section_path), exist_ok=True)
                 with open(section_path, "w", encoding="utf-8") as f:
                     f.write(edited)
@@ -595,7 +613,7 @@ def tab_editor():
                         pipeline.setup_latex_path()
                         result = pipeline.compile_target(target_key, st.session_state.get("attachments_map"))
                         if result:
-                            st.session_state["preview_label"] = target_label
+                            st.session_state["preview_sel"] = target_label
                             st.session_state.pdf_page = 0
                             st.success(f"Compiled: {os.path.basename(result)}")
                         else:
@@ -604,12 +622,9 @@ def tab_editor():
                         st.error(f"Compile error: {e}")
 
     with col_prev:
-        preview_label = st.selectbox("Preview document", [t[0] for t in PDF_TARGETS],
-                                     index=[t[0] for t in PDF_TARGETS].index(
-                                         st.session_state.get("preview_label","Resume")
-                                         if st.session_state.get("preview_label","Resume") in [t[0] for t in PDF_TARGETS]
-                                         else "Resume"),
-                                     key="preview_sel")
+        if "preview_sel" not in st.session_state:
+            st.session_state["preview_sel"] = "Resume"
+        preview_label = st.selectbox("Preview document", [t[0] for t in PDF_TARGETS], key="preview_sel")
         pdf_path = resolve_pdf_path(preview_label)
 
         nav1, nav2, nav3, nav4, nav5 = st.columns([1,1,2,1,1])
@@ -690,7 +705,7 @@ def tab_tracker():
     if entries:
         import pandas as pd
         df = pd.DataFrame(reversed(entries))
-        st.dataframe(df, use_container_width=True, hide_index=True)
+        st.dataframe(df, width="stretch", hide_index=True)
     else:
         st.info("No applications logged yet.")
 
@@ -720,7 +735,7 @@ def tab_tracker():
             st.write(f"**{entry['date']}** — {entry['company']} | {entry['position']} | {entry['status']}")
             new_status = st.selectbox("New status", ["Draft","Applied","Interviewing","Offer","Rejected"],
                                       index=["Draft","Applied","Interviewing","Offer","Rejected"].index(
-                                          entry.get("status","Applied")), key="t_new_status")
+                                          entry.get("status","Applied")), key=f"t_new_status_{real_idx}")
             col1, col2 = st.columns(2)
             if col1.button("Update Status"):
                 st.session_state.tracker[real_idx]["status"] = new_status
