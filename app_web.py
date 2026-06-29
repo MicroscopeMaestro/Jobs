@@ -868,6 +868,15 @@ def tab_scaler():
 
     uploaded_files = st.file_uploader("Upload Images / PDFs to Merge (PNG, JPG, PDF)", type=["png", "jpg", "jpeg", "pdf"], accept_multiple_files=True, key="scaler_uploader")
     
+    rotations = []
+    if uploaded_files:
+        st.write("**File Settings (Rotation)**")
+        for i, uf in enumerate(uploaded_files):
+            col_fn, col_rot = st.columns([3, 2])
+            col_fn.write(f"📄 `{uf.name}`")
+            angle = col_rot.selectbox("Rotation", [0, 90, 180, 270], index=0, key=f"scaler_rot_{i}", format_func=lambda x: f"{x}°")
+            rotations.append(angle)
+    
     col1, col2 = st.columns(2)
     with col1:
         out_name = st.text_input("Output Asset Filename", value="resident_permit.pdf", key="scaler_out_name")
@@ -889,17 +898,28 @@ def tab_scaler():
                 temp_dir = os.path.join(output_dir, "scale_temp")
                 os.makedirs(temp_dir, exist_ok=True)
                 
-                # Save uploaded files to temp_dir
-                file_paths = []
-                for uf in uploaded_files:
+                # Save uploaded files to temp_dir and inspect pages
+                items_to_include = []
+                for i, uf in enumerate(uploaded_files):
+                    angle = rotations[i]
                     fpath = os.path.join(temp_dir, uf.name)
                     with open(fpath, "wb") as f:
                         f.write(uf.getbuffer())
-                    # Convert path to forward slashes for LaTeX
-                    file_paths.append(fpath.replace("\\", "/"))
+                    clean_path = fpath.replace("\\", "/")
+                    
+                    if uf.name.lower().endswith(".pdf"):
+                        try:
+                            doc = fitz.open(clean_path)
+                            for p_num in range(1, len(doc) + 1):
+                                items_to_include.append({"path": clean_path, "page": p_num, "angle": angle})
+                            doc.close()
+                        except Exception:
+                            items_to_include.append({"path": clean_path, "page": 1, "angle": angle})
+                    else:
+                        items_to_include.append({"path": clean_path, "page": None, "angle": angle})
 
                 # Generate scaled_document.tex
-                max_height = 0.9 / len(file_paths)
+                max_height = 0.9 / len(items_to_include) if items_to_include else 0.9
                 
                 latex_code = f"""\\documentclass[a4paper]{{article}}
 \\usepackage[margin=1.5cm]{{geometry}}
@@ -909,9 +929,11 @@ def tab_scaler():
 \\begin{{document}}
 \\begin{{center}}
 """
-                for i, fp in enumerate(file_paths):
-                    latex_code += f"\\includegraphics[width={image_width/100.0}\\textwidth,height={max_height}\\textheight,keepaspectratio]{{{fp}}}\n"
-                    if i < len(file_paths) - 1:
+                for i, item in enumerate(items_to_include):
+                    angle = item["angle"]
+                    page_opt = f"page={item['page']}," if item['page'] is not None else ""
+                    latex_code += f"\\includegraphics[{page_opt}angle={angle},width={image_width/100.0}\\textwidth,height={max_height}\\textheight,keepaspectratio]{{{item['path']}}}\n"
+                    if i < len(items_to_include) - 1:
                         latex_code += "\\vspace{1cm}\n"
 
                 latex_code += """\\end{center}
