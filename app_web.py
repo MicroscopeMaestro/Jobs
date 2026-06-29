@@ -71,6 +71,7 @@ SECTION_MAP = {
     "Resume Education":       "templates/sections/resume/education.tex",
     "Resume Soft Skills":     "templates/sections/resume/soft_skills.tex",
     "Resume Languages":       "templates/sections/resume/languages.tex",
+    "Resume References":      "templates/sections/resume/references.tex",
 }
 
 def resolve_section_path(section_name):
@@ -300,6 +301,10 @@ def init_state():
         st.session_state.settings = load_settings()
     if "attachments_map" not in st.session_state:
         st.session_state.attachments_map = get_default_attachments_map()
+    if "compile_sel" not in st.session_state:
+        st.session_state.compile_sel = "Full Application Bundle"
+    if "preview_sel" not in st.session_state:
+        st.session_state.preview_sel = "Full Application Bundle"
 
 
 # ── Sidebar settings ─────────────────────────────────────────────────────────
@@ -351,6 +356,17 @@ def render_sidebar():
         st.session_state.settings = load_settings()
         st.sidebar.success("Saved!")
 
+
+def sync_attachment(fname, source_key, target_key):
+    st.session_state[target_key] = st.session_state[source_key]
+    categories, actual_assets, _ = scan_assets()
+    new_map = {"professional_experience":[],"education":[],"certificates":[],"others":[]}
+    for cat, fnames in categories.items():
+        for f in fnames:
+            if f in actual_assets:
+                if st.session_state.get(f"att_{f}", False):
+                    new_map.setdefault(cat, []).append(f)
+    st.session_state.attachments_map = new_map
 
 
 # ── Tab 1: Configure & Generate ──────────────────────────────────────────────
@@ -493,7 +509,6 @@ def tab_configure():
 
     # Attachments
     with st.expander("Attachment PDFs"):
-        attachments_map = {"professional_experience":[],"education":[],"certificates":[],"others":[]}
         if actual_assets:
             for cat, fnames in categories.items():
                 st.write(f"**{cat.replace('_',' ').title()}**")
@@ -501,13 +516,13 @@ def tab_configure():
                 for i, fname in enumerate(fnames):
                     if fname in actual_assets:
                         is_checked = (fname in st.session_state.attachments_map.get(cat, []))
-                        checked = cols[i%3].checkbox(fname, value=is_checked,
-                                                     key=f"att_{fname}")
-                        if checked:
-                            attachments_map.setdefault(cat, []).append(fname)
+                        if f"att_{fname}" not in st.session_state:
+                            st.session_state[f"att_{fname}"] = is_checked
+                        cols[i%3].checkbox(fname, key=f"att_{fname}",
+                                           on_change=sync_attachment, args=(fname, f"att_{fname}", f"att_ed_{fname}"))
         else:
             st.info("No PDFs found in assets/")
-        st.session_state.attachments_map = attachments_map
+        attachments_map = st.session_state.attachments_map
 
     # Options
     with st.expander("Application Options"):
@@ -593,6 +608,22 @@ def tab_configure():
 def tab_editor():
     st.header("Edit LaTeX & Preview PDF")
     
+    with st.expander("📎 Select Attachment PDFs", expanded=False):
+        categories, actual_assets, default_assets = scan_assets()
+        if actual_assets:
+            for cat, fnames in categories.items():
+                st.write(f"**{cat.replace('_',' ').title()}**")
+                cols = st.columns(3)
+                for i, fname in enumerate(fnames):
+                    if fname in actual_assets:
+                        is_checked = (fname in st.session_state.attachments_map.get(cat, []))
+                        if f"att_ed_{fname}" not in st.session_state:
+                            st.session_state[f"att_ed_{fname}"] = is_checked
+                        cols[i%3].checkbox(fname, key=f"att_ed_{fname}",
+                                           on_change=sync_attachment, args=(fname, f"att_ed_{fname}", f"att_{fname}"))
+        else:
+            st.info("No PDFs found in assets/")
+
     with st.expander("📦 Save & Restore Working Application", expanded=False):
         st.write("Save your current generated LaTeX sections to continue editing them later, or restore a previously saved application.")
         col_s, col_r = st.columns(2)
@@ -647,9 +678,13 @@ def tab_editor():
             with open(section_path, encoding="utf-8") as f:
                 current_content = f.read()
 
+        if st.session_state.get("compile_success_msg"):
+            st.success(st.session_state["compile_success_msg"])
+            st.session_state["compile_success_msg"] = None
+
         edited = st.text_area("LaTeX Source", value=current_content, height=500,
                               key=f"editor_{section_name}",
-                              help="Edit LaTeX directly. Click Save & Compile to rebuild.")
+                              help="Edit LaTeX directly. Changes are automatically saved and compiled.")
 
         col1, col2 = st.columns(2)
         with col1:
@@ -659,6 +694,8 @@ def tab_editor():
                     f.write(edited)
                 st.success("Saved.")
 
+        if "compile_sel" not in st.session_state:
+            st.session_state["compile_sel"] = "Full Application Bundle"
         target_label = st.selectbox("Compile target", [t[0] for t in PDF_TARGETS], key="compile_sel")
         target_key = next(t[1] for t in PDF_TARGETS if t[0] == target_label)
 
@@ -672,17 +709,31 @@ def tab_editor():
                         pipeline.setup_latex_path()
                         result = pipeline.compile_target(target_key, st.session_state.get("attachments_map"))
                         if result:
-                            st.session_state["preview_sel"] = target_label
-                            st.session_state.pdf_page = 0
                             st.success(f"Compiled: {os.path.basename(result)}")
                         else:
                             st.warning("Compile returned no output.")
                     except Exception as e:
                         st.error(f"Compile error: {e}")
 
+        if edited != current_content:
+            os.makedirs(os.path.dirname(section_path), exist_ok=True)
+            with open(section_path, "w", encoding="utf-8") as f:
+                f.write(edited)
+            with st.spinner("Auto-compiling changes…"):
+                try:
+                    pipeline.setup_latex_path()
+                    result = pipeline.compile_target(target_key, st.session_state.get("attachments_map"))
+                    if result:
+                        st.session_state["compile_success_msg"] = f"Auto-compiled: {os.path.basename(result)}"
+                    else:
+                        st.session_state["compile_success_msg"] = "Auto-compile finished (no output returned)."
+                except Exception as e:
+                    st.session_state["compile_success_msg"] = f"Auto-compile error: {e}"
+            st.rerun()
+
     with col_prev:
         if "preview_sel" not in st.session_state:
-            st.session_state["preview_sel"] = "Resume"
+            st.session_state["preview_sel"] = "Full Application Bundle"
         preview_label = st.selectbox("Preview document", [t[0] for t in PDF_TARGETS], key="preview_sel")
         pdf_path = resolve_pdf_path(preview_label)
 
