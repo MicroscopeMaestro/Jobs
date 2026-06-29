@@ -129,7 +129,7 @@ def cleanup_aux_files(tex_filename):
             except:
                 pass
 
-def _latex_error_snippet(tex_filename, max_lines=10):
+def _latex_error_snippet(tex_filename, max_lines=15):
     """Extract the *root-cause* LaTeX error from the log.
 
     pdflatex often reports a confusing cascade ("I can't find file X.aux",
@@ -156,10 +156,10 @@ def _latex_error_snippet(tex_filename, max_lines=10):
         is_real_bang = ln.startswith("!") and not any(c in low for c in cascade)
         if is_runaway or is_real_bang:
             out.append(ln)
-            for j in range(1, 4):  # following lines carry the offending text / `l.NN`
+            for j in range(1, 7):  # capture up to 6 following lines for deeper macro errors
                 if i + j < len(log) and log[i + j]:
                     out.append(log[i + j])
-                    if log[i + j].startswith("l."):
+                    if log[i + j].lstrip().startswith("l."):
                         break
             if len(out) >= max_lines:
                 break
@@ -168,9 +168,9 @@ def _latex_error_snippet(tex_filename, max_lines=10):
         return "\n".join(out[:max_lines])
 
     # Only cascade lines found -> structural problem with no pinpointed line.
-    return ("No specific line was reported. This usually means a section has an "
+    return ("No specific line was reported in the log. This usually indicates a structural LaTeX error such as an "
             "unbalanced brace { }, an unclosed \\begin{...}/\\end{...} environment, "
-            "or a stray special character (& % # $ _). Check your most recent edit.")
+            "or an unescaped special character (& % # $ _). Please verify your most recent source edit.")
 
 
 def _pdf_is_valid(path):

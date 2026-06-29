@@ -770,55 +770,118 @@ def tab_editor():
 # ── Tab 3: AI Chat ────────────────────────────────────────────────────────────
 
 def tab_chat():
-    st.header("AI Chat Assistant")
-    section_name = st.selectbox("Section to edit", list(SECTION_MAP.keys()), key="chat_section")
-    section_path = resolve_section_path(section_name)
+    st.header("AI Chat Assistant & Live Preview")
+    col_chat, col_prev = st.columns([1, 1])
 
-    current_content = ""
-    if os.path.exists(section_path):
-        with open(section_path, encoding="utf-8") as f:
-            current_content = f.read()
-    st.text_area("Current content (read-only)", value=current_content, height=200, disabled=True)
+    with col_chat:
+        section_name = st.selectbox("Section to edit", list(SECTION_MAP.keys()), key="chat_section")
+        section_path = resolve_section_path(section_name)
 
-    st.subheader("Chat History")
-    for msg in st.session_state.chat_history:
-        with st.chat_message(msg["role"]):
-            st.write(msg["content"][:500] + ("…" if len(msg["content"])>500 else ""))
+        current_content = ""
+        if os.path.exists(section_path):
+            with open(section_path, encoding="utf-8") as f:
+                current_content = f.read()
+        st.text_area("Current content (read-only)", value=current_content, height=200, disabled=True)
 
-    user_prompt = st.chat_input("Instruction (e.g. 'Make the first paragraph more concise')")
-    if user_prompt:
-        st.session_state.chat_history.append({"role": "user", "content": user_prompt})
-        with st.spinner("Editing with AI…"):
-            try:
-                g = get_generator()
-                api_key = _get_api_key()
-                updated = g.edit_section(api_key=api_key, current_text=current_content,
-                                         user_prompt=user_prompt)
-                # Write back
-                os.makedirs(os.path.dirname(section_path), exist_ok=True)
-                with open(section_path, "w", encoding="utf-8") as f:
-                    f.write(updated)
-                st.session_state.chat_history.append({"role": "assistant", "content": updated})
-                st.success("Section updated. Recompile in the Edit tab.")
-                st.rerun()
-            except Exception as e:
-                st.error(f"AI edit failed: {e}")
+        st.subheader("Chat History")
+        for msg in st.session_state.chat_history:
+            with st.chat_message(msg["role"]):
+                st.write(msg["content"][:500] + ("…" if len(msg["content"])>500 else ""))
 
-    if st.button("Clear chat history"):
-        st.session_state.chat_history = []
-        st.rerun()
+        user_prompt = st.chat_input("Instruction (e.g. 'Make the first paragraph more concise')")
+        if user_prompt:
+            st.session_state.chat_history.append({"role": "user", "content": user_prompt})
+            with st.spinner("Editing with AI & auto-compiling…"):
+                try:
+                    g = get_generator()
+                    api_key = _get_api_key()
+                    updated = g.edit_section(api_key=api_key, current_text=current_content,
+                                             user_prompt=user_prompt)
+                    # Write back
+                    os.makedirs(os.path.dirname(section_path), exist_ok=True)
+                    with open(section_path, "w", encoding="utf-8") as f:
+                        f.write(updated)
+                    st.session_state.chat_history.append({"role": "assistant", "content": updated})
+                    
+                    # Auto-compile
+                    pipeline.setup_latex_path()
+                    target_label = st.session_state.get("compile_sel", "Full Application Bundle")
+                    target_key = next((t[1] for t in PDF_TARGETS if t[0] == target_label), "full_bundle")
+                    pipeline.compile_target(target_key, st.session_state.get("attachments_map"))
+                    
+                    st.success("Section updated and compiled successfully!")
+                    st.rerun()
+                except Exception as e:
+                    st.error(f"AI edit or compile failed: {e}")
+
+        if st.button("Clear chat history"):
+            st.session_state.chat_history = []
+            st.rerun()
+
+    with col_prev:
+        if "preview_sel" not in st.session_state:
+            st.session_state["preview_sel"] = "Full Application Bundle"
+        preview_label = st.selectbox("Preview document", [t[0] for t in PDF_TARGETS], key="chat_preview_sel")
+        pdf_path = resolve_pdf_path(preview_label)
+
+        nav1, nav2, nav3, nav4, nav5 = st.columns([1,1,2,1,1])
+        if nav1.button("◀", key="chat_nav1"):
+            st.session_state.pdf_page = max(0, st.session_state.pdf_page - 1)
+        if nav5.button("▶", key="chat_nav5"):
+            st.session_state.pdf_page += 1
+        if nav3.button("Zoom +", key="chat_nav3"):
+            st.session_state.pdf_zoom = min(3.0, st.session_state.pdf_zoom + 0.25)
+        if nav4.button("Zoom -", key="chat_nav4"):
+            st.session_state.pdf_zoom = max(0.5, st.session_state.pdf_zoom - 0.25)
+        if nav2.button("Fit", key="chat_nav2"):
+            st.session_state.pdf_zoom = 1.5
+
+        if pdf_path and os.path.exists(pdf_path):
+            img_bytes, n_pages, page_idx = render_pdf_page_img(
+                pdf_path, st.session_state.pdf_page, st.session_state.pdf_zoom)
+            st.session_state.pdf_page = page_idx
+            if img_bytes:
+                st.image(img_bytes, caption=f"Page {page_idx+1} of {n_pages}  |  {os.path.basename(pdf_path)}")
+                with open(pdf_path, "rb") as f:
+                    st.download_button("Download PDF", f.read(),
+                                       file_name=os.path.basename(pdf_path), mime="application/pdf", key="chat_dl_btn")
+            else:
+                st.warning("Could not render PDF page.")
+        else:
+            st.info("No PDF found. Generate or compile first.")
 
 
 # ── Tab 4: Tracker ───────────────────────────────────────────────────────────
 
 def tab_tracker():
-    st.header("Application Tracker")
+    st.header("Application Tracker & CRM")
     entries = st.session_state.tracker
 
     if entries:
         import pandas as pd
         df = pd.DataFrame(reversed(entries))
-        st.dataframe(df, width="stretch", hide_index=True)
+        
+        # KPI Dashboard
+        total_apps = len(df)
+        interviews = len(df[df["status"] == "Interviewing"])
+        offers = len(df[df["status"] == "Offer"])
+        rejections = len(df[df["status"] == "Rejected"])
+        
+        col_m1, col_m2, col_m3, col_m4 = st.columns(4)
+        col_m1.metric("Total Applications", total_apps)
+        col_m2.metric("Active Interviews", interviews, delta=f"{interviews} active", delta_color="normal")
+        col_m3.metric("Offers Received", offers, delta=f"{offers} won" if offers else None)
+        col_m4.metric("Rejected", rejections)
+        
+        st.divider()
+        
+        # Status Filter
+        st.subheader("Filter Applications")
+        all_statuses = ["Draft", "Applied", "Interviewing", "Offer", "Rejected"]
+        selected_statuses = st.multiselect("Filter by Status", all_statuses, default=all_statuses, key="tracker_filter")
+        
+        filtered_df = df[df["status"].isin(selected_statuses)]
+        st.dataframe(filtered_df, width="stretch", hide_index=True)
     else:
         st.info("No applications logged yet.")
 

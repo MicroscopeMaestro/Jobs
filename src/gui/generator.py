@@ -387,11 +387,28 @@ The JSON must have exactly these keys:
         except Exception as e:
             raise RuntimeError(f"Claude API generation error: {e}")
 
-        # Parse XML tags
+        # Parse XML tags with intelligent regex fallback recovery
         def extract_tag(text, tag):
             pattern = re.compile(rf"<{tag}>(.*?)</{tag}>", re.DOTALL | re.IGNORECASE)
             match = pattern.search(text)
             val = match.group(1).strip() if match else ""
+            if not val:
+                # Fallback heuristics if AI omitted XML tags
+                if tag == "RESUME_SUMMARY":
+                    m = re.search(r"\\section\{Summary\}(.*?)(?=\\section|\Z)", text, re.DOTALL | re.IGNORECASE)
+                    if m: val = "\\section{Summary}\n" + m.group(1).strip()
+                elif tag == "RESUME_EXPERIENCE":
+                    m = re.search(r"\\section\{Research/Professional Experience\}(.*?)(?=\\section|\Z)", text, re.DOTALL | re.IGNORECASE)
+                    if m: val = "\\section{Research/Professional Experience}\n" + m.group(1).strip()
+                elif tag == "RESUME_COMPETENCIES":
+                    m = re.search(r"\\section\{Technical Competencies\}(.*?)(?=\\section|\Z)", text, re.DOTALL | re.IGNORECASE)
+                    if m: val = "\\section{Technical Competencies}\n" + m.group(1).strip()
+                elif tag == "ML_SUBJECT":
+                    m = re.search(r"\\textbf\{[^}]*\|[^}]*\}", text)
+                    if m: val = m.group(0).strip()
+                elif tag == "ML_BODY":
+                    m = re.search(r"(Sehr geehrte[^\n]*|Dear[^\n]*)(.*?)(?=\\section|\Z)", text, re.DOTALL)
+                    if m: val = m.group(1) + m.group(2).strip()
             if val.startswith("```"):
                 lines = val.split("\n")
                 if lines[0].startswith("```"):
@@ -437,6 +454,7 @@ The JSON must have exactly these keys:
                 content = re.sub(r'(?<!\\)%', r'\%', content)
                 content = re.sub(r'(?<!\\)#', r'\#', content)
                 content = re.sub(r'(?<!\\)_', r'\_', content)
+                content = re.sub(r'(?<!\\)\$', r'\$', content)
                 
                 if key != "resume_competencies":
                     content = re.sub(r'(?<!\\)&', r'\&', content)
@@ -448,6 +466,7 @@ The JSON must have exactly these keys:
                         inner = re.sub(r'(?<!\\)%', r'\%', inner)
                         inner = re.sub(r'(?<!\\)#', r'\#', inner)
                         inner = re.sub(r'(?<!\\)_', r'\_', inner)
+                        inner = re.sub(r'(?<!\\)\$', r'\$', inner)
                         return f"{macro}{{{inner}}}"
                     content = re.sub(r'(\\cvtag[A-Za-z]*|\\textbf)\{([^}]+)\}', clean_macro, content)
 
