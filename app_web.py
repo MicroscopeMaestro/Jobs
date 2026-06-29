@@ -6,6 +6,8 @@ import re
 import json
 import glob
 import shutil
+import base64
+import subprocess
 from datetime import datetime
 from io import BytesIO
 
@@ -858,6 +860,100 @@ def tab_tracker():
                 st.rerun()
 
 
+# ── Tab 5: A4 Document Scaler & Merger ───────────────────────────────────────
+
+def tab_scaler():
+    st.header("A4 Document Scaler & Merger")
+    st.write("Easily merge and scale multiple images or PDF documents (e.g., front and back of a resident permit or passport) into a single perfectly-proportioned A4 PDF page.")
+
+    uploaded_files = st.file_uploader("Upload Images / PDFs to Merge (PNG, JPG, PDF)", type=["png", "jpg", "jpeg", "pdf"], accept_multiple_files=True, key="scaler_uploader")
+    
+    col1, col2 = st.columns(2)
+    with col1:
+        out_name = st.text_input("Output Asset Filename", value="resident_permit.pdf", key="scaler_out_name")
+        if not out_name.endswith(".pdf"):
+            out_name += ".pdf"
+
+    with col2:
+        image_width = st.slider("Scaling Width (% of A4 text width)", min_value=50, max_value=100, value=85, step=5, key="scaler_width")
+
+    if st.button("Scale, Merge & Save to Assets", type="primary", width="stretch"):
+        if not uploaded_files:
+            st.warning("Please upload at least one file to merge.")
+            return
+
+        with st.spinner("Generating A4 scaled PDF..."):
+            try:
+                output_dir = os.path.join(PROJECT_ROOT, "generated")
+                os.makedirs(output_dir, exist_ok=True)
+                temp_dir = os.path.join(output_dir, "scale_temp")
+                os.makedirs(temp_dir, exist_ok=True)
+                
+                # Save uploaded files to temp_dir
+                file_paths = []
+                for uf in uploaded_files:
+                    fpath = os.path.join(temp_dir, uf.name)
+                    with open(fpath, "wb") as f:
+                        f.write(uf.getbuffer())
+                    # Convert path to forward slashes for LaTeX
+                    file_paths.append(fpath.replace("\\", "/"))
+
+                # Generate scaled_document.tex
+                max_height = 0.9 / len(file_paths)
+                
+                latex_code = f"""\\documentclass[a4paper]{{article}}
+\\usepackage[margin=1.5cm]{{geometry}}
+\\usepackage{{graphicx}}
+\\usepackage{{grffile}}
+\\pagestyle{{empty}}
+\\begin{{document}}
+\\begin{{center}}
+"""
+                for i, fp in enumerate(file_paths):
+                    latex_code += f"\\includegraphics[width={image_width/100.0}\\textwidth,height={max_height}\\textheight,keepaspectratio]{{{fp}}}\n"
+                    if i < len(file_paths) - 1:
+                        latex_code += "\\vspace{1cm}\n"
+
+                latex_code += """\\end{center}
+\\end{document}
+"""
+                tex_path = os.path.join(output_dir, "scaled_document.tex")
+                with open(tex_path, "w", encoding="utf-8") as f:
+                    f.write(latex_code)
+
+                # Compile with pdflatex
+                run_env = dict(os.environ, TEXMFOUTPUT=output_dir)
+                pipeline.setup_latex_path()
+                cmd = ['pdflatex', '-output-directory', output_dir, '-interaction=nonstopmode', 'scaled_document.tex']
+                res = subprocess.run(cmd, cwd=output_dir, env=run_env, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
+
+                pdf_path = os.path.join(output_dir, "scaled_document.pdf")
+                if res.returncode == 0 and os.path.exists(pdf_path):
+                    # Save to personal/assets/
+                    personal_assets = os.path.join(PROJECT_ROOT, "personal", "assets")
+                    os.makedirs(personal_assets, exist_ok=True)
+                    target_asset = os.path.join(personal_assets, out_name)
+                    shutil.copy2(pdf_path, target_asset)
+                    
+                    # Also copy to assets/ for fallback
+                    base_assets = os.path.join(PROJECT_ROOT, "assets")
+                    os.makedirs(base_assets, exist_ok=True)
+                    shutil.copy2(pdf_path, os.path.join(base_assets, out_name))
+
+                    st.success(f"Successfully scaled and merged documents into {out_name}!")
+                    
+                    # Display PDF preview
+                    with open(target_asset, "rb") as f:
+                        base64_pdf = base64.b64encode(f.read()).decode('utf-8')
+                    pdf_display = f'<iframe src="data:application/pdf;base64,{base64_pdf}#toolbar=0&navpanes=0" width="100%" height="600" type="application/pdf"></iframe>'
+                    st.markdown(pdf_display, unsafe_allow_html=True)
+                else:
+                    st.error("LaTeX compilation failed during scaling. Check file formats or logs.")
+                    st.code(res.stdout)
+            except Exception as e:
+                st.error(f"Error during scaling and merging: {e}")
+
+
 # ── Main ─────────────────────────────────────────────────────────────────────
 
 st.set_page_config(page_title="Job Application Generator", layout="wide",
@@ -877,7 +973,7 @@ render_sidebar()
 
 st.title("Job Application LaTeX Generator")
 
-tab1, tab2, tab3, tab4 = st.tabs(["1. Configure & Generate", "2. Edit & Preview", "3. AI Chat", "4. Tracker"])
+tab1, tab2, tab3, tab4, tab5 = st.tabs(["1. Configure & Generate", "2. Edit & Preview", "3. AI Chat", "4. Tracker", "5. A4 Document Scaler"])
 
 with tab1:
     tab_configure()
@@ -890,3 +986,6 @@ with tab3:
 
 with tab4:
     tab_tracker()
+
+with tab5:
+    tab_scaler()
