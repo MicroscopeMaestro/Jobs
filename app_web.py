@@ -964,9 +964,20 @@ def tab_scaler():
 
                     st.success(f"Successfully scaled and merged documents into {out_name}!")
                     
-                    # Display PDF preview
+                    # Display PDF preview and Download Button
                     with open(target_asset, "rb") as f:
-                        base64_pdf = base64.b64encode(f.read()).decode('utf-8')
+                        pdf_data = f.read()
+                        base64_pdf = base64.b64encode(pdf_data).decode('utf-8')
+                    
+                    st.download_button(
+                        label=f"📥 Download {out_name}",
+                        data=pdf_data,
+                        file_name=out_name,
+                        mime="application/pdf",
+                        type="primary",
+                        key="scaler_download_btn"
+                    )
+
                     pdf_display = f'<iframe src="data:application/pdf;base64,{base64_pdf}#toolbar=0&navpanes=0" width="100%" height="600" type="application/pdf"></iframe>'
                     st.markdown(pdf_display, unsafe_allow_html=True)
                 else:
