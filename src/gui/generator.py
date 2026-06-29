@@ -76,11 +76,18 @@ class Generator:
             max_tokens = min(max_tokens, 8192)
             timeout = 120
         elif provider == "kimi":
-            base_url = "https://api.moonshot.cn/v1/chat/completions"
             url_api_key = os.environ.get("KIMI_API_KEY", "")
-            provider_name = "Kimi"
-            target_model = "moonshot-v1-128k"
-            timeout = 120
+            if url_api_key.startswith("nvapi-"):
+                base_url = "https://integrate.api.nvidia.com/v1/chat/completions"
+                target_model = "meta/llama-3.1-70b-instruct"
+                provider_name = "NVIDIA Kimi"
+                max_tokens = min(max_tokens, 4096)
+                timeout = 240
+            else:
+                base_url = "https://api.moonshot.cn/v1/chat/completions"
+                target_model = "moonshot-v1-128k"
+                provider_name = "Kimi"
+                timeout = 120
         elif provider == "ollama":
             base_url = "http://localhost:11434/v1/chat/completions"
             url_api_key = "ollama"
@@ -109,12 +116,24 @@ class Generator:
             if provider_name == "Ollama":
                 json_data["options"] = {"num_ctx": 16384}
                 
-            resp = requests.post(
-                base_url,
-                headers={"Authorization": f"Bearer {url_api_key}", "Content-Type": "application/json"},
-                json=json_data,
-                timeout=timeout,
-            )
+            try:
+                resp = requests.post(
+                    base_url,
+                    headers={"Authorization": f"Bearer {url_api_key}", "Content-Type": "application/json"},
+                    json=json_data,
+                    timeout=timeout,
+                )
+            except requests.exceptions.RequestException as e:
+                if attempt < MAX_RETRIES - 1:
+                    sleep_time = BACKOFF_FACTOR ** attempt
+                    print(f"Request error/timeout for {provider_name} ({e}). Retrying in {sleep_time}s...")
+                    if provider_name == "NVIDIA Kimi":
+                        target_model = "meta/llama-3.1-8b-instruct"
+                    time.sleep(sleep_time)
+                    continue
+                else:
+                    raise RuntimeError(f"{provider_name} API request failed after {MAX_RETRIES} attempts: {e}")
+                    
             if resp.status_code == 429:
                 if attempt < MAX_RETRIES - 1:
                     sleep_time = BACKOFF_FACTOR ** attempt
@@ -274,6 +293,7 @@ The JSON must have exactly these keys:
             {style_profile}
 
             == STRICTURES (CRITICAL) ==
+            - STRICT LANGUAGE PROTOCOL: The ENTIRE standard resume document structure (Summary, Experience, Competencies, Education, Publications, Soft Skills, Languages, References) MUST ALWAYS be written in English. All Motivation Letter sections (<ML_SUBJECT>, <ML_RECIPIENT>, <ML_BODY>, <ML_CLOSING>) MUST be written in the specified target language ({lang_instruction}).
             - NO DASHES: Never use "-", "–", or "—" in the text or dates. Use "to" for date ranges (e.g., "2022 to 2026").
             - NO ARROWS: Never use "→", "\\rightarrow", or "->" in content text.
             - VERTICAL SPINE: Resume content must be aligned at exactly 103pt from the left using `\\begin{{adjustwidth}}{{103pt}}{{0pt}}`.
@@ -297,7 +317,9 @@ The JSON must have exactly these keys:
             {examples_str}
             {skills_str}
             {experience_str}
-            - Language for Motivation Letter: {lang_instruction}
+            - LANGUAGE PROTOCOL (CRITICAL):
+              * THE ENTIRE STANDARD RESUME DOCUMENT STRUCTURE (Summary, Experience, Competencies, Education, Publications, Soft Skills, Languages, References) MUST ALWAYS BE IN ENGLISH ONLY! Do not translate any part of the resume into German or any other language.
+              * ALL MOTIVATION LETTER SECTIONS (<ML_SUBJECT>, <ML_RECIPIENT>, <ML_BODY>, <ML_CLOSING>) MUST BE IN THE TARGET LANGUAGE: {lang_instruction}.
             - Target Recipient Info:
               * Company Name: {params.get('recipient_company', '')}
               * Contact Person: {params.get('recipient_contact', '')}
@@ -322,20 +344,23 @@ The JSON must have exactly these keys:
                Make sure the closing mentions any graduation/availability details and work permit details if they are relevant and specified in the candidate's career context (e.g. PhD timeline or residency status).
                CRITICAL RULES FOR ML_BODY:
                - Do NOT include any closing salutation (e.g., "Mit freundlichen Grüßen", "Sincerely", or the candidate's name) at the end, as this is already dynamically appended by the template.
-               - NEVER use \entry, \cvtag, or any custom resume LaTeX macros in the motivation letter (<ML_BODY>). Use plain text to reference experience or roles.
+               - NEVER use \\entry, \\cvtag, or any custom resume LaTeX macros in the motivation letter (<ML_BODY>). Use plain text to reference experience or roles.
 
             4. <RESUME_SUMMARY>: The summary paragraph at the top of the resume.
+               CRITICAL RULE: THIS SECTION MUST BE 100% IN ENGLISH ONLY!!! NO GERMAN OR OTHER LANGUAGES ALLOWED!
                You MUST start this section exactly with: `\\section{{Summary}}`.
-               Write a 3-4 sentence paragraph that bridges his general photonics expertise with the specific domain of the job.
+               Write a 3-4 sentence paragraph in ENGLISH ONLY that bridges his general photonics expertise with the specific domain of the job.
 
             5. <RESUME_EXPERIENCE>: The professional/research experience section for the resume.
+               CRITICAL RULE: THIS SECTION MUST BE 100% IN ENGLISH ONLY!!! Translate any German job titles, institution names, descriptions, or bullet points into English! NO GERMAN ALLOWED!
                You MUST start this section exactly with: `\\section{{Research/Professional Experience}}`
-               Generate `\\entry{{Institution}}{{Location}}{{Title}}{{Date}}` blocks for the selected experience entries, each followed by `\\begin{{adjustwidth}}{{103pt}}{{0pt}}` and bullet points with `\\sepbullet` or `\\sepentry` separators, aligned to 103pt. Use the custom job titles specified by the user!
+               Generate `\\entry{{Institution}}{{Location}}{{Title}}{{Date}}` blocks for the selected experience entries, each followed by `\\begin{{adjustwidth}}{{103pt}}{{0pt}}` and bullet points.
                Make sure all dates use the short version of the month and the year, separated by "to" (e.g., "Jan 2022 to Jun 2026").
-               Ensure bullet points are concrete, highly relevant to the JD, and structured with bold prefixes.
+               CRITICAL FORMATTING RULE: Each bullet point MUST start exactly with `\\sepbullet ` followed directly by the concrete accomplishment text in ENGLISH ONLY. DO NOT use bold prefixes or subheadings in the bullet points, to perfectly maintain the clean, elegant structure of the candidate's archived master resume.
                IMPORTANT: Always escape ampersands in job titles or descriptions as `\\&` (e.g., `R\\&D`). Never write unescaped `&`.
 
             6. <RESUME_COMPETENCIES>: Technical competencies section.
+               CRITICAL RULE: THIS SECTION MUST BE 100% IN ENGLISH ONLY!!! All category names (e.g., use "Quality Management", NOT "Qualitätsmanagement") and skill names MUST be in English! NO GERMAN ALLOWED!
                List skills grouped by category, highlighting the selected skills that match this job posting.
                Use `\\cvtagExpertise{{}}` for skills marked as 'Expertise' in the selected skills list, and `\\cvtagKnowledge{{}}` for skills marked as 'Knowledge'.
                You MUST use a beautiful, modern, tabular grid format to structure and align the categories perfectly.
@@ -343,9 +368,9 @@ The JSON must have exactly these keys:
                \\section{{Technical Competencies}}
                \\renewcommand{{\\arraystretch}}{{1.5}}
                \\begin{{tabular}}{{@{{}}p{{95pt}}@{{\\hspace{{8pt}}}}p{{\\dimexpr\\textwidth-103pt\\relax}}@{{}}}}
-                   \\raggedright\\textbf{{[Category 1]}} & \\cvtagExpertise{{[Skill 1]}} \\cvtagKnowledge{{[Skill 2]}} \\cvtagExpertise{{[Skill 3]}} \\\\
-                   \\raggedright\\textbf{{[Category 2]}} & \\cvtagKnowledge{{[Skill 4]}} \\cvtagKnowledge{{[Skill 5]}} \\cvtagExpertise{{[Skill 6]}} \\\\
-                   \\raggedright\\textbf{{[Category 3]}} & \\cvtagExpertise{{[Skill 7]}} \\cvtagKnowledge{{[Skill 8]}} \\cvtagKnowledge{{[Skill 9]}} \\\\
+                   \\raggedright\\textbf{{[Category 1 in English]}} & \\cvtagExpertise{{[Skill 1]}} \\cvtagKnowledge{{[Skill 2]}} \\cvtagExpertise{{[Skill 3]}} \\\\
+                   \\raggedright\\textbf{{[Category 2 in English]}} & \\cvtagKnowledge{{[Skill 4]}} \\cvtagKnowledge{{[Skill 5]}} \\cvtagExpertise{{[Skill 6]}} \\\\
+                   \\raggedright\\textbf{{[Category 3 in English]}} & \\cvtagExpertise{{[Skill 7]}} \\cvtagKnowledge{{[Skill 8]}} \\cvtagKnowledge{{[Skill 9]}} \\\\
                \\end{{tabular}}
 
             Let's begin. Generate the 6 sections enclosed in their tags.
@@ -418,8 +443,12 @@ The JSON must have exactly these keys:
                 else:
                     def clean_macro(m):
                         macro = m.group(1)
-                        inner_text = m.group(2).replace('&', r'\&').replace('%', r'\%').replace('#', r'\#').replace('_', r'\_')
-                        return f"{macro}{{{inner_text}}}"
+                        inner = m.group(2)
+                        inner = re.sub(r'(?<!\\)&', r'\&', inner)
+                        inner = re.sub(r'(?<!\\)%', r'\%', inner)
+                        inner = re.sub(r'(?<!\\)#', r'\#', inner)
+                        inner = re.sub(r'(?<!\\)_', r'\_', inner)
+                        return f"{macro}{{{inner}}}"
                     content = re.sub(r'(\\cvtag[A-Za-z]*|\\textbf)\{([^}]+)\}', clean_macro, content)
 
                 content = content.replace("{1103pt}", "{103pt}")

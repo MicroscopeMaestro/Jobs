@@ -73,6 +73,14 @@ SECTION_MAP = {
     "Resume Languages":       "templates/sections/resume/languages.tex",
 }
 
+def resolve_section_path(section_name):
+    rel_path = SECTION_MAP[section_name]
+    personal_path = os.path.join(PROJECT_ROOT, "personal", rel_path)
+    if os.path.exists(os.path.join(PROJECT_ROOT, "personal")):
+        os.makedirs(os.path.dirname(personal_path), exist_ok=True)
+        return personal_path
+    return os.path.join(PROJECT_ROOT, rel_path)
+
 def get_user_name():
     personal_dir = os.path.join(PROJECT_ROOT, "personal")
     if os.path.exists(personal_dir):
@@ -122,7 +130,7 @@ EXP_ENTRIES, FOCUS_THEMES, TITLE_OPTIONS = load_app_config()
 @st.cache_data
 def load_settings():
     defaults = {"model": "claude-opus-4-8", "temperature": 0.2, "max_tokens": 4000,
-                "ai_provider": PROVIDER_GEMINI, "ollama_model": "qwen2.5:7b"}
+                "ai_provider": PROVIDER_KIMI, "ollama_model": "qwen2.5:7b"}
     if os.path.exists(SETTINGS_PATH):
         try:
             with open(SETTINGS_PATH) as f:
@@ -465,6 +473,13 @@ def tab_configure():
             sel_skills = st.multiselect("Select skills to highlight", all_skills, key="skills_sel")
         else:
             sel_skills = st.multiselect("Select skills to highlight", all_skills, default=[], key="skills_sel")
+        
+        if sel_skills:
+            st.write("Select degree of experience for each skill:")
+            for s in sel_skills:
+                col_sk1, col_sk2 = st.columns([3, 2])
+                col_sk1.write(f"**{s}**")
+                col_sk2.selectbox("Level", ["Expertise", "Knowledge"], key=f"sk_lvl_{s}", label_visibility="collapsed")
 
     # Experience
     with st.expander("Resume Experience Entries"):
@@ -524,7 +539,7 @@ def tab_configure():
             "title": st.session_state.get("title_sel", TITLE_OPTIONS[0]),
             "focus": st.session_state.get("focus", []),
             "examples": selected_examples,
-            "skills": [{"name": s, "level": "Knowledge"} for s in st.session_state.get("skills_sel",[])],
+            "skills": [{"name": s, "level": st.session_state.get(f"sk_lvl_{s}", "Expertise")} for s in st.session_state.get("skills_sel",[])],
             "experience": exp_entries,
             "attachments": attachments_map,
             "language": lang_code,
@@ -577,11 +592,55 @@ def tab_configure():
 
 def tab_editor():
     st.header("Edit LaTeX & Preview PDF")
+    
+    with st.expander("📦 Save & Restore Working Application", expanded=False):
+        st.write("Save your current generated LaTeX sections to continue editing them later, or restore a previously saved application.")
+        col_s, col_r = st.columns(2)
+        
+        saves_dir = os.path.join(PROJECT_ROOT, "saved_applications")
+        os.makedirs(saves_dir, exist_ok=True)
+        
+        with col_s:
+            st.subheader("💾 Save Application")
+            save_name = st.text_input("Save Name", placeholder="e.g. Zeiss_Optical_Engineer", key="app_save_name")
+            if st.button("Save Current Application", type="primary", width="stretch"):
+                if not save_name.strip():
+                    st.warning("Please enter a valid save name.")
+                else:
+                    target_save_dir = os.path.join(saves_dir, save_name.strip())
+                    os.makedirs(target_save_dir, exist_ok=True)
+                    # Copy all section files
+                    for sec_key, rel_sec in SECTION_MAP.items():
+                        src_path = resolve_section_path(sec_key)
+                        if os.path.exists(src_path):
+                            dest_path = os.path.join(target_save_dir, os.path.basename(rel_sec))
+                            shutil.copy2(src_path, dest_path)
+                    st.success(f"Successfully saved application as '{save_name.strip()}'!")
+
+        with col_r:
+            st.subheader("📂 Restore Application")
+            existing_saves = [d for d in os.listdir(saves_dir) if os.path.isdir(os.path.join(saves_dir, d))]
+            if not existing_saves:
+                st.info("No saved applications found yet.")
+            else:
+                selected_save = st.selectbox("Select Saved Application", existing_saves, key="app_restore_name")
+                if st.button("Restore Application", width="stretch"):
+                    source_save_dir = os.path.join(saves_dir, selected_save)
+                    # Copy back to active sections dir
+                    for sec_key, rel_sec in SECTION_MAP.items():
+                        active_path = resolve_section_path(sec_key)
+                        saved_file = os.path.join(source_save_dir, os.path.basename(rel_sec))
+                        if os.path.exists(saved_file):
+                            os.makedirs(os.path.dirname(active_path), exist_ok=True)
+                            shutil.copy2(saved_file, active_path)
+                    st.success(f"Successfully restored application '{selected_save}'!")
+                    st.rerun()
+
     col_ed, col_prev = st.columns([1, 1])
 
     with col_ed:
         section_name = st.selectbox("Section", list(SECTION_MAP.keys()), key="section_sel")
-        section_path = os.path.join(PROJECT_ROOT, SECTION_MAP[section_name])
+        section_path = resolve_section_path(section_name)
         # Load from disk
         current_content = ""
         if os.path.exists(section_path):
@@ -659,7 +718,7 @@ def tab_editor():
 def tab_chat():
     st.header("AI Chat Assistant")
     section_name = st.selectbox("Section to edit", list(SECTION_MAP.keys()), key="chat_section")
-    section_path = os.path.join(PROJECT_ROOT, SECTION_MAP[section_name])
+    section_path = resolve_section_path(section_name)
 
     current_content = ""
     if os.path.exists(section_path):
