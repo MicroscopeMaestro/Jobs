@@ -72,6 +72,7 @@ SECTION_MAP = {
     "Resume Soft Skills":     "templates/sections/resume/soft_skills.tex",
     "Resume Languages":       "templates/sections/resume/languages.tex",
     "Resume References":      "templates/sections/resume/references.tex",
+    "Resume Publications":    "templates/sections/resume/publications.tex",
 }
 
 def resolve_section_path(section_name):
