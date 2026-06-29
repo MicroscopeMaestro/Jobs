@@ -932,7 +932,7 @@ def tab_scaler():
                 for i, item in enumerate(items_to_include):
                     angle = item["angle"]
                     page_opt = f"page={item['page']}," if item['page'] is not None else ""
-                    latex_code += f"\\includegraphics[{page_opt}angle={angle},width={image_width/100.0}\\textwidth,height={max_height}\\textheight,keepaspectratio]{{{item['path']}}}\n"
+                    latex_code += f"\\rotatebox{{{angle}}}{{\\includegraphics[{page_opt}width={image_width/100.0}\\textwidth,height={max_height}\\textheight,keepaspectratio]{{{item['path']}}}}}\n"
                     if i < len(items_to_include) - 1:
                         latex_code += "\\vspace{1cm}\n"
 
